@@ -12,7 +12,6 @@ export const Contact = () => {
   const getEmailTemplate = () => {
     const displayName = name || '[Your Name]'
     const displayCompany = company || '[Your Company]'
-    const displayEmail = email ? `\n- Email: ${email}` : ''
     
     const templates = {
       founders: {
@@ -22,7 +21,7 @@ export const Contact = () => {
 I'd like to join the Nimrita Games founders list for early access!
 
 About me:
-- Name: ${displayName}${displayCompany !== '[Your Company]' ? `\n- Company: ${displayCompany}` : ''}${displayEmail}
+- Name: ${displayName}${displayCompany !== '[Your Company]' ? `\n- Company: ${displayCompany}` : ''}${email ? `\n- Email: ${email}` : ''}
 - Gaming interests: Love multiplayer games and innovative tech
 - Why interested: Your proprietary engine and multiplayer-first approach sounds amazing!
 
@@ -40,7 +39,7 @@ I'm reaching out regarding a potential business opportunity.
 
 Details:
 - Company: ${displayCompany}
-- Contact: ${displayName}${displayEmail}
+- Contact: ${displayName}${email ? `\n- Email: ${email}` : ''}
 - Inquiry: Partnership/Investment/Press opportunity
 
 ${customMessage ? `Details:\n${customMessage}\n` : 'Let\'s discuss how we can work together!'}
@@ -57,7 +56,7 @@ ${displayName}${displayCompany !== '[Your Company]' ? `\n${displayCompany}` : ''
 ${customMessage || 'I\'d love to learn more about Nimrita Games and what you\'re building!'}
 
 Best regards,
-${displayName}${displayEmail}`
+${displayName}${email ? `\n- Email: ${email}` : ''}`
       }
     }
     return templates[templateType as keyof typeof templates]
