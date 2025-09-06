@@ -12,7 +12,7 @@ export const Contact = () => {
   const getEmailTemplate = () => {
     const displayName = name || '[Your Name]'
     const displayCompany = company || '[Your Company]'
-    const displayEmail = email ? `\nEmail: ${email}` : ''
+    const displayEmail = email ? `\n- Email: ${email}` : ''
     
     const templates = {
       founders: {
