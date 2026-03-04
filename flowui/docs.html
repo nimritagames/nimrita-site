@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowUI Documentation — Type-Safe Unity UI Management</title>
+  <meta name="description" content="Complete documentation for FlowUI — installation, editor guide, API reference, and troubleshooting for Unity UI management.">
+
+  <!-- OG Tags -->
+  <meta property="og:title" content="FlowUI Documentation">
+  <meta property="og:description" content="Complete documentation for FlowUI — installation, editor guide, API reference, and troubleshooting.">
+  <meta property="og:type" content="website">
+
+  <!-- Prevent theme flash -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('flowui-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/docs.css">
+</head>
+<body>
+
+  <!-- ============================================
+       Navigation
+       ============================================ -->
+  <nav class="nav nav--scrolled" id="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="nav__logo">
+        <div class="nav__logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        FlowUI
+      </a>
+
+      <div class="nav__links">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#workflow">Workflow</a>
+        <a href="index.html#install">Install</a>
+        <a href="docs.html" class="active">Docs</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <a href="https://github.com/nimritagames/Unity-FlowUI" class="nav__github" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <button class="nav__hamburger" id="nav-hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="nav__mobile-menu" id="nav-mobile">
+      <a href="index.html#features">Features</a>
+      <a href="index.html#workflow">Workflow</a>
+      <a href="index.html#install">Install</a>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/nimritagames/Unity-FlowUI" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       Docs Layout
+       ============================================ -->
+  <div class="docs-layout">
+
+    <!-- Sidebar -->
+    <aside class="docs-sidebar" id="docs-sidebar">
+
+      <!-- GETTING STARTED -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">Getting Started</div>
+        <a href="#overview" class="docs-sidebar__link active">Overview</a>
+        <a href="#installation" class="docs-sidebar__link">Installation</a>
+        <a href="#quick-start" class="docs-sidebar__link">Quick Start</a>
+        <a href="#requirements" class="docs-sidebar__link">Requirements</a>
+      </div>
+
+      <!-- CORE CONCEPTS -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">Core Concepts</div>
+        <a href="#uimanager-component" class="docs-sidebar__link">UIManager Component</a>
+        <a href="#uireference-uicategory" class="docs-sidebar__link">UIReference &amp; UICategory</a>
+        <a href="#ui-element-types" class="docs-sidebar__link">UI Element Types</a>
+        <a href="#path-based-referencing" class="docs-sidebar__link">Path-Based Referencing</a>
+      </div>
+
+      <!-- EDITOR GUIDE -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">Editor Guide</div>
+
+        <button class="docs-sidebar__toggle expanded">
+          UI Hierarchy Tab
+          <svg class="docs-sidebar__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <div class="docs-sidebar__collapsible open">
+          <a href="#hierarchy-scanning" class="docs-sidebar__link">Scanning</a>
+          <a href="#hierarchy-adding" class="docs-sidebar__link">Adding &amp; Removing</a>
+          <a href="#hierarchy-bulk" class="docs-sidebar__link">Bulk Operations</a>
+          <a href="#hierarchy-search" class="docs-sidebar__link">Search</a>
+        </div>
+
+        <button class="docs-sidebar__toggle">
+          Library Generation Tab
+          <svg class="docs-sidebar__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <div class="docs-sidebar__collapsible">
+          <a href="#library-output" class="docs-sidebar__link">Output Settings</a>
+          <a href="#library-structure" class="docs-sidebar__link">Generated Code Structure</a>
+          <a href="#library-regeneration" class="docs-sidebar__link">Regeneration</a>
+        </div>
+
+        <button class="docs-sidebar__toggle">
+          Handler Generation Tab
+          <svg class="docs-sidebar__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <div class="docs-sidebar__collapsible">
+          <a href="#handlers-events" class="docs-sidebar__link">Event Handlers</a>
+          <a href="#handlers-partial" class="docs-sidebar__link">Partial Classes</a>
+          <a href="#handlers-supported" class="docs-sidebar__link">Supported Events</a>
+        </div>
+
+        <button class="docs-sidebar__toggle">
+          Panel Handlers Tab
+          <svg class="docs-sidebar__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <div class="docs-sidebar__collapsible">
+          <a href="#panels-showhide" class="docs-sidebar__link">Show / Hide / Toggle</a>
+          <a href="#panels-isvisible" class="docs-sidebar__link">IsVisible</a>
+        </div>
+
+        <a href="#categories-tab" class="docs-sidebar__link">Categories Tab</a>
+        <a href="#missing-refs-tab" class="docs-sidebar__link">Missing References Tab</a>
+        <a href="#smart-naming-tab" class="docs-sidebar__link">Smart Naming Tab</a>
+        <a href="#tools-tab" class="docs-sidebar__link">Tools Tab</a>
+      </div>
+
+      <!-- API REFERENCE -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">API Reference</div>
+
+        <button class="docs-sidebar__toggle">
+          UIManager Methods
+          <svg class="docs-sidebar__toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <div class="docs-sidebar__collapsible">
+          <a href="#api-add-remove" class="docs-sidebar__link">Add / Remove Reference</a>
+          <a href="#api-query" class="docs-sidebar__link">Query Methods</a>
+          <a href="#api-panels" class="docs-sidebar__link">Panel Methods</a>
+          <a href="#api-maintenance" class="docs-sidebar__link">Maintenance</a>
+        </div>
+
+        <a href="#api-uireference" class="docs-sidebar__link">UIReference Properties</a>
+        <a href="#api-uielementtype" class="docs-sidebar__link">UIElementType Enum</a>
+        <a href="#api-uicategory" class="docs-sidebar__link">UICategory</a>
+      </div>
+
+      <!-- GENERATED CODE -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">Generated Code</div>
+        <a href="#gen-library-structure" class="docs-sidebar__link">Library Structure</a>
+        <a href="#gen-dot-notation" class="docs-sidebar__link">Dot-Notation Access</a>
+        <a href="#gen-panel-methods" class="docs-sidebar__link">Panel Methods</a>
+        <a href="#gen-type-mapping" class="docs-sidebar__link">Type Mapping Table</a>
+      </div>
+
+      <!-- TROUBLESHOOTING -->
+      <div class="docs-sidebar__group">
+        <div class="docs-sidebar__group-title">Troubleshooting</div>
+        <a href="#common-issues" class="docs-sidebar__link">Common Issues</a>
+        <a href="#faq" class="docs-sidebar__link">FAQ</a>
+      </div>
+    </aside>
+
+    <div class="docs-sidebar__overlay" id="docs-overlay"></div>
+
+    <!-- Mobile sidebar toggle FAB -->
+    <button class="docs-mobile-toggle" id="docs-mobile-toggle" aria-label="Toggle sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+
+      <!-- ==========================================
+           GETTING STARTED
+           ========================================== -->
+
+      <h2 id="overview">Overview</h2>
+      <div class="docs-section">
+        <p>
+          FlowUI is a Unity editor tool that provides <strong>type-safe UI management</strong> for your projects. It scans your scene hierarchy, registers UI elements into a central registry, auto-categorizes them, and generates static C# classes for compile-time safe access.
+        </p>
+        <p>
+          Instead of using fragile <code>GameObject.Find()</code> calls or manually dragging references in the inspector, FlowUI gives you a clean, discoverable API:
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="cm">// Access any UI element with IntelliSense and compile-time safety</span>
+<span class="tp">Button</span> play = <span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>();
+<span class="tp">Slider</span> health = <span class="tp">UI</span>.<span class="tp">HUD</span>.<span class="fn">HealthBar</span>();
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ShowMainMenu</span>();</pre>
+        </div>
+        <h3>Key Capabilities</h3>
+        <ul>
+          <li><strong>Scene Scanning</strong> — Discovers 16 UI component types automatically</li>
+          <li><strong>Central Registry</strong> — All UI elements in one place with path-based identification</li>
+          <li><strong>Code Generation</strong> — Static classes with dot-notation access</li>
+          <li><strong>Event Handlers</strong> — Scaffolded handler methods using partial classes</li>
+          <li><strong>Panel Management</strong> — Generated Show/Hide/Toggle/IsVisible methods</li>
+          <li><strong>Missing Reference Detection</strong> — Scan, fix, and clean broken references</li>
+          <li><strong>Smart Naming</strong> — 6 naming conventions with conflict resolution</li>
+          <li><strong>Editor Integration</strong> — Full custom inspector with tabbed interface</li>
+        </ul>
+      </div>
+
+      <h2 id="installation">Installation</h2>
+      <div class="docs-section">
+        <h3>Method 1: Git URL (Recommended)</h3>
+        <p>Open the Unity Package Manager and add a package from Git URL:</p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">URL</span>
+          </div>
+          <pre>https://github.com/nimritagames/Unity-FlowUI.git</pre>
+        </div>
+        <ol>
+          <li>In Unity, go to <strong>Window &rarr; Package Manager</strong></li>
+          <li>Click the <strong>+</strong> button in the top-left</li>
+          <li>Select <strong>Add package from git URL</strong></li>
+          <li>Paste the URL above and click <strong>Add</strong></li>
+        </ol>
+
+        <h3>Method 2: Local Clone</h3>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">bash</span>
+          </div>
+          <pre><span class="fn">git</span> clone https://github.com/nimritagames/Unity-FlowUI.git</pre>
+        </div>
+        <p>Then use <strong>Add package from disk</strong> in the Package Manager and select the <code>package.json</code> file.</p>
+      </div>
+
+      <h2 id="quick-start">Quick Start</h2>
+      <div class="docs-section">
+        <ol>
+          <li><strong>Add UIManager to your scene:</strong> Create an empty GameObject and add the <code>UIManager</code> component, or use the Quick Start Window (<strong>Tools &rarr; FlowUI &rarr; Quick Start</strong>).</li>
+          <li><strong>Scan your UI elements:</strong> In the UIManager inspector, go to the <strong>UI Hierarchy</strong> tab and click <strong>Scan Scene for UI Elements</strong>.</li>
+          <li><strong>Generate your library:</strong> Go to the <strong>Library Generation</strong> tab, set your output path and namespace, then click <strong>Generate</strong>.</li>
+          <li><strong>Use in code:</strong> Access your UI elements with type-safe dot-notation:</li>
+        </ol>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="kw">using</span> <span class="tp">UnityEngine</span>;
+
+<span class="kw">public class</span> <span class="cl">GameUI</span> : <span class="tp">MonoBehaviour</span>
+{
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        <span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">OnPlay</span>);
+        <span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">SettingsButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">OnSettings</span>);
+    }
+
+    <span class="kw">void</span> <span class="fn">OnPlay</span>()
+    {
+        <span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">HideMainMenu</span>();
+        <span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ShowHUD</span>();
+    }
+
+    <span class="kw">void</span> <span class="fn">OnSettings</span>()
+    {
+        <span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ToggleSettings</span>();
+    }
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="requirements">Requirements</h2>
+      <div class="docs-section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Dependency</th><th>Minimum Version</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Unity</td><td>2022.3 LTS or later</td></tr>
+              <tr><td>TextMeshPro</td><td>3.0.7+</td></tr>
+              <tr><td>Unity UI (UGUI)</td><td>1.0.0+ (com.unity.ugui)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>FlowUI is an editor tool with runtime components. It works on all build targets supported by Unity.</p>
+      </div>
+
+
+      <!-- ==========================================
+           CORE CONCEPTS
+           ========================================== -->
+
+      <h2 id="uimanager-component">UIManager Component</h2>
+      <div class="docs-section">
+        <p>
+          The <code>UIManager</code> is the central MonoBehaviour that manages all registered UI elements. Add it to a single GameObject in your scene (typically on the Canvas root or a dedicated manager object).
+        </p>
+        <p>It maintains:</p>
+        <ul>
+          <li>A list of <code>UIReference</code> entries — one per registered UI element</li>
+          <li>A list of <code>UICategory</code> entries for organizational grouping</li>
+          <li>An internal dictionary for fast path-based lookups at runtime</li>
+        </ul>
+        <div class="docs-callout docs-callout--tip">
+          <strong>Tip</strong>
+          You only need one UIManager per scene. If you have multiple canvases, they can all be managed by the same UIManager.
+        </div>
+      </div>
+
+      <h2 id="uireference-uicategory">UIReference &amp; UICategory</h2>
+      <div class="docs-section">
+        <h3>UIReference</h3>
+        <p>Each registered UI element is stored as a <code>UIReference</code> with:</p>
+        <ul>
+          <li><code>referenceName</code> — A unique name derived from the GameObject name</li>
+          <li><code>path</code> — The full hierarchy path (e.g., <code>"Canvas/MainMenu/PlayButton"</code>)</li>
+          <li><code>elementType</code> — The <code>UIElementType</code> enum value</li>
+          <li><code>gameObjectRef</code> — A direct reference to the GameObject</li>
+          <li><code>category</code> — The category this element belongs to</li>
+        </ul>
+
+        <h3>UICategory</h3>
+        <p>Categories group related UI elements together:</p>
+        <ul>
+          <li><code>categoryName</code> — Display name for the category</li>
+          <li><code>color</code> — Color-coding for the editor hierarchy view</li>
+        </ul>
+        <p>Categories are auto-created based on top-level panels when scanning, but you can create custom ones.</p>
+      </div>
+
+      <h2 id="ui-element-types">UI Element Types</h2>
+      <div class="docs-section">
+        <p>FlowUI supports the following 16 UI component types:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Type</th><th>Component</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Button</td><td><code>Button</code></td><td>Standard Unity button</td></tr>
+              <tr><td>Text</td><td><code>TMP_Text</code></td><td>TextMeshPro text element</td></tr>
+              <tr><td>Image</td><td><code>Image</code></td><td>Unity UI Image</td></tr>
+              <tr><td>RawImage</td><td><code>RawImage</code></td><td>Raw texture display</td></tr>
+              <tr><td>Toggle</td><td><code>Toggle</code></td><td>Checkbox / toggle switch</td></tr>
+              <tr><td>Slider</td><td><code>Slider</code></td><td>Slider control</td></tr>
+              <tr><td>Scrollbar</td><td><code>Scrollbar</code></td><td>Scrollbar component</td></tr>
+              <tr><td>Dropdown</td><td><code>TMP_Dropdown</code></td><td>Dropdown selector</td></tr>
+              <tr><td>InputField</td><td><code>TMP_InputField</code></td><td>Text input field</td></tr>
+              <tr><td>ScrollRect</td><td><code>ScrollRect</code></td><td>Scrollable area</td></tr>
+              <tr><td>Canvas</td><td><code>Canvas</code></td><td>Canvas root</td></tr>
+              <tr><td>CanvasGroup</td><td><code>CanvasGroup</code></td><td>Group alpha/interaction</td></tr>
+              <tr><td>LayoutGroup</td><td><code>LayoutGroup</code></td><td>Vertical/Horizontal/Grid layout</td></tr>
+              <tr><td>Panel</td><td><code>RectTransform</code></td><td>Generic panel container</td></tr>
+              <tr><td>Mask</td><td><code>Mask / RectMask2D</code></td><td>Masking component</td></tr>
+              <tr><td>ContentSizeFitter</td><td><code>ContentSizeFitter</code></td><td>Auto-size container</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 id="path-based-referencing">Path-Based Referencing</h2>
+      <div class="docs-section">
+        <p>
+          Every UI element is identified by its <strong>hierarchy path</strong> — the full path from the scene root to the element. This ensures unique identification even when multiple elements share the same name.
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">paths</span>
+          </div>
+          <pre><span class="cm">// Examples of hierarchy paths</span>
+Canvas/MainMenu/PlayButton
+Canvas/MainMenu/SettingsButton
+Canvas/HUD/HealthBar
+Canvas/HUD/ScoreText
+Canvas/Settings/VolumeSlider
+Canvas/Settings/DifficultyDropdown</pre>
+        </div>
+        <p>
+          When code is generated, these paths are used internally for lookups, while the generated API gives you clean dot-notation access.
+        </p>
+      </div>
+
+
+      <!-- ==========================================
+           EDITOR GUIDE
+           ========================================== -->
+
+      <h2 id="hierarchy-scanning">UI Hierarchy — Scanning</h2>
+      <div class="docs-section">
+        <p>
+          The <strong>UI Hierarchy</strong> tab is the primary interface for managing your registered UI elements.
+        </p>
+        <h3>Scanning Your Scene</h3>
+        <p>
+          Click <strong>"Scan Scene for UI Elements"</strong> to automatically discover all UI components in your scene hierarchy. FlowUI checks every GameObject for supported component types and offers to register them.
+        </p>
+        <div class="docs-callout docs-callout--info">
+          <strong>Note</strong>
+          Scanning does not remove existing registrations. It only adds newly discovered elements. Use the bulk operations or manual removal to clean up.
+        </div>
+      </div>
+
+      <h2 id="hierarchy-adding">UI Hierarchy — Adding &amp; Removing</h2>
+      <div class="docs-section">
+        <h3>Adding Elements</h3>
+        <p>You can add elements in three ways:</p>
+        <ul>
+          <li><strong>Scene scan</strong> — Automatic discovery of all UI elements</li>
+          <li><strong>Manual add</strong> — Drag a GameObject into the add slot in the inspector</li>
+          <li><strong>Context menu</strong> — Right-click a UI element in the hierarchy and select "Register with FlowUI"</li>
+        </ul>
+        <h3>Removing Elements</h3>
+        <p>
+          Click the <strong>X</strong> button next to any element in the list to unregister it. The element remains in your scene — only the FlowUI registration is removed.
+        </p>
+      </div>
+
+      <h2 id="hierarchy-bulk">UI Hierarchy — Bulk Operations</h2>
+      <div class="docs-section">
+        <p>For managing large UI hierarchies efficiently:</p>
+        <ul>
+          <li><strong>Select All / Deselect All</strong> — Toggle selection for batch operations</li>
+          <li><strong>Remove Selected</strong> — Unregister multiple elements at once</li>
+          <li><strong>Remove Missing</strong> — Clean up references to deleted GameObjects</li>
+        </ul>
+      </div>
+
+      <h2 id="hierarchy-search">UI Hierarchy — Search</h2>
+      <div class="docs-section">
+        <p>
+          The search bar at the top of the hierarchy tab filters elements by name, path, or type. Search is case-insensitive and matches partial strings.
+        </p>
+      </div>
+
+      <h2 id="library-output">Library Generation — Output Settings</h2>
+      <div class="docs-section">
+        <p>Configure how your UI library code is generated:</p>
+        <ul>
+          <li><strong>Output Path</strong> — Where the generated C# file is saved (default: <code>Assets/Scripts/Generated/</code>)</li>
+          <li><strong>Namespace</strong> — The C# namespace for generated classes (default: none / global)</li>
+          <li><strong>Class Name</strong> — The root static class name (default: <code>UI</code>)</li>
+        </ul>
+      </div>
+
+      <h2 id="library-structure">Library Generation — Generated Code Structure</h2>
+      <div class="docs-section">
+        <p>FlowUI generates a static class hierarchy that mirrors your UI organization:</p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C# — Generated</span>
+          </div>
+          <pre><span class="cm">// Auto-generated by FlowUI — do not edit manually</span>
+<span class="kw">using</span> <span class="tp">UnityEngine</span>;
+<span class="kw">using</span> <span class="tp">UnityEngine.UI</span>;
+<span class="kw">using</span> <span class="tp">TMPro</span>;
+
+<span class="kw">public static class</span> <span class="cl">UI</span>
+{
+    <span class="kw">private static</span> <span class="tp">UIManager</span> _mgr;
+    <span class="kw">private static</span> <span class="tp">UIManager</span> <span class="fn">Mgr</span> =&gt;
+        _mgr != <span class="kw">null</span> ? _mgr : _mgr = <span class="tp">Object</span>.<span class="fn">FindObjectOfType</span>&lt;<span class="tp">UIManager</span>&gt;();
+
+    <span class="kw">public static class</span> <span class="cl">MainMenu</span>
+    {
+        <span class="kw">public static</span> <span class="tp">Button</span> <span class="fn">PlayButton</span>()
+            =&gt; <span class="fn">Mgr</span>.<span class="fn">GetUIComponent</span>&lt;<span class="tp">Button</span>&gt;(<span class="st">"PlayButton"</span>);
+
+        <span class="kw">public static</span> <span class="tp">Button</span> <span class="fn">SettingsButton</span>()
+            =&gt; <span class="fn">Mgr</span>.<span class="fn">GetUIComponent</span>&lt;<span class="tp">Button</span>&gt;(<span class="st">"SettingsButton"</span>);
+    }
+
+    <span class="kw">public static class</span> <span class="cl">HUD</span>
+    {
+        <span class="kw">public static</span> <span class="tp">Slider</span> <span class="fn">HealthBar</span>()
+            =&gt; <span class="fn">Mgr</span>.<span class="fn">GetUIComponent</span>&lt;<span class="tp">Slider</span>&gt;(<span class="st">"HealthBar"</span>);
+
+        <span class="kw">public static</span> <span class="tp">TMP_Text</span> <span class="fn">ScoreText</span>()
+            =&gt; <span class="fn">Mgr</span>.<span class="fn">GetUIComponent</span>&lt;<span class="tp">TMP_Text</span>&gt;(<span class="st">"ScoreText"</span>);
+    }
+
+    <span class="kw">public static class</span> <span class="cl">Panels</span>
+    {
+        <span class="kw">public static void</span> <span class="fn">ShowMainMenu</span>() =&gt; <span class="fn">Mgr</span>.<span class="fn">SetPanelActive</span>(<span class="st">"MainMenu"</span>, <span class="kw">true</span>);
+        <span class="kw">public static void</span> <span class="fn">HideMainMenu</span>() =&gt; <span class="fn">Mgr</span>.<span class="fn">SetPanelActive</span>(<span class="st">"MainMenu"</span>, <span class="kw">false</span>);
+        <span class="kw">public static void</span> <span class="fn">ToggleMainMenu</span>() =&gt; <span class="fn">Mgr</span>.<span class="fn">TogglePanel</span>(<span class="st">"MainMenu"</span>);
+        <span class="kw">public static bool</span> <span class="fn">IsMainMenuVisible</span>() =&gt; <span class="fn">Mgr</span>.<span class="fn">IsPanelVisible</span>(<span class="st">"MainMenu"</span>);
+    }
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="library-regeneration">Library Generation — Regeneration</h2>
+      <div class="docs-section">
+        <p>
+          Regenerate your library any time you add, remove, or rename UI elements. The generated file is completely overwritten — <strong>do not manually edit it</strong>.
+        </p>
+        <div class="docs-callout docs-callout--warning">
+          <strong>Warning</strong>
+          The generated library file is overwritten on every generation. Any manual edits will be lost. Use event handlers (partial classes) for custom logic.
+        </div>
+      </div>
+
+      <h2 id="handlers-events">Handler Generation — Event Handlers</h2>
+      <div class="docs-section">
+        <p>
+          FlowUI can generate event handler scaffolding for your UI elements. This creates method stubs for button clicks, toggle changes, slider values, and more.
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C# — Generated Handler</span>
+          </div>
+          <pre><span class="cm">// Generated handler base class</span>
+<span class="kw">public partial class</span> <span class="cl">MainMenuHandlers</span> : <span class="tp">MonoBehaviour</span>
+{
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        <span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">OnPlayButtonClicked</span>);
+        <span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">SettingsButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">OnSettingsButtonClicked</span>);
+    }
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="handlers-partial">Handler Generation — Partial Classes</h2>
+      <div class="docs-section">
+        <p>
+          Handlers use the <code>partial</code> keyword so you can implement your logic in a separate file that won't be overwritten:
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C# — Your Implementation</span>
+          </div>
+          <pre><span class="cm">// Your custom implementation — never overwritten</span>
+<span class="kw">public partial class</span> <span class="cl">MainMenuHandlers</span>
+{
+    <span class="kw">void</span> <span class="fn">OnPlayButtonClicked</span>()
+    {
+        <span class="tp">SceneManager</span>.<span class="fn">LoadScene</span>(<span class="st">"GameScene"</span>);
+    }
+
+    <span class="kw">void</span> <span class="fn">OnSettingsButtonClicked</span>()
+    {
+        <span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ToggleSettings</span>();
+    }
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="handlers-supported">Handler Generation — Supported Events</h2>
+      <div class="docs-section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Component</th><th>Event</th><th>Handler Signature</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Button</td><td><code>onClick</code></td><td><code>void OnXClicked()</code></td></tr>
+              <tr><td>Toggle</td><td><code>onValueChanged</code></td><td><code>void OnXChanged(bool value)</code></td></tr>
+              <tr><td>Slider</td><td><code>onValueChanged</code></td><td><code>void OnXChanged(float value)</code></td></tr>
+              <tr><td>Dropdown</td><td><code>onValueChanged</code></td><td><code>void OnXChanged(int index)</code></td></tr>
+              <tr><td>InputField</td><td><code>onValueChanged</code></td><td><code>void OnXChanged(string text)</code></td></tr>
+              <tr><td>InputField</td><td><code>onEndEdit</code></td><td><code>void OnXEndEdit(string text)</code></td></tr>
+              <tr><td>ScrollRect</td><td><code>onValueChanged</code></td><td><code>void OnXScrolled(Vector2 pos)</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 id="panels-showhide">Panel Handlers — Show / Hide / Toggle</h2>
+      <div class="docs-section">
+        <p>
+          For every registered Panel element, FlowUI generates convenience methods:
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="cm">// Show a panel (activates the GameObject)</span>
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ShowMainMenu</span>();
+
+<span class="cm">// Hide a panel (deactivates the GameObject)</span>
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">HideMainMenu</span>();
+
+<span class="cm">// Toggle visibility</span>
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ToggleMainMenu</span>();</pre>
+        </div>
+      </div>
+
+      <h2 id="panels-isvisible">Panel Handlers — IsVisible</h2>
+      <div class="docs-section">
+        <p>Check if a panel is currently active:</p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="kw">if</span> (<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">IsMainMenuVisible</span>())
+{
+    <span class="tp">Debug</span>.<span class="fn">Log</span>(<span class="st">"Main menu is open"</span>);
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="categories-tab">Categories Tab</h2>
+      <div class="docs-section">
+        <p>
+          The Categories tab lets you manage organizational groups for your UI elements:
+        </p>
+        <ul>
+          <li><strong>Color Coding</strong> — Assign colors to categories for visual distinction in the hierarchy view</li>
+          <li><strong>Filtering</strong> — Filter the hierarchy view by category to focus on specific UI groups</li>
+          <li><strong>Multi-Select</strong> — Select multiple elements and reassign them to a different category</li>
+        </ul>
+        <p>Categories are auto-created during scanning based on top-level parent panels, but you can rename, recolor, merge, or create custom categories at any time.</p>
+      </div>
+
+      <h2 id="missing-refs-tab">Missing References Tab</h2>
+      <div class="docs-section">
+        <p>
+          Over time, UI elements may be deleted from the scene while their registrations remain. The Missing References tab helps you find and fix these:
+        </p>
+        <ul>
+          <li><strong>Scan</strong> — Check all registrations for broken references</li>
+          <li><strong>Auto-Fix</strong> — Attempt to re-link references by matching names in the hierarchy</li>
+          <li><strong>Manual Fix</strong> — Drag the correct GameObject to re-link</li>
+          <li><strong>Bulk Remove</strong> — Remove all missing references at once</li>
+        </ul>
+        <div class="docs-callout docs-callout--tip">
+          <strong>Tip</strong>
+          Run a missing reference scan after reorganizing your UI hierarchy or deleting GameObjects.
+        </div>
+      </div>
+
+      <h2 id="smart-naming-tab">Smart Naming Tab</h2>
+      <div class="docs-section">
+        <p>
+          The Smart Naming Assistant enforces consistent naming across your UI hierarchy. It supports 6 naming conventions:
+        </p>
+        <ul>
+          <li><strong>PascalCase</strong> — <code>PlayButton</code>, <code>HealthBar</code></li>
+          <li><strong>camelCase</strong> — <code>playButton</code>, <code>healthBar</code></li>
+          <li><strong>snake_case</strong> — <code>play_button</code>, <code>health_bar</code></li>
+          <li><strong>kebab-case</strong> — <code>play-button</code>, <code>health-bar</code></li>
+          <li><strong>UPPER_SNAKE_CASE</strong> — <code>PLAY_BUTTON</code>, <code>HEALTH_BAR</code></li>
+          <li><strong>Hungarian Notation</strong> — <code>btnPlay</code>, <code>sldHealth</code></li>
+        </ul>
+        <p>
+          Features include conflict detection, batch rename preview, and undo support. Preview all changes before applying them.
+        </p>
+      </div>
+
+      <h2 id="tools-tab">Tools Tab</h2>
+      <div class="docs-section">
+        <ul>
+          <li><strong>Refresh</strong> — Re-scan the scene and update all references</li>
+          <li><strong>Reset</strong> — Clear all registrations and start fresh</li>
+          <li><strong>Debug Mode</strong> — View raw serialized data for all registered elements</li>
+        </ul>
+      </div>
+
+
+      <!-- ==========================================
+           API REFERENCE
+           ========================================== -->
+
+      <h2 id="api-add-remove">UIManager — Add / Remove Reference</h2>
+      <div class="docs-section">
+        <h3>AddUIReference</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">AddUIReference</span>(<span class="tp">GameObject</span> go, <span class="tp">UIElementType</span> type, <span class="tp">string</span> category = <span class="st">""</span>)
+        </div>
+        <p>Registers a UI element with the UIManager. If the element is already registered, this is a no-op.</p>
+        <ul>
+          <li><code>go</code> — The GameObject to register</li>
+          <li><code>type</code> — The UI element type</li>
+          <li><code>category</code> — Optional category name (auto-detected if empty)</li>
+        </ul>
+
+        <h3>RemoveUIReference</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">RemoveUIReference</span>(<span class="tp">string</span> referenceName)
+        </div>
+        <p>Unregisters a UI element by its reference name. The GameObject is not destroyed.</p>
+      </div>
+
+      <h2 id="api-query">UIManager — Query Methods</h2>
+      <div class="docs-section">
+        <h3>IsRegistered</h3>
+        <div class="docs-method">
+          <span class="kw">public bool</span> <span class="fn">IsRegistered</span>(<span class="tp">string</span> referenceName)
+        </div>
+        <p>Returns <code>true</code> if an element with the given name is registered.</p>
+
+        <h3>GetUIComponent&lt;T&gt;</h3>
+        <div class="docs-method">
+          <span class="kw">public</span> <span class="tp">T</span> <span class="fn">GetUIComponent</span>&lt;<span class="tp">T</span>&gt;(<span class="tp">string</span> referenceName) <span class="kw">where</span> <span class="tp">T</span> : <span class="tp">Component</span>
+        </div>
+        <p>Returns the specified component from a registered UI element. Returns <code>null</code> if not found.</p>
+
+        <h3>GetPanel</h3>
+        <div class="docs-method">
+          <span class="kw">public</span> <span class="tp">GameObject</span> <span class="fn">GetPanel</span>(<span class="tp">string</span> panelName)
+        </div>
+        <p>Returns the GameObject for a registered panel by name.</p>
+      </div>
+
+      <h2 id="api-panels">UIManager — Panel Methods</h2>
+      <div class="docs-section">
+        <h3>SetPanelActive</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">SetPanelActive</span>(<span class="tp">string</span> panelName, <span class="tp">bool</span> active)
+        </div>
+        <p>Activates or deactivates a panel's GameObject.</p>
+
+        <h3>TogglePanel</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">TogglePanel</span>(<span class="tp">string</span> panelName)
+        </div>
+        <p>Toggles a panel's active state.</p>
+
+        <h3>IsPanelVisible</h3>
+        <div class="docs-method">
+          <span class="kw">public bool</span> <span class="fn">IsPanelVisible</span>(<span class="tp">string</span> panelName)
+        </div>
+        <p>Returns whether the panel's GameObject is currently active.</p>
+      </div>
+
+      <h2 id="api-maintenance">UIManager — Maintenance</h2>
+      <div class="docs-section">
+        <h3>InitializeDictionaries</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">InitializeDictionaries</span>()
+        </div>
+        <p>Rebuilds the internal lookup dictionaries from the serialized reference list. Called automatically on Awake, but can be called manually if references change at runtime.</p>
+
+        <h3>ValidateState</h3>
+        <div class="docs-method">
+          <span class="kw">public</span> <span class="tp">ValidationResult</span> <span class="fn">ValidateState</span>()
+        </div>
+        <p>Checks all registrations for missing references, duplicate names, and other integrity issues.</p>
+
+        <h3>RefreshStalePaths</h3>
+        <div class="docs-method">
+          <span class="kw">public void</span> <span class="fn">RefreshStalePaths</span>()
+        </div>
+        <p>Updates stored hierarchy paths for all references to match current scene state. Use after reparenting UI elements.</p>
+      </div>
+
+      <h2 id="api-uireference">UIReference Properties</h2>
+      <div class="docs-section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>referenceName</code></td><td><code>string</code></td><td>Unique identifier for this element</td></tr>
+              <tr><td><code>path</code></td><td><code>string</code></td><td>Full hierarchy path</td></tr>
+              <tr><td><code>elementType</code></td><td><code>UIElementType</code></td><td>Type of UI component</td></tr>
+              <tr><td><code>gameObjectRef</code></td><td><code>GameObject</code></td><td>Reference to the scene object</td></tr>
+              <tr><td><code>category</code></td><td><code>string</code></td><td>Category assignment</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 id="api-uielementtype">UIElementType Enum</h2>
+      <div class="docs-section">
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="kw">public enum</span> <span class="cl">UIElementType</span>
+{
+    Button, Text, Image, RawImage,
+    Toggle, Slider, Scrollbar, Dropdown,
+    InputField, ScrollRect, Canvas, CanvasGroup,
+    LayoutGroup, Panel, Mask, ContentSizeFitter
+}</pre>
+        </div>
+      </div>
+
+      <h2 id="api-uicategory">UICategory</h2>
+      <div class="docs-section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>categoryName</code></td><td><code>string</code></td><td>Display name</td></tr>
+              <tr><td><code>color</code></td><td><code>Color</code></td><td>Color for editor visualization</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <!-- ==========================================
+           GENERATED CODE
+           ========================================== -->
+
+      <h2 id="gen-library-structure">Library Structure</h2>
+      <div class="docs-section">
+        <p>Generated code follows this structure:</p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">structure</span>
+          </div>
+          <pre>UI (root static class)
+├── MainMenu (nested static class per category)
+│   ├── PlayButton()      → Button
+│   ├── SettingsButton()  → Button
+│   └── TitleText()       → TMP_Text
+├── HUD
+│   ├── HealthBar()       → Slider
+│   ├── ScoreText()       → TMP_Text
+│   └── MiniMap()         → RawImage
+└── Panels
+    ├── ShowMainMenu()    → void
+    ├── HideMainMenu()    → void
+    ├── ToggleMainMenu()  → void
+    └── IsMainMenuVisible() → bool</pre>
+        </div>
+      </div>
+
+      <h2 id="gen-dot-notation">Dot-Notation Access</h2>
+      <div class="docs-section">
+        <p>
+          Every element is accessible via <code>UI.Category.ElementName()</code>. The parentheses are required because the accessor is a method that performs a lookup — this ensures you always get the current reference, even if the scene reloads.
+        </p>
+        <div class="code-block">
+          <div class="code-block__header">
+            <span class="code-block__lang">C#</span>
+          </div>
+          <pre><span class="cm">// Button access</span>
+<span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>().onClick.<span class="fn">AddListener</span>(() =&gt; { });
+
+<span class="cm">// Text access</span>
+<span class="tp">UI</span>.<span class="tp">HUD</span>.<span class="fn">ScoreText</span>().<span class="fn">SetText</span>($<span class="st">"Score: {score}"</span>);
+
+<span class="cm">// Slider access</span>
+<span class="kw">float</span> hp = <span class="tp">UI</span>.<span class="tp">HUD</span>.<span class="fn">HealthBar</span>().value;</pre>
+        </div>
+      </div>
+
+      <h2 id="gen-panel-methods">Panel Methods</h2>
+      <div class="docs-section">
+        <p>For every registered Panel, four methods are generated in <code>UI.Panels</code>:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Method</th><th>Return Type</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>Show{Name}()</code></td><td><code>void</code></td><td>Activates the panel GameObject</td></tr>
+              <tr><td><code>Hide{Name}()</code></td><td><code>void</code></td><td>Deactivates the panel GameObject</td></tr>
+              <tr><td><code>Toggle{Name}()</code></td><td><code>void</code></td><td>Toggles active state</td></tr>
+              <tr><td><code>Is{Name}Visible()</code></td><td><code>bool</code></td><td>Returns current active state</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 id="gen-type-mapping">Type Mapping Table</h2>
+      <div class="docs-section">
+        <p>FlowUI maps each <code>UIElementType</code> to the corresponding Unity component type in generated code:</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>UIElementType</th><th>Generated Return Type</th><th>Namespace</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Button</td><td><code>Button</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Text</td><td><code>TMP_Text</code></td><td>TMPro</td></tr>
+              <tr><td>Image</td><td><code>Image</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>RawImage</td><td><code>RawImage</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Toggle</td><td><code>Toggle</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Slider</td><td><code>Slider</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Scrollbar</td><td><code>Scrollbar</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Dropdown</td><td><code>TMP_Dropdown</code></td><td>TMPro</td></tr>
+              <tr><td>InputField</td><td><code>TMP_InputField</code></td><td>TMPro</td></tr>
+              <tr><td>ScrollRect</td><td><code>ScrollRect</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Canvas</td><td><code>Canvas</code></td><td>UnityEngine</td></tr>
+              <tr><td>CanvasGroup</td><td><code>CanvasGroup</code></td><td>UnityEngine</td></tr>
+              <tr><td>LayoutGroup</td><td><code>LayoutGroup</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>Panel</td><td><code>RectTransform</code></td><td>UnityEngine</td></tr>
+              <tr><td>Mask</td><td><code>Mask</code></td><td>UnityEngine.UI</td></tr>
+              <tr><td>ContentSizeFitter</td><td><code>ContentSizeFitter</code></td><td>UnityEngine.UI</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <!-- ==========================================
+           TROUBLESHOOTING
+           ========================================== -->
+
+      <h2 id="common-issues">Common Issues</h2>
+      <div class="docs-section">
+        <h3>Generated code has compile errors</h3>
+        <p>
+          <strong>Cause:</strong> Usually happens when UI elements are renamed or removed after generation.
+          <br><strong>Fix:</strong> Re-run <strong>Library Generation</strong> to regenerate the code.
+        </p>
+
+        <h3>UI element returns null at runtime</h3>
+        <p>
+          <strong>Cause:</strong> The UIManager hasn't initialized yet, or the referenced element was destroyed.
+          <br><strong>Fix:</strong> Ensure your code runs after <code>Awake()</code> (use <code>Start()</code> or later). Check the Missing References tab for broken references.
+        </p>
+
+        <h3>Elements not found during scan</h3>
+        <p>
+          <strong>Cause:</strong> GameObjects may be inactive, or components may be on child objects not in the scan scope.
+          <br><strong>Fix:</strong> Make sure the GameObjects are active, or use manual registration for specific elements.
+        </p>
+
+        <h3>Duplicate reference names</h3>
+        <p>
+          <strong>Cause:</strong> Two UI elements in different parts of the hierarchy share the same name.
+          <br><strong>Fix:</strong> Rename one of the GameObjects, or use the Smart Naming Assistant to resolve conflicts.
+        </p>
+      </div>
+
+      <h2 id="faq">FAQ</h2>
+      <div class="docs-section">
+        <h3>Can I use FlowUI with multiple scenes?</h3>
+        <p>
+          Yes. Each scene should have its own UIManager instance. The generated code references the UIManager in the active scene.
+        </p>
+
+        <h3>Does FlowUI work with additive scene loading?</h3>
+        <p>
+          Yes, but you may need to call <code>InitializeDictionaries()</code> after loading a new scene if UI elements are added dynamically.
+        </p>
+
+        <h3>Can I register elements at runtime?</h3>
+        <p>
+          Yes. Call <code>AddUIReference()</code> to register new elements. Note that the generated static classes won't include runtime additions — use the UIManager API directly for dynamic elements.
+        </p>
+
+        <h3>What happens if I delete a registered GameObject?</h3>
+        <p>
+          The registration becomes a missing reference. Use the <strong>Missing References tab</strong> to detect and clean these up, then regenerate your library.
+        </p>
+
+        <h3>Is there a performance cost at runtime?</h3>
+        <p>
+          Minimal. UIManager uses dictionary lookups (O(1)) for element access. The initial dictionary build happens once in <code>Awake()</code>. There is no per-frame overhead.
+        </p>
+
+        <h3>Can I customize the generated code template?</h3>
+        <p>
+          Not currently. The code generation follows a fixed template optimized for type-safety and performance. This may be configurable in a future version.
+        </p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ============================================
+       Footer
+       ============================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__brand-name">FlowUI</div>
+          <div class="footer__brand-company">by <a href="/" style="color: inherit; text-decoration: underline; text-underline-offset: 2px;">Nimrita Games</a></div>
+          <p class="footer__brand-desc">
+            A professional Unity editor tool for type-safe UI management. Scan, register, and generate code for your UI elements.
+          </p>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Links</div>
+          <div class="footer__col-links">
+            <a href="index.html#features">Features</a>
+            <a href="index.html#workflow">Workflow</a>
+            <a href="index.html#install">Installation</a>
+            <a href="docs.html">Documentation</a>
+          </div>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Community</div>
+          <div class="footer__col-links">
+            <a href="https://github.com/nimritagames/Unity-FlowUI" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/nimritagames/Unity-FlowUI/issues" target="_blank" rel="noopener">Report Issues</a>
+            <a href="https://github.com/nimritagames/Unity-FlowUI/releases" target="_blank" rel="noopener">Changelog</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>&copy; 2026 Nimrita Games. All rights reserved.</span>
+        <span>Made by <a href="/" style="color: var(--color-accent); text-decoration: none;">Nimrita Games</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/docs.js"></script>
+  <script src="js/copy.js"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+/* ============================================
+   FlowUI Design Tokens
+   ============================================ */
+
+:root {
+  /* --- Typography --- */
+  --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-code: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* --- Spacing --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  --section-padding: clamp(3.5rem, 7vw, 7rem);
+  --container-max: 1280px;
+  --container-narrow: 800px;
+
+  /* --- Borders & Radius --- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  /* --- Transitions --- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 350ms ease;
+  --transition-theme: 400ms ease;
+
+  /* --- Z-index --- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+}
+
+/* ============================================
+   Dark Theme (default)
+   ============================================ */
+[data-theme="dark"] {
+  --color-bg: #060a13;
+  --color-bg-alt: #0c1120;
+  --color-bg-elevated: #141b2d;
+  --color-bg-card: #0f1525;
+  --color-bg-code: #0a0f1a;
+  --color-bg-nav: rgba(6, 10, 19, 0.82);
+
+  --color-text: #e8edf5;
+  --color-text-secondary: #8a95aa;
+  --color-text-muted: #556179;
+  --color-text-inverse: #060a13;
+
+  --color-accent: #4f8fff;
+  --color-accent-hover: #74a8ff;
+  --color-accent-subtle: rgba(79, 143, 255, 0.1);
+  --color-accent-glow: rgba(79, 143, 255, 0.25);
+
+  --color-secondary: #a78bfa;
+  --color-secondary-glow: rgba(167, 139, 250, 0.2);
+
+  --color-border: rgba(148, 163, 184, 0.08);
+  --color-border-strong: rgba(148, 163, 184, 0.18);
+
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+
+  /* Syntax highlighting */
+  --syn-keyword: #c678dd;
+  --syn-type: #61afef;
+  --syn-string: #98c379;
+  --syn-comment: #5c6370;
+  --syn-function: #e5c07b;
+  --syn-number: #d19a66;
+  --syn-operator: #56b6c2;
+  --syn-plain: #abb2bf;
+  --syn-attribute: #d19a66;
+  --syn-class: #e5c07b;
+
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 8px 40px rgba(79, 143, 255, 0.12), 0 0 0 1px rgba(79, 143, 255, 0.15);
+  --shadow-nav: 0 1px 16px rgba(0, 0, 0, 0.5);
+
+  /* Grain overlay */
+  --grain-opacity: 0.03;
+}
+
+/* ============================================
+   Light Theme
+   ============================================ */
+[data-theme="light"] {
+  --color-bg: #fbfcfe;
+  --color-bg-alt: #f1f4f9;
+  --color-bg-elevated: #e8ecf4;
+  --color-bg-card: #ffffff;
+  --color-bg-code: #eef1f7;
+  --color-bg-nav: rgba(251, 252, 254, 0.88);
+
+  --color-text: #151c2b;
+  --color-text-secondary: #4a5568;
+  --color-text-muted: #8a95aa;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: rgba(37, 99, 235, 0.06);
+  --color-accent-glow: rgba(37, 99, 235, 0.1);
+
+  --color-secondary: #7c3aed;
+  --color-secondary-glow: rgba(124, 58, 237, 0.1);
+
+  --color-border: rgba(30, 41, 59, 0.1);
+  --color-border-strong: rgba(30, 41, 59, 0.2);
+
+  --color-success: #059669;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+
+  /* Syntax highlighting */
+  --syn-keyword: #a626a4;
+  --syn-type: #4078f2;
+  --syn-string: #50a14f;
+  --syn-comment: #a0a1a7;
+  --syn-function: #c18401;
+  --syn-number: #986801;
+  --syn-operator: #0184bc;
+  --syn-plain: #383a42;
+  --syn-attribute: #986801;
+  --syn-class: #c18401;
+
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 32px rgba(37, 99, 235, 0.08), 0 0 0 1px rgba(37, 99, 235, 0.12);
+  --shadow-nav: 0 1px 12px rgba(0, 0, 0, 0.06);
+
+  --grain-opacity: 0.02;
+}

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowUI — Type-Safe Unity UI Management</title>
+  <meta name="description" content="Stop wrestling with Unity UI references. Scan, register, and generate type-safe C# code for your UI elements. One click. Zero magic strings.">
+
+  <!-- OG Tags -->
+  <meta property="og:title" content="FlowUI — Type-Safe Unity UI Management">
+  <meta property="og:description" content="Scan, register, and generate type-safe C# code for your Unity UI. One click. Zero magic strings.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://flowui.dev">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Prevent theme flash -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('flowui-theme');
+      if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+
+  <!-- ============================================
+       Navigation
+       ============================================ -->
+  <nav class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="index.html" class="nav__logo">
+        <div class="nav__logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        FlowUI
+      </a>
+
+      <div class="nav__links">
+        <a href="#features">Features</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#install">Install</a>
+        <a href="docs.html">Docs</a>
+      </div>
+
+      <div class="nav__actions">
+        <button class="nav__theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+        <a href="https://github.com/nimritagames/Unity-FlowUI" class="nav__github" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+      <button class="nav__hamburger" id="nav-hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <div class="nav__mobile-menu" id="nav-mobile">
+      <a href="#features">Features</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#install">Install</a>
+      <a href="docs.html">Docs</a>
+      <a href="https://github.com/nimritagames/Unity-FlowUI" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- ============================================
+       Hero
+       ============================================ -->
+  <section class="hero section">
+    <div class="container hero__grid">
+      <div class="hero__content">
+        <div class="badge hero__badge animate-fade-up delay-1">
+          <span class="badge__dot"></span>
+          Free &amp; Open Source
+        </div>
+        <h1 class="hero__title animate-fade-up delay-2">Stop wrestling with <span>Unity UI</span> references.</h1>
+        <p class="hero__subtitle animate-fade-up delay-3">
+          Scan your scene. Register elements. Generate type-safe C# code.<br>
+          One click. Zero magic strings.
+        </p>
+        <div class="hero__actions animate-fade-up delay-4">
+          <a href="#install" class="btn btn--primary btn--lg">Get Started</a>
+          <a href="docs.html" class="btn btn--secondary btn--lg">Read the Docs</a>
+        </div>
+        <p class="hero__meta animate-fade-up delay-5">
+          MIT License <span>&middot;</span> Unity 2022.3+ <span>&middot;</span> UPM Package
+        </p>
+      </div>
+
+      <div class="hero__code animate-scale-in delay-3">
+        <div class="hero__code-comparison">
+          <div>
+            <div class="hero__code-label hero__code-label--before">GameObject.Find — magic strings</div>
+            <div class="code-block">
+              <div class="code-block__header">
+                <span class="code-block__lang">C#</span>
+              </div>
+              <pre><span class="tp">GameObject</span>.<span class="fn">Find</span>(<span class="st">"Canvas/MainMenu/PlayBtn"</span>)
+  .<span class="fn">GetComponent</span>&lt;<span class="tp">Button</span>&gt;()
+  .onClick.<span class="fn">AddListener</span>(<span class="fn">OnPlay</span>);</pre>
+            </div>
+          </div>
+          <div>
+            <div class="hero__code-label hero__code-label--better">SerializeField — manual wiring</div>
+            <div class="code-block">
+              <div class="code-block__header">
+                <span class="code-block__lang">C#</span>
+              </div>
+              <pre>[<span class="at">SerializeField</span>] <span class="tp">Button</span> playBtn;
+
+playBtn.onClick.<span class="fn">AddListener</span>(<span class="fn">OnPlay</span>);</pre>
+            </div>
+          </div>
+          <div>
+            <div class="hero__code-label hero__code-label--after">FlowUI — type-safe, zero setup</div>
+            <div class="code-block">
+              <div class="code-block__header">
+                <span class="code-block__lang">C#</span>
+              </div>
+              <pre><span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">OnPlay</span>);</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Problem Cards
+       ============================================ -->
+  <section class="problems section" id="problems">
+    <div class="container">
+      <div class="section-header">
+        <h2>The UI reference problem every Unity developer knows</h2>
+        <p>You've been there. Everyone has. These are the pain points FlowUI eliminates.</p>
+      </div>
+
+      <div class="problems__grid">
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <h3 class="card__title">String Fragility</h3>
+          <p class="card__text">
+            <code>GameObject.Find("Canvas/Panel/Button")</code> compiles fine but breaks silently at runtime when someone renames an object. No warnings. Just null references.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <h3 class="card__title">Manual Bookkeeping</h3>
+          <p class="card__text">
+            Every new UI element means another <code>[SerializeField]</code>, another inspector drag, another thing that breaks when you reorganize your hierarchy. It doesn't scale.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <h3 class="card__title">No Organization</h3>
+          <p class="card__text">
+            UI elements scattered across scenes with no central registry. Finding which script references which button means searching through dozens of files and inspector slots.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Features
+       ============================================ -->
+  <section class="features section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <h2>Everything you need to manage Unity UI</h2>
+        <p>A complete toolkit — from scanning your hierarchy to generating production-ready code.</p>
+      </div>
+
+      <div class="features__grid">
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h3 class="card__title">Quick Add by Type</h3>
+          <p class="card__text">
+            Register UI elements by type with one click — all buttons, all texts, all sliders. Supports 16 component types including TMP, ScrollRect, and CanvasGroup.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <h3 class="card__title">Auto-Categorization</h3>
+          <p class="card__text">
+            UI elements are automatically grouped into color-coded categories. Filter, search, and browse your UI library in a clean hierarchy view.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+          </div>
+          <h3 class="card__title">Type-Safe Code Generation</h3>
+          <p class="card__text">
+            Generates static C# classes with dot-notation access. Configurable namespace, compile-time checked references, full IntelliSense support.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </div>
+          <h3 class="card__title">Event Handler Scaffolding</h3>
+          <p class="card__text">
+            Generates event handler methods for buttons, toggles, sliders, and more. Uses partial classes so your custom logic is never overwritten.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="card__title">Missing Reference Detection</h3>
+          <p class="card__text">
+            Scans for broken or missing references and offers one-click auto-fix. Bulk remove invalid entries to keep your registry clean.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </div>
+          <h3 class="card__title">Smart Naming Assistant</h3>
+          <p class="card__text">
+            Supports 6 naming conventions with conflict detection and batch rename preview. Keep your UI hierarchy consistent and readable.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Workflow
+       ============================================ -->
+  <section class="workflow section" id="workflow">
+    <div class="container">
+      <div class="section-header">
+        <h2>Three steps. That's it.</h2>
+        <p>From messy hierarchy to production-ready code in under a minute.</p>
+      </div>
+
+      <div class="workflow__steps">
+        <div class="workflow__step">
+          <div class="workflow__step-number">1</div>
+          <h3 class="workflow__step-title">Add Your Elements</h3>
+          <p class="workflow__step-desc">
+            Open the UIManager inspector and use Quick Add to register elements by type — buttons, texts, sliders, panels, and more.
+          </p>
+          <div class="code-block">
+            <div class="code-block__header">
+              <span class="code-block__lang">Editor</span>
+            </div>
+            <pre><span class="cm">// UIManager Inspector → UI Hierarchy Tab</span>
+<span class="cm">// Quick Add Elements:</span>
+<span class="cm">//   + All Buttons    + All Texts</span>
+<span class="cm">//   + All Toggles    + All Sliders</span>
+<span class="cm">//   + All Panels     + All Dropdowns</span>
+<span class="cm">//</span>
+<span class="cm">// Added: 24 elements across 6 categories</span></pre>
+          </div>
+        </div>
+
+        <div class="workflow__step">
+          <div class="workflow__step-number">2</div>
+          <h3 class="workflow__step-title">Generate Your Library</h3>
+          <p class="workflow__step-desc">
+            Click Generate and FlowUI creates static classes with dot-notation access for every registered element.
+          </p>
+          <div class="code-block">
+            <div class="code-block__header">
+              <span class="code-block__lang">Generated C#</span>
+            </div>
+            <pre><span class="cm">// Auto-generated: UILibrary.cs</span>
+<span class="kw">public static class</span> <span class="cl">UI</span> {
+  <span class="kw">public static class</span> <span class="cl">MainMenu</span> {
+    <span class="kw">public static</span> <span class="tp">Button</span> <span class="fn">PlayButton</span>() =&gt; ...;
+    <span class="kw">public static</span> <span class="tp">Button</span> <span class="fn">SettingsButton</span>() =&gt; ...;
+  }
+  <span class="kw">public static class</span> <span class="cl">HUD</span> {
+    <span class="kw">public static</span> <span class="tp">Slider</span> <span class="fn">HealthBar</span>() =&gt; ...;
+    <span class="kw">public static</span> <span class="tp">TMP_Text</span> <span class="fn">ScoreText</span>() =&gt; ...;
+  }
+}</pre>
+          </div>
+        </div>
+
+        <div class="workflow__step">
+          <div class="workflow__step-number">3</div>
+          <h3 class="workflow__step-title">Write Your Logic</h3>
+          <p class="workflow__step-desc">
+            Access any UI element with IntelliSense. Type-safe, discoverable, and compile-time checked.
+          </p>
+          <div class="code-block">
+            <div class="code-block__header">
+              <span class="code-block__lang">C#</span>
+            </div>
+            <pre><span class="cm">// Your game code — clean and safe</span>
+<span class="tp">UI</span>.<span class="tp">MainMenu</span>.<span class="fn">PlayButton</span>().onClick.<span class="fn">AddListener</span>(<span class="fn">StartGame</span>);
+<span class="tp">UI</span>.<span class="tp">HUD</span>.<span class="fn">ScoreText</span>().<span class="fn">SetText</span>($<span class="st">"Score: {score}"</span>);
+
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">ShowHUD</span>();
+<span class="tp">UI</span>.<span class="tp">Panels</span>.<span class="fn">HideMainMenu</span>();</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Installation
+       ============================================ -->
+  <section class="install section" id="install">
+    <div class="container">
+      <div class="section-header">
+        <h2>Install in 30 seconds</h2>
+        <p>Choose the method that works best for your project.</p>
+      </div>
+
+      <div class="install__methods">
+        <div class="install__method install__method--recommended">
+          <h3 class="install__method-title">Git URL</h3>
+          <p class="install__method-desc">Add via Unity Package Manager using the Git URL.</p>
+          <div class="code-block">
+            <div class="code-block__header">
+              <span class="code-block__lang">URL</span>
+            </div>
+            <pre>https://github.com/nimritagames/Unity-FlowUI.git</pre>
+          </div>
+          <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-4);">
+            Window &rarr; Package Manager &rarr; + &rarr; Add package from git URL
+          </p>
+        </div>
+
+        <div class="install__method">
+          <h3 class="install__method-title">UPM GUI</h3>
+          <p class="install__method-desc">Through the Unity Package Manager interface.</p>
+          <ol class="install__steps">
+            <li>Window &rarr; Package Manager</li>
+            <li>Click + (top-left)</li>
+            <li>"Add package from git URL"</li>
+            <li>Paste the repo URL</li>
+            <li>Click Add</li>
+          </ol>
+        </div>
+
+        <div class="install__method">
+          <h3 class="install__method-title">Local Clone</h3>
+          <p class="install__method-desc">Clone the repo and reference it locally.</p>
+          <div class="code-block">
+            <div class="code-block__header">
+              <span class="code-block__lang">bash</span>
+            </div>
+            <pre><span class="fn">git</span> clone https://github.com/nimritagames/Unity-FlowUI.git</pre>
+          </div>
+          <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-4);">
+            Then: + &rarr; Add package from disk &rarr; select <code>package.json</code>
+          </p>
+        </div>
+      </div>
+
+      <div class="install__requirements">
+        <strong>Requirements:</strong> Unity 2022.3+ &nbsp;&bull;&nbsp; TextMeshPro 3.0.7+ &nbsp;&bull;&nbsp; UGUI (com.unity.ugui)
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Open Source Banner
+       ============================================ -->
+  <section class="oss-banner section">
+    <div class="container">
+      <div class="oss-banner__grid">
+        <div class="oss-banner__item">
+          <div class="oss-banner__item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <h3 class="oss-banner__item-title">MIT License</h3>
+          <p class="oss-banner__item-desc">Free for commercial and personal use. No strings attached.</p>
+        </div>
+
+        <div class="oss-banner__item">
+          <div class="oss-banner__item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            </svg>
+          </div>
+          <h3 class="oss-banner__item-title">UPM Native</h3>
+          <p class="oss-banner__item-desc">Install via Unity Package Manager. One-click updates.</p>
+        </div>
+
+        <div class="oss-banner__item">
+          <div class="oss-banner__item-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h3 class="oss-banner__item-title">Active Development</h3>
+          <p class="oss-banner__item-desc">Regular updates, bug fixes, and new features. Community driven.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================
+       Footer
+       ============================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <div class="footer__brand-name">FlowUI</div>
+          <div class="footer__brand-company">by <a href="/" style="color: inherit; text-decoration: underline; text-underline-offset: 2px;">Nimrita Games</a></div>
+          <p class="footer__brand-desc">
+            A professional Unity editor tool for type-safe UI management. Scan, register, and generate code for your UI elements.
+          </p>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Links</div>
+          <div class="footer__col-links">
+            <a href="#features">Features</a>
+            <a href="#workflow">Workflow</a>
+            <a href="#install">Installation</a>
+            <a href="docs.html">Documentation</a>
+          </div>
+        </div>
+
+        <div class="footer__col">
+          <div class="footer__col-title">Community</div>
+          <div class="footer__col-links">
+            <a href="https://github.com/nimritagames/Unity-FlowUI" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/nimritagames/Unity-FlowUI/issues" target="_blank" rel="noopener">Report Issues</a>
+            <a href="https://github.com/nimritagames/Unity-FlowUI/releases" target="_blank" rel="noopener">Changelog</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>&copy; 2026 Nimrita Games. All rights reserved.</span>
+        <span>Made by <a href="/" style="color: var(--color-accent); text-decoration: none;">Nimrita Games</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/theme.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/copy.js"></script>
+</body>
+</html>
