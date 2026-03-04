@@ -169,6 +169,20 @@ input, textarea, select {
   font-size: var(--text-lg);
 }
 
+@media (max-width: 639px) {
+  .section-header {
+    margin-bottom: var(--space-10);
+  }
+
+  .section-header p {
+    font-size: var(--text-base);
+  }
+
+  .section {
+    padding: var(--space-12) 0;
+  }
+}
+
 /* ============================================
    Page Load Animations
    ============================================ */

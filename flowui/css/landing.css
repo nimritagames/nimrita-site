@@ -124,6 +124,10 @@
 }
 
 @media (max-width: 1023px) {
+  .hero {
+    padding: calc(var(--section-padding) + 40px) 0 var(--section-padding);
+  }
+
   .hero__grid {
     grid-template-columns: 1fr;
     gap: var(--space-12);
@@ -140,6 +144,37 @@
 
   .hero__meta {
     text-align: center;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero {
+    padding: calc(var(--section-padding) + 20px) 0 var(--space-12);
+  }
+
+  .hero__title {
+    font-size: var(--text-2xl);
+  }
+
+  .hero__subtitle {
+    font-size: var(--text-base);
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero__actions .btn {
+    text-align: center;
+  }
+
+  .hero__code-label {
+    font-size: 0.6rem;
+  }
+
+  .hero__code-comparison .code-block pre {
+    font-size: 0.7rem;
   }
 }
 
@@ -279,6 +314,26 @@
   .workflow__step-number {
     box-shadow: none;
   }
+
+  .workflow__step .code-block pre {
+    min-height: auto;
+  }
+
+  .workflow__step-desc {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  .workflow__step-number {
+    width: 48px;
+    height: 48px;
+    font-size: var(--text-lg);
+  }
+
+  .workflow__step-title {
+    font-size: var(--text-lg);
+  }
 }
 
 /* ============================================
@@ -397,6 +452,17 @@
 @media (max-width: 1023px) {
   .install__methods {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  .install__method {
+    padding: var(--space-6);
+  }
+
+  .install__requirements {
+    font-size: var(--text-xs);
+    padding: var(--space-4);
   }
 }
 

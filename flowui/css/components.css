@@ -424,11 +424,23 @@
 .code-block pre {
   padding: var(--space-5) var(--space-6);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   font-family: var(--font-code);
   font-size: var(--text-sm);
   line-height: var(--leading-relaxed);
   color: var(--syn-plain);
   tab-size: 4;
+}
+
+@media (max-width: 639px) {
+  .code-block pre {
+    padding: var(--space-4);
+    font-size: var(--text-xs);
+  }
+
+  .code-block__header {
+    padding: var(--space-2) var(--space-3);
+  }
 }
 
 /* Syntax tokens */
