@@ -175,20 +175,22 @@
 .docs-content {
   flex: 1;
   margin-left: 280px;
-  margin-right: 0;
   padding: var(--space-12) var(--space-12);
-}
-
-@media (max-width: 1279px) {
-  .docs-content {
-    margin-right: 0;
-  }
+  max-width: 960px;
+  min-width: 0;
 }
 
 @media (max-width: 1023px) {
   .docs-content {
     margin-left: 0;
     padding: var(--space-8) var(--space-6);
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .docs-content {
+    padding: var(--space-6) var(--space-4);
   }
 }
 
@@ -402,8 +404,9 @@
 
 .docs-content .table-wrap {
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow-x: auto;
   border: 1px solid var(--color-border);
+  -webkit-overflow-scrolling: touch;
 }
 
 .docs-content table {
@@ -456,5 +459,45 @@
 
 .docs-sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-strong);
+}
+
+/* ============================================
+   Mobile Responsive Fixes
+   ============================================ */
+
+@media (max-width: 640px) {
+  .docs-content h2 {
+    font-size: var(--text-xl);
+    margin-top: var(--space-12);
+  }
+
+  .docs-content h3 {
+    font-size: var(--text-lg);
+  }
+
+  .docs-content .code-block {
+    margin-left: calc(var(--space-4) * -1);
+    margin-right: calc(var(--space-4) * -1);
+    border-radius: 0;
+  }
+
+  .docs-method {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-xs);
+  }
+
+  .docs-callout {
+    padding: var(--space-4);
+  }
+
+  .docs-content th,
+  .docs-content td {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .docs-content blockquote {
+    padding: var(--space-3) var(--space-4);
+  }
 }
 
