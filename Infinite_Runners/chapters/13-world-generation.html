@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedural World Generation - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link active"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 13</span>
+        <h1>Procedural World Generation</h1>
+        <p class="chapter-desc">Build the WorldGenerator that spawns chunks ahead of the player, recycles them behind, and populates spawn points with obstacles and collectibles &mdash; creating an endless, seamless world.</p>
+      </div>
+
+      <!-- Section: The World Generation Flow -->
+      <h2>The World Generation Flow</h2>
+      <p>Now we bring together the chunk system (Chapter 11) and object pooling (Chapter 12) to create the actual infinite world. The world generation algorithm is surprisingly simple once you understand the flow:</p>
+      <ol>
+        <li><strong>At game start:</strong> Spawn a few chunks ahead of the player to fill the visible area.</li>
+        <li><strong>Every frame during gameplay:</strong> Check if the player has moved far enough forward that we need to spawn the next chunk ahead.</li>
+        <li><strong>When spawning:</strong> Take a chunk from the object pool, position it at the end of the last chunk, and populate it with obstacles and collectibles.</li>
+        <li><strong>Every frame during gameplay:</strong> Check if any chunk has fallen far enough behind the player that it's no longer visible.</li>
+        <li><strong>When despawning:</strong> Return the chunk (and all its spawned objects) to the object pool.</li>
+      </ol>
+      <p>The player runs forward. Chunks appear ahead and disappear behind. The player sees an endless road, but behind the scenes, the same 5-7 chunk objects are being recycled over and over.</p>
+
+      <div class="callout info">
+        <div class="callout-title">Spawn Distance vs. Despawn Distance</div>
+        <p>The <strong>spawn distance</strong> is how far ahead of the player chunks should extend. If the player can see 60 units ahead, your spawn distance should be at least 80 (so new chunks appear before the player can see the edge of the world). The <strong>despawn distance</strong> is how far behind the player a chunk must be before it's recycled. A despawn distance of 30 means a chunk disappears 30 units behind the player. Keep the despawn distance generous &mdash; if the player turns the camera, you don't want them to see chunks vanishing.</p>
+      </div>
+
+      <!-- Section: Active Chunks Tracking -->
+      <h2>Tracking Active Chunks</h2>
+      <p>The WorldGenerator needs to track which chunks are currently active in the world. We use a simple <code>List</code> (or <code>LinkedList</code>) where:</p>
+      <ul>
+        <li>The first element is the chunk farthest behind the player (the next one to be despawned).</li>
+        <li>The last element is the chunk farthest ahead (the most recently spawned).</li>
+      </ul>
+      <p>When we spawn, we add to the end. When we despawn, we remove from the front. This is the classic "sliding window" pattern.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Visual: Active Chunks Sliding Window</span><span class="lang-badge">Diagram</span></div><pre><code>Player moves forward -->
+
+  [despawn zone]  [visible area]           [spawn zone]
+  |               |                        |
+  v               v                        v
+
+  [Chunk1] [Chunk2] [Chunk3] [Chunk4] [Chunk5] [Chunk6]
+  ^                                              ^
+  |                                              |
+  oldest chunk                            newest chunk
+  (return to pool                     (just spawned from pool)
+   when behind player)</code></pre></div>
+
+      <!-- Section: The Full WorldGenerator Script -->
+      <h2>The WorldGenerator Script</h2>
+      <p>Here is the complete <code>WorldGenerator.cs</code>. This is the core system that makes the world infinite. Read through it carefully &mdash; we'll break down every section afterward.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">WorldGenerator.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.World;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Generates the infinite world by spawning chunks ahead of the player
+    /// and recycling chunks that fall behind.
+    ///
+    /// Requires: PoolManager (Chapter 12), ChunkRegistry (Chapter 11)
+    /// &lt;/summary&gt;
+    public class WorldGenerator : MonoBehaviour
+    {
+        [Header("References")]
+        [Tooltip("The player's Transform. Chunks spawn/despawn relative to this.")]
+        [SerializeField] private Transform playerTransform;
+
+        [Tooltip("The chunk registry containing all available chunk configs.")]
+        [SerializeField] private ChunkRegistry chunkRegistry;
+
+        [Header("Generation Settings")]
+        [Tooltip("How far ahead of the player chunks should be spawned (units).")]
+        [SerializeField] private float spawnDistance = 100f;
+
+        [Tooltip("How far behind the player a chunk must be before despawning.")]
+        [SerializeField] private float despawnDistance = 30f;
+
+        [Tooltip("How many chunks to spawn during initial setup (at game start).")]
+        [SerializeField] private int initialChunkCount = 5;
+
+        [Tooltip("Force the first chunk to be a safe zone (no obstacles).")]
+        [SerializeField] private bool firstChunkIsSafe = true;
+
+        [Header("Difficulty")]
+        [Tooltip("Current difficulty level. Determines which chunks are available.")]
+        [SerializeField] private int currentDifficulty = 0;
+
+        // ---- Internal State ----
+
+        // All currently active chunks, ordered from oldest to newest
+        private readonly LinkedList&lt;ActiveChunk&gt; activeChunks
+            = new LinkedList&lt;ActiveChunk&gt;();
+
+        // The Z position where the next chunk should be placed
+        private float nextSpawnZ = 0f;
+
+        // Whether generation is currently running
+        private bool isGenerating = false;
+
+        /// &lt;summary&gt;
+        /// Tracks a chunk that's currently in the world along with its config.
+        /// We need the config to know which pool to return it to.
+        /// &lt;/summary&gt;
+        private struct ActiveChunk
+        {
+            public ChunkData ChunkData;
+            public ChunkConfig Config;
+            public string PoolId;
+        }
+
+        // ---- Lifecycle ----
+
+        private void Start()
+        {
+            // Don't auto-start. Wait for the GameManager to tell us to begin.
+            // In the meantime, validate references.
+            ValidateReferences();
+        }
+
+        private void Update()
+        {
+            if (!isGenerating) return;
+            if (playerTransform == null) return;
+
+            float playerZ = playerTransform.position.z;
+
+            // Spawn new chunks if the player is approaching the end
+            SpawnChunksAhead(playerZ);
+
+            // Despawn old chunks that are behind the player
+            DespawnChunksBehind(playerZ);
+        }
+
+        // ---- Public API ----
+
+        /// &lt;summary&gt;
+        /// Start world generation. Called by GameManager when the game begins.
+        /// Spawns the initial set of chunks.
+        /// &lt;/summary&gt;
+        public void StartGeneration()
+        {
+            if (isGenerating)
+            {
+                Debug.LogWarning("WorldGenerator: Already generating!");
+                return;
+            }
+
+            isGenerating = true;
+            nextSpawnZ = 0f;
+
+            // Spawn the initial batch of chunks
+            for (int i = 0; i &lt; initialChunkCount; i++)
+            {
+                bool forceSafe = (i == 0 &amp;&amp; firstChunkIsSafe);
+                SpawnNextChunk(forceSafe);
+            }
+
+            Debug.Log(
+                $"WorldGenerator: Started with {initialChunkCount} chunks. " +
+                $"Next spawn at Z={nextSpawnZ}"
+            );
+        }
+
+        /// &lt;summary&gt;
+        /// Stop world generation. Called by GameManager on game over.
+        /// Active chunks remain in place (for the game over screen).
+        /// &lt;/summary&gt;
+        public void StopGeneration()
+        {
+            isGenerating = false;
+        }
+
+        /// &lt;summary&gt;
+        /// Reset the world: return all chunks to pools and clear state.
+        /// Called before starting a new run.
+        /// &lt;/summary&gt;
+        public void ResetWorld()
+        {
+            StopGeneration();
+
+            // Return all active chunks to their pools
+            foreach (ActiveChunk chunk in activeChunks)
+            {
+                ReturnChunkToPool(chunk);
+            }
+
+            activeChunks.Clear();
+            nextSpawnZ = 0f;
+
+            Debug.Log("WorldGenerator: World reset complete.");
+        }
+
+        /// &lt;summary&gt;
+        /// Updates the current difficulty level.
+        /// Called by the difficulty system (Chapter 18).
+        /// &lt;/summary&gt;
+        public void SetDifficulty(int difficulty)
+        {
+            currentDifficulty = Mathf.Clamp(difficulty, 0, 10);
+        }
+
+        /// &lt;summary&gt;
+        /// Called by OriginShifter (Chapter 14) to adjust internal positions
+        /// when the world is shifted back toward the origin.
+        /// &lt;/summary&gt;
+        public void OnOriginShift(Vector3 shiftAmount)
+        {
+            nextSpawnZ += shiftAmount.z;
+        }
+
+        // ---- Spawn Logic ----
+
+        /// &lt;summary&gt;
+        /// Checks if we need to spawn more chunks ahead of the player.
+        /// &lt;/summary&gt;
+        private void SpawnChunksAhead(float playerZ)
+        {
+            // Keep spawning until the world extends far enough ahead
+            while (nextSpawnZ - playerZ &lt; spawnDistance)
+            {
+                SpawnNextChunk(forceSafe: false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Spawns a single chunk at the current nextSpawnZ position.
+        /// &lt;/summary&gt;
+        /// &lt;param name="forceSafe"&gt;If true, forces a safe (no obstacle) chunk.&lt;/param&gt;
+        private void SpawnNextChunk(bool forceSafe)
+        {
+            // Pick which chunk to spawn
+            ChunkConfig config;
+
+            if (forceSafe)
+            {
+                config = GetSafeChunkConfig();
+            }
+            else
+            {
+                config = chunkRegistry.GetWeightedRandomChunk(currentDifficulty);
+            }
+
+            if (config == null)
+            {
+                Debug.LogError("WorldGenerator: Failed to get a chunk config!");
+                return;
+            }
+
+            // Get a chunk from the pool
+            string poolId = config.ChunkPrefab.name;
+            GameObject chunkObj = PoolManager.Instance.Get(poolId);
+
+            if (chunkObj == null)
+            {
+                Debug.LogError(
+                    $"WorldGenerator: Failed to get chunk '{poolId}' from pool!"
+                );
+                return;
+            }
+
+            // Get the ChunkData component
+            ChunkData chunkData = chunkObj.GetComponent&lt;ChunkData&gt;();
+            if (chunkData == null)
+            {
+                Debug.LogError(
+                    $"WorldGenerator: Chunk '{poolId}' has no ChunkData component!"
+                );
+                PoolManager.Instance.Return(poolId, chunkObj);
+                return;
+            }
+
+            // Position the chunk
+            // The chunk's local origin should align with nextSpawnZ
+            Vector3 spawnPos = new Vector3(0f, 0f, nextSpawnZ);
+            chunkObj.transform.position = spawnPos;
+
+            // Track this chunk
+            ActiveChunk active = new ActiveChunk
+            {
+                ChunkData = chunkData,
+                Config = config,
+                PoolId = poolId
+            };
+            activeChunks.AddLast(active);
+
+            // Populate spawn points with obstacles and collectibles
+            if (!config.IsSafeZone)
+            {
+                PopulateObstacles(chunkData, config);
+            }
+            PopulateCollectibles(chunkData, config);
+
+            // Advance the spawn position for the next chunk
+            nextSpawnZ += chunkData.ChunkLength;
+        }
+
+        /// &lt;summary&gt;
+        /// Finds a safe chunk config (one with IsSafeZone = true).
+        /// Falls back to the first available chunk if no safe zone exists.
+        /// &lt;/summary&gt;
+        private ChunkConfig GetSafeChunkConfig()
+        {
+            foreach (ChunkConfig config in chunkRegistry.AllChunks)
+            {
+                if (config != null &amp;&amp; config.IsSafeZone)
+                {
+                    return config;
+                }
+            }
+
+            Debug.LogWarning(
+                "WorldGenerator: No safe chunk found! Using first available."
+            );
+
+            // Fallback to any available chunk
+            return chunkRegistry.GetWeightedRandomChunk(0);
+        }
+
+        // ---- Despawn Logic ----
+
+        /// &lt;summary&gt;
+        /// Checks if the oldest chunk is far enough behind the player to recycle.
+        /// &lt;/summary&gt;
+        private void DespawnChunksBehind(float playerZ)
+        {
+            // Keep checking the oldest chunk
+            while (activeChunks.Count &gt; 0)
+            {
+                ActiveChunk oldest = activeChunks.First.Value;
+
+                // Check if the END of this chunk is behind the despawn threshold
+                float chunkEndZ = oldest.ChunkData.EndPosition.z;
+                if (playerZ - chunkEndZ &gt; despawnDistance)
+                {
+                    // This chunk is far behind the player - recycle it
+                    ReturnChunkToPool(oldest);
+                    activeChunks.RemoveFirst();
+                }
+                else
+                {
+                    // This chunk is still close enough. Since chunks are
+                    // ordered by position, all subsequent chunks are even
+                    // closer, so we can stop checking.
+                    break;
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Returns a chunk and all its spawned objects to their pools.
+        /// &lt;/summary&gt;
+        private void ReturnChunkToPool(ActiveChunk chunk)
+        {
+            if (chunk.ChunkData == null) return;
+
+            // The ChunkData.OnDespawn() method (from Chapter 12) automatically
+            // returns all registered spawned objects to their pools.
+            PoolManager.Instance.Return(chunk.PoolId, chunk.ChunkData.gameObject);
+        }
+
+        // ---- Obstacle &amp; Collectible Spawning ----
+
+        /// &lt;summary&gt;
+        /// Spawns obstacles on a chunk's obstacle spawn points.
+        /// Not every spawn point gets an obstacle - we randomly select some.
+        /// &lt;/summary&gt;
+        private void PopulateObstacles(ChunkData chunkData, ChunkConfig config)
+        {
+            Transform[] spawnPoints = chunkData.ObstacleSpawnPoints;
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+
+            // Determine how many obstacles to place (up to config.MaxObstacles)
+            int obstacleCount = Random.Range(1, config.MaxObstacles + 1);
+            obstacleCount = Mathf.Min(obstacleCount, spawnPoints.Length);
+
+            // Shuffle spawn points so we pick random positions
+            Transform[] shuffled = ShuffleArray(spawnPoints);
+
+            for (int i = 0; i &lt; obstacleCount; i++)
+            {
+                Transform point = shuffled[i];
+                if (point == null) continue;
+
+                // Pick an obstacle type (for now, just use "Obstacle_Low")
+                // Chapter 15 will add proper type selection based on difficulty
+                string obstaclePoolId = "Obstacle_Low";
+
+                GameObject obstacle = PoolManager.Instance.Get(obstaclePoolId);
+                if (obstacle == null) continue;
+
+                // Position the obstacle at the spawn point
+                obstacle.transform.position = point.position;
+                obstacle.transform.rotation = point.rotation;
+
+                // Register with the chunk so it gets returned when chunk despawns
+                chunkData.RegisterSpawnedObject(obstacle);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Spawns collectibles on a chunk's collectible spawn points.
+        /// &lt;/summary&gt;
+        private void PopulateCollectibles(ChunkData chunkData, ChunkConfig config)
+        {
+            Transform[] spawnPoints = chunkData.CollectibleSpawnPoints;
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+
+            // Determine how many collectibles to place
+            int collectibleCount = Random.Range(
+                config.MaxCollectibles / 2,
+                config.MaxCollectibles + 1
+            );
+            collectibleCount = Mathf.Min(collectibleCount, spawnPoints.Length);
+
+            Transform[] shuffled = ShuffleArray(spawnPoints);
+
+            for (int i = 0; i &lt; collectibleCount; i++)
+            {
+                Transform point = shuffled[i];
+                if (point == null) continue;
+
+                // Spawn a coin (Chapter 16 will add power-ups)
+                string coinPoolId = "Coin";
+
+                GameObject coin = PoolManager.Instance.Get(coinPoolId);
+                if (coin == null) continue;
+
+                coin.transform.position = point.position;
+                coin.transform.rotation = Quaternion.identity;
+
+                chunkData.RegisterSpawnedObject(coin);
+            }
+        }
+
+        // ---- Utility ----
+
+        /// &lt;summary&gt;
+        /// Creates a shuffled copy of a Transform array (Fisher-Yates shuffle).
+        /// Used to randomly select which spawn points to use.
+        /// &lt;/summary&gt;
+        private Transform[] ShuffleArray(Transform[] original)
+        {
+            Transform[] shuffled = new Transform[original.Length];
+            System.Array.Copy(original, shuffled, original.Length);
+
+            for (int i = shuffled.Length - 1; i &gt; 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                Transform temp = shuffled[i];
+                shuffled[i] = shuffled[j];
+                shuffled[j] = temp;
+            }
+
+            return shuffled;
+        }
+
+        private void ValidateReferences()
+        {
+            if (playerTransform == null)
+            {
+                Debug.LogError(
+                    "WorldGenerator: Player Transform is not assigned!",
+                    this
+                );
+            }
+
+            if (chunkRegistry == null)
+            {
+                Debug.LogError(
+                    "WorldGenerator: Chunk Registry is not assigned!",
+                    this
+                );
+            }
+        }
+
+        // ---- Editor Visualization ----
+
+        private void OnDrawGizmosSelected()
+        {
+            if (playerTransform == null) return;
+
+            float playerZ = Application.isPlaying
+                ? playerTransform.position.z
+                : 0f;
+
+            // Draw spawn distance (green line ahead)
+            Gizmos.color = Color.green;
+            Vector3 spawnLine = new Vector3(0, 2, playerZ + spawnDistance);
+            Gizmos.DrawWireCube(spawnLine, new Vector3(10, 0.1f, 0.1f));
+            Gizmos.DrawLine(
+                playerTransform.position,
+                new Vector3(0, 2, playerZ + spawnDistance)
+            );
+
+            // Draw despawn distance (red line behind)
+            Gizmos.color = Color.red;
+            Vector3 despawnLine = new Vector3(0, 2, playerZ - despawnDistance);
+            Gizmos.DrawWireCube(despawnLine, new Vector3(10, 0.1f, 0.1f));
+        }
+    }
+}</code></pre></div>
+
+      <p>That's the entire world generator. Let's break down the key sections:</p>
+
+      <!-- Section: Breaking Down SpawnNextChunk -->
+      <h2>Breaking Down: SpawnNextChunk</h2>
+      <p>This is the heart of the system. When called, it:</p>
+      <ol class="steps">
+        <li><strong>Picks a chunk config</strong> using weighted random selection from the ChunkRegistry. The current difficulty level filters which chunks are available. If we're at difficulty 0, only easy chunks appear. At difficulty 5, harder variants become eligible.</li>
+        <li><strong>Gets a chunk from the pool</strong> by looking up the prefab name as the pool ID. The PoolManager returns an inactive chunk and activates it.</li>
+        <li><strong>Positions the chunk</strong> at <code>nextSpawnZ</code>. This is the Z position where the previous chunk ended. The first chunk starts at Z = 0.</li>
+        <li><strong>Populates spawn points</strong> with obstacles and collectibles. Not every spawn point gets something &mdash; we randomly pick a subset based on the config's max counts.</li>
+        <li><strong>Advances nextSpawnZ</strong> by the chunk's length, so the next chunk will be placed right at the end of this one.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">Why LinkedList Instead of List?</div>
+        <p>We use <code>LinkedList&lt;ActiveChunk&gt;</code> instead of <code>List&lt;ActiveChunk&gt;</code> because we frequently add to the end (spawn) and remove from the front (despawn). With a <code>List</code>, removing the first element requires shifting every other element down, which is O(n). With a <code>LinkedList</code>, both operations are O(1). For our 5-7 active chunks, the difference is tiny, but it's a good habit to choose the right data structure.</p>
+      </div>
+
+      <!-- Section: Weighted Random Selection -->
+      <h2>How Weighted Random Selection Works</h2>
+      <p>The <code>ChunkRegistry.GetWeightedRandomChunk()</code> method (from Chapter 11) uses a technique called <strong>weighted random selection</strong>. Let's understand it with an example.</p>
+      <p>Suppose we have three chunks available:</p>
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Chunk</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Weight</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Probability</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">Straight</td>
+            <td style="padding: 0.75rem;">10</td>
+            <td style="padding: 0.75rem;">10/16 = 62.5%</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">Dense</td>
+            <td style="padding: 0.75rem;">5</td>
+            <td style="padding: 0.75rem;">5/16 = 31.25%</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem;">Safe</td>
+            <td style="padding: 0.75rem;">1</td>
+            <td style="padding: 0.75rem;">1/16 = 6.25%</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>The total weight is 16. The algorithm picks a random number between 0 and 15. If the number is 0-9 (range of 10), Straight is chosen. If 10-14 (range of 5), Dense is chosen. If 15 (range of 1), Safe is chosen. This gives each chunk a probability proportional to its weight.</p>
+      <p>As difficulty increases and new chunks become available, the total weight changes, automatically adjusting all probabilities. This is much more flexible than hard-coded percentages.</p>
+
+      <!-- Section: Chunk Positioning -->
+      <h2>Chunk Positioning: End-to-End Placement</h2>
+      <p>Getting chunks to line up seamlessly is critical. If there's even a tiny gap between chunks, the player will see a flickering seam in the ground. Here's how our system ensures perfect alignment:</p>
+      <ol>
+        <li>We maintain a <code>nextSpawnZ</code> variable that always holds the Z position where the next chunk should start.</li>
+        <li>When we spawn a chunk, we set its position to <code>(0, 0, nextSpawnZ)</code>.</li>
+        <li>After spawning, we add the chunk's length to <code>nextSpawnZ</code>: <code>nextSpawnZ += chunkData.ChunkLength</code>.</li>
+        <li>The next chunk will start exactly where this one ends.</li>
+      </ol>
+
+      <div class="callout warning">
+        <div class="callout-title">Make Sure Chunk Length Matches the Ground Mesh</div>
+        <p>If your ground mesh is 20 units long but ChunkData says the chunk is 22 units long, you'll get a 2-unit gap between chunks. Always use the SnapPoint_Start and SnapPoint_End transforms to define chunk length (the OnValidate method in ChunkData calculates it automatically). If you see gaps, double-check that the SnapPoint_End Z position matches the actual end of the ground mesh.</p>
+      </div>
+
+      <!-- Section: Despawning -->
+      <h2>Despawning: Cleaning Up Behind the Player</h2>
+      <p>The <code>DespawnChunksBehind</code> method runs every frame and checks if the oldest chunk (the one farthest behind the player) has passed the despawn threshold. If so, it returns the chunk to the pool.</p>
+      <p>The key insight is that chunks are ordered by position in our <code>activeChunks</code> list. The first element is always the chunk with the smallest Z position (farthest behind). So we only ever need to check the first element. If it's not far enough behind, none of the others are either, so we can stop checking immediately.</p>
+      <p>When a chunk is returned to the pool, its <code>OnDespawn()</code> method (which we implemented in Chapter 12) automatically returns all obstacles and collectibles that were spawned on it. This cascading cleanup means we never have orphaned objects floating in the scene.</p>
+
+      <!-- Section: Connecting to GameManager -->
+      <h2>Connecting to the GameManager</h2>
+      <p>The WorldGenerator doesn't run on its own. It's controlled by the GameManager (Chapter 6), which tells it when to start and stop based on the game state.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">GameManager Integration (pseudocode)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// In your GameManager.cs (from Chapter 6):
+
+[SerializeField] private WorldGenerator worldGenerator;
+
+private void OnGameStart()
+{
+    // Player pressed "Play" - start generating the world
+    worldGenerator.StartGeneration();
+}
+
+private void OnGameOver()
+{
+    // Player died - stop generating but don't clear the world
+    // (the game over screen shows the world in the background)
+    worldGenerator.StopGeneration();
+}
+
+private void OnGameRestart()
+{
+    // Player pressed "Retry" - clear everything and start fresh
+    worldGenerator.ResetWorld();
+    worldGenerator.StartGeneration();
+}</code></pre></div>
+
+      <p>The three-method API (<code>StartGeneration</code>, <code>StopGeneration</code>, <code>ResetWorld</code>) gives the GameManager full control over the world's lifecycle without needing to know how world generation works internally. This is clean separation of concerns.</p>
+
+      <div class="callout info">
+        <div class="callout-title">Event-Driven Alternative</div>
+        <p>Instead of the GameManager directly calling WorldGenerator methods, you could use the event system from Chapter 7. The GameManager fires <code>GameEvents.OnGameStarted</code>, and the WorldGenerator subscribes to it. Both approaches work. Direct method calls are simpler and easier to debug. Events are more decoupled and flexible. For our project, either is fine &mdash; we'll use direct calls for simplicity.</p>
+      </div>
+
+      <!-- Section: Setting Up in Unity -->
+      <h2>Setting Up the WorldGenerator in Unity</h2>
+      <ol class="steps">
+        <li>Create an empty GameObject in your scene called <code>WorldGenerator</code>.</li>
+        <li>Add the <code>WorldGenerator</code> script component to it.</li>
+        <li>In the Inspector, assign:
+          <ul>
+            <li><strong>Player Transform:</strong> Drag your player GameObject here.</li>
+            <li><strong>Chunk Registry:</strong> Drag your ChunkRegistry ScriptableObject asset here.</li>
+          </ul>
+        </li>
+        <li>Configure the generation settings:
+          <ul>
+            <li><strong>Spawn Distance:</strong> 100 (units ahead of player)</li>
+            <li><strong>Despawn Distance:</strong> 30 (units behind player)</li>
+            <li><strong>Initial Chunk Count:</strong> 5</li>
+            <li><strong>First Chunk Is Safe:</strong> checked</li>
+          </ul>
+        </li>
+        <li>Make sure the PoolManager has pools configured for each chunk prefab. The pool IDs must match the prefab names exactly (e.g., "Chunk_Straight", "Chunk_Dense").</li>
+        <li>Also ensure the PoolManager has pools for "Coin" and "Obstacle_Low" (which we'll create properly in Chapters 15 and 16).</li>
+      </ol>
+
+      <!-- Section: Testing -->
+      <h2>Testing: Watch It Work</h2>
+      <p>Let's verify the world generation is working correctly.</p>
+
+      <h3>Test 1: Initial Spawn</h3>
+      <ol class="steps">
+        <li>Enter Play mode.</li>
+        <li>Call <code>StartGeneration()</code> (temporarily add a call in <code>Start()</code> for testing, or use the GameManager).</li>
+        <li>Look in the Hierarchy window. You should see 5 chunk objects appear under the Pool containers, all now active.</li>
+        <li>In the Scene view, zoom out. You should see 5 chunks lined up end-to-end starting from the origin.</li>
+        <li>The first chunk should be a safe zone (no obstacle spawns).</li>
+      </ol>
+
+      <h3>Test 2: Continuous Spawning</h3>
+      <ol class="steps">
+        <li>Move the player forward (or temporarily give it an auto-movement script).</li>
+        <li>Watch the Scene view. As the player approaches the end of the visible chunks, new ones should appear ahead.</li>
+        <li>As the player moves past chunks, old ones behind should disappear and their objects should return to inactive state under the Pool containers.</li>
+        <li>Open the Pool Debug Overlay (F3) and verify that active counts go up and down as expected.</li>
+      </ol>
+
+      <h3>Test 3: No Gaps</h3>
+      <ol class="steps">
+        <li>In the Scene view, zoom in on the boundary between two chunks.</li>
+        <li>There should be zero gap between the ground meshes. The end of one chunk should perfectly touch the start of the next.</li>
+        <li>If you see gaps, check that your SnapPoint_End positions match your ground mesh dimensions.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">Quick Test Script</div>
+        <p>If you don't have the GameManager or PlayerController set up yet, create a temporary test script that calls <code>WorldGenerator.StartGeneration()</code> on Start and moves the player forward automatically. This lets you test world generation in isolation before all systems are connected.</p>
+      </div>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">WorldGenTester.cs (temporary test helper)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Temporary script for testing world generation in isolation.
+    /// Attach to the player object. Delete when real player controller is ready.
+    /// &lt;/summary&gt;
+    public class WorldGenTester : MonoBehaviour
+    {
+        [SerializeField] private WorldGenerator worldGenerator;
+        [SerializeField] private float moveSpeed = 20f;
+
+        private void Start()
+        {
+            // Start generating after a short delay to let pools initialize
+            Invoke(nameof(BeginTest), 0.1f);
+        }
+
+        private void BeginTest()
+        {
+            if (worldGenerator != null)
+            {
+                worldGenerator.StartGeneration();
+                Debug.Log("WorldGenTester: Generation started!");
+            }
+        }
+
+        private void Update()
+        {
+            // Auto-move forward to test spawning and despawning
+            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+
+            // Speed controls for testing
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                transform.Translate(
+                    Vector3.forward * moveSpeed * 3f * Time.deltaTime
+                );
+            }
+        }
+    }
+}</code></pre></div>
+
+      <!-- Section: Performance Notes -->
+      <h2>Performance Considerations</h2>
+      <p>Our WorldGenerator is already well-optimized thanks to object pooling, but here are a few additional notes:</p>
+      <ul>
+        <li><strong>Frame budget:</strong> Spawning a chunk and populating its spawn points happens in a single frame. With our simple prefabs, this takes less than 1ms. For more complex chunks with many spawn points, you could spread spawning over multiple frames using a coroutine.</li>
+        <li><strong>Check frequency:</strong> We check for spawning/despawning every frame. This is fine because the checks are cheap (just comparing float positions). If you had 100+ active chunks, you might want to check less frequently, but with 5-7 active chunks, every-frame checks add essentially zero overhead.</li>
+        <li><strong>Shuffle allocation:</strong> The <code>ShuffleArray</code> method creates a new array each call. In Chapter 24 (Optimization), we'll replace this with an in-place shuffle using a cached array to eliminate this allocation.</li>
+      </ul>
+
+      <!-- Section: Summary -->
+      <h2>What We Built</h2>
+      <p>The world generation system ties together everything from Part 3. Here's the complete picture:</p>
+      <ul>
+        <li><strong>WorldGenerator.cs</strong> &mdash; The main system that spawns chunks ahead of the player and recycles them behind. Uses weighted random selection for variety and difficulty-based filtering for progression.</li>
+        <li><strong>Chunk spawning flow:</strong> Pick a config from the registry, get a chunk from the pool, position it, populate its spawn points, advance the spawn position.</li>
+        <li><strong>Chunk despawning flow:</strong> Check if the oldest chunk is behind the player, return it (and all its objects) to their pools.</li>
+        <li><strong>GameManager integration:</strong> Three clean methods (Start, Stop, Reset) that give the game state controller full authority over world generation.</li>
+      </ul>
+      <p>There's one more critical piece of the world generation puzzle: <strong>origin shifting</strong>. In the next chapter, we'll solve the floating point precision problem that would otherwise cause visual artifacts after the player runs a few thousand meters.</p>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The world generates infinitely. Commit this to our feature branch.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add procedural world generation with chunk spawning and recycling"</code></pre>
+        </div>
+        <p>One more chapter on this branch — origin shifting — and then we'll merge everything back into main.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="12-object-pooling.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Object Pooling</span></a>
+        <a href="14-origin-shifting.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Origin Shifting</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

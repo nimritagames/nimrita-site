@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unity Editor Tour - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link active"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 3</span>
+        <h1>Unity Editor Tour</h1>
+        <p class="chapter-desc">A comprehensive walkthrough of every major panel in the Unity editor. Learn to navigate the Scene View, understand the Hierarchy, use the Inspector, and master the tools you'll use every day.</p>
+      </div>
+
+      <p>Before we write a single line of game code, we need to be comfortable with the Unity editor itself. This chapter is your guided tour of every important panel, tool, and concept in the editor. Take your time here &mdash; you'll spend hundreds of hours in this environment, and knowing your way around will make everything faster.</p>
+
+      <p>Open your <code>InfiniteRunner</code> project in Unity Hub if it isn't already open. Make sure you've loaded the <code>GameScene</code> we created in the previous chapter.</p>
+
+      <!-- Section: Scene View -->
+      <h2>The Scene View</h2>
+      <p>The <strong>Scene View</strong> is the large 3D viewport in the center of the editor. This is your design workspace &mdash; where you place objects, build levels, and visually arrange everything in your game world. Think of it as looking through a floating camera that you control freely.</p>
+
+      <h3>Navigating the Scene View</h3>
+      <p>Navigating in 3D space can feel strange at first if you've never used a 3D application before. Here are the essential controls:</p>
+
+      <ul>
+        <li><strong>Orbit (rotate the view around a point):</strong> Hold <strong>Alt + Left Mouse Button</strong> and drag. The view will rotate around the center of the screen. This is like walking around an object to see it from different angles.</li>
+        <li><strong>Pan (slide the view left/right/up/down):</strong> Hold <strong>Middle Mouse Button</strong> (click the scroll wheel) and drag. Alternatively, hold <strong>Alt + Middle Mouse Button</strong>. This slides the camera without rotating it.</li>
+        <li><strong>Zoom (move closer/farther):</strong> Scroll the <strong>mouse wheel</strong> up to zoom in, down to zoom out. You can also hold <strong>Alt + Right Mouse Button</strong> and drag up/down for finer control.</li>
+        <li><strong>Fly-through mode:</strong> Hold the <strong>Right Mouse Button</strong> and use <strong>WASD</strong> keys to fly around like a first-person game. <strong>Q</strong> moves down, <strong>E</strong> moves up. The scroll wheel adjusts fly speed. This is the fastest way to navigate large scenes.</li>
+        <li><strong>Focus on an object:</strong> Select an object in the Hierarchy, then press <strong>F</strong> (for "focus" or "frame"). The Scene View will zoom in and center on that object. Incredibly useful when you lose track of where something is.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Practice Navigation Now</div>
+        <p>Spend 2&ndash;3 minutes just practicing these controls. Orbit around the scene. Pan left and right. Zoom in and out. Try fly-through mode. Click on the "Main Camera" in the Hierarchy and press F to focus on it. The more comfortable you are with navigation, the faster you'll work in every future chapter.</p>
+      </div>
+
+      <h3>Scene View Gizmos</h3>
+      <p>In the top-right corner of the Scene View, you'll see a small <strong>gizmo</strong> &mdash; a colored cube with labeled axes (X, Y, Z). This shows your current orientation:</p>
+      <ul>
+        <li><strong>Red (X)</strong> = left/right</li>
+        <li><strong>Green (Y)</strong> = up/down</li>
+        <li><strong>Blue (Z)</strong> = forward/back</li>
+      </ul>
+      <p>You can click on any axis label on the gizmo to snap to that view. For example, clicking <strong>"Y"</strong> gives you a top-down view. Clicking <strong>"Z"</strong> gives you a front view. This is useful when you need precise alignment.</p>
+
+      <h3>Scene View Toolbar</h3>
+      <p>At the top-left of the Scene View, you'll see several tool buttons. These control what happens when you click and drag objects in the scene:</p>
+      <ul>
+        <li><strong>Q &mdash; Hand Tool:</strong> Click and drag to pan the view. Same as middle-mouse panning.</li>
+        <li><strong>W &mdash; Move Tool:</strong> Shows colored arrows on the selected object. Drag an arrow to move the object along that axis. Red = X, Green = Y, Blue = Z.</li>
+        <li><strong>E &mdash; Rotate Tool:</strong> Shows colored circles around the selected object. Drag a circle to rotate around that axis.</li>
+        <li><strong>R &mdash; Scale Tool:</strong> Shows colored cubes on each axis. Drag to scale the object along that axis. Drag the center cube to scale uniformly.</li>
+        <li><strong>T &mdash; Rect Tool:</strong> A 2D-focused tool for UI elements. We'll use this when building our UI system.</li>
+        <li><strong>Y &mdash; Transform Tool:</strong> Combines Move, Rotate, and Scale into one gizmo.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; Keyboard Shortcuts Are Your Best Friend</div>
+        <p>Notice that each tool has a single-letter shortcut (Q, W, E, R, T, Y). These are the most-used shortcuts in Unity. You'll be switching between Move (W) and Rotate (E) constantly. Memorize these now. Throughout this course, we'll introduce more shortcuts as they become relevant.</p>
+      </div>
+
+      <!-- Section: Game View -->
+      <h2>The Game View</h2>
+      <p>The <strong>Game View</strong> shows exactly what the player will see when they play your game. It renders through the <strong>Main Camera</strong> in your scene. While the Scene View is your design workspace, the Game View is your preview window.</p>
+
+      <p>You can find the Game View as a tab next to the Scene View. Click on the <strong>"Game"</strong> tab to switch to it. When you're not in Play Mode, the Game View shows a static preview. When you press Play, it becomes a live, interactive view of your running game.</p>
+
+      <h3>Resolution and Aspect Ratio</h3>
+      <p>At the top of the Game View, you'll see a dropdown that says something like <strong>"Free Aspect"</strong> or <strong>"1920x1080."</strong> This controls the resolution and aspect ratio of the preview. For our infinite runner, we'll want to test at common mobile resolutions:</p>
+      <ul>
+        <li>Click the dropdown and select <strong>"+"</strong> to add a custom resolution.</li>
+        <li>For a portrait mobile game (like Subway Surfers), add <strong>1080 x 1920</strong> (9:16 portrait).</li>
+        <li>For landscape, add <strong>1920 x 1080</strong> (16:9 landscape).</li>
+        <li>You can switch between these any time to see how your game looks at different sizes.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Game View vs. Scene View</div>
+        <p>A common beginner mistake is to design your game while looking at the Game View and wonder why clicking doesn't select objects. The Game View is for <em>previewing and playing</em>. The Scene View is for <em>designing and editing</em>. Always do your building work in the Scene View. Switch to the Game View (or press Play) to see how it looks from the player's perspective.</p>
+      </div>
+
+      <!-- Section: Hierarchy -->
+      <h2>The Hierarchy</h2>
+      <p>The <strong>Hierarchy panel</strong> (usually on the left side) shows a list of <strong>every GameObject</strong> in the currently loaded scene. Right now, your <code>GameScene</code> should have two objects:</p>
+      <ul>
+        <li><strong>Main Camera</strong> &mdash; The virtual camera through which the player sees the world.</li>
+        <li><strong>Directional Light</strong> &mdash; A light source that simulates the sun, casting light in one direction across the entire scene.</li>
+      </ul>
+
+      <h3>What Is a GameObject?</h3>
+      <p>In Unity, <strong>everything</strong> in your scene is a <strong>GameObject</strong>. The camera is a GameObject. Lights are GameObjects. Your player character will be a GameObject. Obstacles, coins, UI elements, invisible trigger zones &mdash; all GameObjects. A GameObject is just a container. By itself, it does nothing. It becomes useful when you add <strong>components</strong> to it (more on that in the Inspector section below).</p>
+
+      <h3>Creating GameObjects</h3>
+      <p>Let's create a simple object so we have something to work with. We'll create a cube:</p>
+      <ol class="steps">
+        <li>Right-click in an empty area of the Hierarchy panel.</li>
+        <li>Choose <strong>3D Object &rarr; Cube</strong>.</li>
+        <li>A cube appears in both the Scene View and the Hierarchy. It's selected by default (highlighted in blue in the Hierarchy).</li>
+      </ol>
+
+      <p>You now have three objects in your Hierarchy. Try clicking on each one to select it. Notice how the Scene View highlights the selected object and the Inspector on the right updates to show its properties.</p>
+
+      <h3>Parent-Child Relationships</h3>
+      <p>GameObjects can be organized into parent-child hierarchies. When you drag one object onto another in the Hierarchy, it becomes a <strong>child</strong> of that object. Child objects:</p>
+      <ul>
+        <li><strong>Move with their parent.</strong> If you move the parent, all children move with it, maintaining their relative position.</li>
+        <li><strong>Rotate with their parent.</strong> Rotating the parent rotates all children around the parent's pivot point.</li>
+        <li><strong>Scale with their parent.</strong> Scaling the parent scales all children proportionally.</li>
+        <li><strong>Their Transform values become relative to the parent</strong>, not the world. A child at position (0, 1, 0) is 1 unit above its parent, regardless of where the parent is in the world.</li>
+      </ul>
+
+      <p>We'll use parent-child relationships extensively. For example, our player character will be a parent object with child objects for the body mesh, particle effects, and collision shapes.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Organizing with Empty GameObjects</div>
+        <p>You can create <strong>empty GameObjects</strong> (right-click &rarr; Create Empty) to act as folders in your Hierarchy. For example, you might create an empty called "Environment" and drag all your ground and decoration objects into it. This keeps your Hierarchy clean and organized. Empty GameObjects have only a Transform component and are invisible in the game.</p>
+      </div>
+
+      <!-- Section: Inspector -->
+      <h2>The Inspector</h2>
+      <p>The <strong>Inspector panel</strong> (usually on the right side) shows the details of whatever object you have selected. It displays all the <strong>components</strong> attached to a GameObject and lets you edit their properties.</p>
+
+      <p>Click on the <strong>Cube</strong> you created earlier. The Inspector should show:</p>
+
+      <h3>The Transform Component</h3>
+      <p>Every single GameObject has a <strong>Transform</strong> component. It cannot be removed. The Transform defines three things:</p>
+      <ul>
+        <li><strong>Position</strong> &mdash; Where the object is in 3D space, expressed as three numbers: X (left/right), Y (up/down), Z (forward/back). By default, new objects are placed at (0, 0, 0), which is called the <strong>origin</strong>.</li>
+        <li><strong>Rotation</strong> &mdash; How the object is rotated, in degrees, around each axis. (0, 0, 0) means no rotation.</li>
+        <li><strong>Scale</strong> &mdash; How large the object is along each axis. (1, 1, 1) means normal size. (2, 2, 2) means twice as big in all directions.</li>
+      </ul>
+
+      <p>Try changing the cube's position. In the Inspector, find the <strong>Position</strong> row under Transform. Click on the number next to <strong>Y</strong> and change it from <code>0</code> to <code>3</code>. Press Enter. Watch the cube in the Scene View &mdash; it moved up. Change it back to <code>0</code>.</p>
+
+      <h3>Other Components on the Cube</h3>
+      <p>Below Transform, the cube has several other components:</p>
+      <ul>
+        <li><strong>Mesh Filter</strong> &mdash; Defines the shape of the object (in this case, a cube mesh). This is the 3D geometry.</li>
+        <li><strong>Mesh Renderer</strong> &mdash; Makes the mesh visible by rendering it with a material. Without this, the cube would exist but be invisible.</li>
+        <li><strong>Box Collider</strong> &mdash; Defines the cube's collision shape for the physics system. This is how Unity knows when objects bump into each other.</li>
+      </ul>
+
+      <h3>Adding Components</h3>
+      <p>You can add new components to any GameObject by clicking the <strong>"Add Component"</strong> button at the bottom of the Inspector. This is how you give objects new abilities. For example, adding a <strong>Rigidbody</strong> component makes an object respond to gravity and physics. Adding a <strong>script component</strong> lets you control the object with your own C# code.</p>
+
+      <p>Let's try it:</p>
+      <ol class="steps">
+        <li>Make sure the Cube is selected.</li>
+        <li>In the Inspector, click <strong>"Add Component."</strong></li>
+        <li>Type <strong>"Rigidbody"</strong> in the search box.</li>
+        <li>Click <strong>"Rigidbody"</strong> (not "Rigidbody 2D" &mdash; we're working in 3D).</li>
+        <li>Now press <strong>Play</strong>. The cube falls! That's gravity. The Rigidbody component told Unity's physics engine to apply gravity to this object.</li>
+        <li>Press <strong>Play</strong> again to stop.</li>
+      </ol>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Changes in Play Mode Don't Save!</div>
+        <p>This is one of the most important things to understand about Unity. Any changes you make while the game is running (Play Mode is active) are <strong>temporary</strong>. When you stop playing, everything reverts to how it was before you pressed Play. This is actually a feature &mdash; it lets you experiment freely during testing without breaking anything. But many beginners have spent 30 minutes tweaking values in Play Mode, only to lose all their work when they pressed Stop. If you want changes to persist, make them while Play Mode is <strong>off</strong>.</p>
+      </div>
+
+      <!-- Section: Project Window -->
+      <h2>The Project Window</h2>
+      <p>The <strong>Project window</strong> (usually at the bottom of the editor) is your file browser. It shows every file and folder inside your project's <code>Assets</code> directory. This is where you'll find and organize scripts, scenes, prefabs, materials, textures, audio files, and everything else.</p>
+
+      <h3>Key Things to Know</h3>
+      <ul>
+        <li><strong>Everything lives in Assets.</strong> All your project files must be inside the <code>Assets</code> folder. Unity ignores files outside of it.</li>
+        <li><strong>Create folders to stay organized.</strong> Right-click in the Project window and choose <strong>Create &rarr; Folder</strong>. We'll set up a proper folder structure in Chapter 5.</li>
+        <li><strong>Never move Unity files outside of Unity.</strong> If you need to rename, move, or delete a file, do it in the Project window, not in Windows Explorer or macOS Finder. Unity tracks files using <code>.meta</code> files (hidden companion files). Moving files outside Unity breaks these references, causing errors.</li>
+        <li><strong>Search is powerful.</strong> The search bar at the top of the Project window can find any file by name. You can also filter by type (e.g., <code>t:Script</code> to show only scripts, <code>t:Material</code> to show only materials).</li>
+        <li><strong>Drag-and-drop works.</strong> You can drag files from your operating system's file browser into the Project window to import them. This is how you'll add art, audio, and other assets.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; The .meta Files</div>
+        <p>For every file and folder in your project, Unity creates a hidden <code>.meta</code> file. For example, next to <code>GameScene.unity</code>, there's a <code>GameScene.unity.meta</code>. These meta files store import settings and unique IDs that Unity uses to reference assets. <strong>Never delete .meta files manually.</strong> If you use version control (like Git), always commit .meta files alongside their corresponding assets.</p>
+      </div>
+
+      <!-- Section: Console -->
+      <h2>The Console</h2>
+      <p>The <strong>Console panel</strong> shows messages, warnings, and errors from Unity and your scripts. If you don't see it, open it with <strong>Window &rarr; General &rarr; Console</strong>. It typically shares a tab with the Project window at the bottom of the editor.</p>
+
+      <h3>Types of Console Messages</h3>
+      <ul>
+        <li><strong>White messages (Log):</strong> Informational messages you've written with <code>Debug.Log()</code>. These are for your own debugging purposes. Unity doesn't generate these &mdash; only your code does.</li>
+        <li><strong>Yellow messages (Warning):</strong> Something isn't quite right but the game can still run. You can write these with <code>Debug.LogWarning()</code>. Unity also generates warnings when it detects potential issues.</li>
+        <li><strong>Red messages (Error):</strong> Something is broken. Your code has a compile error, a null reference, or some other problem. Written with <code>Debug.LogError()</code> or generated by Unity when things crash. <strong>Always fix red errors before moving on.</strong></li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">ConsoleExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">void Start()
+{
+    // These three lines demonstrate the different console message types
+    Debug.Log("This is a regular message.");        // White
+    Debug.LogWarning("This is a warning.");          // Yellow
+    Debug.LogError("This is an error!");             // Red
+}</code></pre>
+      </div>
+
+      <h3>Console Toolbar</h3>
+      <p>At the top of the Console, you'll see toggle buttons for each message type. You can click them to filter which messages are shown. There's also:</p>
+      <ul>
+        <li><strong>Clear</strong> &mdash; Clears all messages from the console.</li>
+        <li><strong>Collapse</strong> &mdash; Groups identical messages together instead of showing each one separately. Useful when a message is being printed every frame (60 times per second).</li>
+        <li><strong>Error Pause</strong> &mdash; Automatically pauses the game when an error occurs. Extremely useful for debugging.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; The Console Is Your Best Debugging Tool</div>
+        <p>When something doesn't work the way you expect, the Console is the first place to check. Get in the habit of checking the Console every time you press Play. If there are red errors, read them carefully &mdash; they usually tell you the exact file, line number, and nature of the problem. Clicking on an error in the Console will open your code editor at the exact line that caused it.</p>
+      </div>
+
+      <!-- Section: GameObjects and Components -->
+      <h2>GameObjects and Components: The Core Concept</h2>
+      <p>This is the single most important concept in Unity, so we're going to make sure it's crystal clear.</p>
+
+      <p>Unity uses a <strong>component-based architecture</strong>. This means:</p>
+      <ul>
+        <li>A <strong>GameObject</strong> is an empty container. By itself, it has no behavior, no appearance, no purpose.</li>
+        <li><strong>Components</strong> are the building blocks that give a GameObject its abilities. Attach a <strong>Mesh Renderer</strong> and it becomes visible. Attach a <strong>Rigidbody</strong> and it responds to physics. Attach a <strong>C# script</strong> and it does whatever you program it to do.</li>
+        <li>A single GameObject can have <strong>many components</strong>. Your player character, for example, will have a Transform (position), a Mesh Renderer (appearance), a Rigidbody (physics), a Collider (collision), and several custom scripts (behavior).</li>
+      </ul>
+
+      <p>Think of it like building with LEGO. The GameObject is the base plate. Each component is a LEGO brick you snap on. A camera brick makes it see. A light brick makes it glow. A script brick makes it think.</p>
+
+      <h3>Common Built-in Components</h3>
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Component</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">What It Does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Transform</td>
+            <td style="padding: 0.75rem;">Position, rotation, and scale. Every GameObject has this, always.</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Mesh Filter + Mesh Renderer</td>
+            <td style="padding: 0.75rem;">Gives the object a visible 3D shape (cube, sphere, custom model).</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Collider (Box, Sphere, Capsule, Mesh)</td>
+            <td style="padding: 0.75rem;">Defines the object's physical shape for collision detection.</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Rigidbody</td>
+            <td style="padding: 0.75rem;">Makes the object obey physics (gravity, forces, collisions).</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Camera</td>
+            <td style="padding: 0.75rem;">Renders the scene from this object's perspective. The player's eyes.</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Light</td>
+            <td style="padding: 0.75rem;">Illuminates the scene. Can be directional (sun), point (light bulb), or spot (flashlight).</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Audio Source</td>
+            <td style="padding: 0.75rem;">Plays sound effects or music from this object's position.</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem; font-weight: 600;">Your Custom Scripts</td>
+            <td style="padding: 0.75rem;">C# scripts you write that inherit from MonoBehaviour. This is how you add your own game logic.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section: Transform Deep Dive -->
+      <h2>The Transform Component: Position, Rotation, Scale</h2>
+      <p>Since the Transform is on every single object and we'll interact with it constantly, let's understand it deeply.</p>
+
+      <h3>Position</h3>
+      <p>Position is measured in <strong>units</strong>. One Unity unit typically represents one meter, though you can decide your own scale. Position has three values:</p>
+      <ul>
+        <li><strong>X</strong> &mdash; Horizontal axis (left is negative, right is positive).</li>
+        <li><strong>Y</strong> &mdash; Vertical axis (down is negative, up is positive).</li>
+        <li><strong>Z</strong> &mdash; Depth axis (back is negative, forward is positive).</li>
+      </ul>
+      <p>In our runner, the player will run along the <strong>Z axis</strong> (forward). Lanes will be offset along the <strong>X axis</strong> (left/right). Jumping changes the <strong>Y axis</strong> (up/down).</p>
+
+      <h3>Rotation</h3>
+      <p>Rotation is measured in <strong>degrees</strong> (0 to 360) around each axis. Rotating 90 degrees around the Y axis turns the object to face sideways. Rotation can be tricky to think about &mdash; for now, just know it exists. We'll manipulate it more when we work with the player character.</p>
+
+      <h3>Scale</h3>
+      <p>Scale defines the object's size relative to its default. A scale of (1, 1, 1) is normal size. A scale of (2, 1, 1) makes it twice as wide but normal height and depth. A scale of (0.5, 0.5, 0.5) makes it half-size in all directions.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Try It: Transform Playground</div>
+        <p>Select the Cube in your scene. In the Inspector, try changing its Position, Rotation, and Scale values. Watch how the cube changes in the Scene View. Move it to (3, 0, 0). Rotate it by setting Y Rotation to 45. Scale it to (2, 0.5, 1). Get a feel for how these numbers correspond to visual changes. When you're done experimenting, you can reset the Transform by right-clicking on the "Transform" label in the Inspector and choosing <strong>"Reset."</strong></p>
+      </div>
+
+      <h3>Accessing Transform from Code</h3>
+      <p>In C# scripts (which we'll start writing in the next chapter), you access the Transform like this:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">TransformExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">void Start()
+{
+    // Read the current position
+    Vector3 pos = transform.position;
+    Debug.Log("I am at: " + pos);
+
+    // Move the object to a new position
+    transform.position = new Vector3(0f, 5f, 10f);
+
+    // Move the object relative to its current position
+    transform.Translate(Vector3.forward * 2f);
+
+    // Rotate 90 degrees around the Y axis
+    transform.Rotate(0f, 90f, 0f);
+}</code></pre>
+      </div>
+
+      <p>Don't worry about understanding every line right now. We'll cover C# in depth in the next chapter. The key takeaway is that <code>transform</code> (lowercase) is available in every script and gives you direct access to the object's position, rotation, and scale.</p>
+
+      <!-- Section: Play Mode -->
+      <h2>Play Mode: Testing Your Game</h2>
+      <p>At the top center of the Unity editor, you'll find three buttons:</p>
+      <ul>
+        <li><strong>Play (triangle):</strong> Starts your game. The Game View activates and your scripts begin running.</li>
+        <li><strong>Pause (two vertical lines):</strong> Pauses the game mid-play. Useful for inspecting objects during gameplay.</li>
+        <li><strong>Step (triangle with a line):</strong> Advances the game by exactly one frame. Useful for debugging frame-by-frame.</li>
+      </ul>
+
+      <p>The keyboard shortcut for Play/Stop is <strong>Ctrl+P</strong> (Windows) or <strong>Cmd+P</strong> (Mac).</p>
+
+      <h3>The Play Mode Tint</h3>
+      <p>When Play Mode is active, Unity tints the editor slightly (usually a subtle color change around the edges). This visual cue reminds you that you're in Play Mode and any changes are temporary. You can customize this tint color in <strong>Edit &rarr; Preferences &rarr; Colors &rarr; Playmode tint</strong>. Many developers set it to a strong red or blue so they never accidentally make changes in Play Mode.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Changes in Play Mode Are LOST When You Stop</div>
+        <p>We mentioned this earlier, but it's worth repeating because nearly every Unity beginner gets burned by this at least once. When Play Mode is active, you can move objects, change values, even add components &mdash; but the moment you press Stop, <strong>everything reverts to how it was before you pressed Play</strong>. If you find a perfect value during Play Mode, <strong>write it down</strong> before pressing Stop, then apply it after stopping. Some developers use <strong>Edit &rarr; Preferences &rarr; Colors &rarr; Playmode tint</strong> to set a bright red tint so they always know when they're in Play Mode.</p>
+      </div>
+
+      <!-- Section: Essential Keyboard Shortcuts -->
+      <h2>Essential Keyboard Shortcuts</h2>
+      <p>Here are the shortcuts you'll use most frequently. Memorize these &mdash; they'll save you hours over the course of this project:</p>
+
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Shortcut</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Ctrl+S / Cmd+S</td>
+            <td style="padding: 0.75rem;">Save the scene</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Ctrl+Z / Cmd+Z</td>
+            <td style="padding: 0.75rem;">Undo</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Ctrl+P / Cmd+P</td>
+            <td style="padding: 0.75rem;">Play / Stop</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">F</td>
+            <td style="padding: 0.75rem;">Focus on selected object in Scene View</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">W / E / R</td>
+            <td style="padding: 0.75rem;">Move / Rotate / Scale tool</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Ctrl+D / Cmd+D</td>
+            <td style="padding: 0.75rem;">Duplicate selected object</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Delete / Cmd+Backspace</td>
+            <td style="padding: 0.75rem;">Delete selected object</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Ctrl+Shift+N / Cmd+Shift+N</td>
+            <td style="padding: 0.75rem;">Create new empty GameObject</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section: Common Beginner Mistakes -->
+      <h2>Common Beginner Mistakes (and How to Avoid Them)</h2>
+      <p>Every Unity beginner hits the same walls. Knowing about these pitfalls in advance will save you hours of frustration. Read through each one carefully &mdash; you <em>will</em> encounter most of these during this course.</p>
+
+      <h3>1. "My changes disappeared!" &mdash; Editing in Play Mode</h3>
+      <p>This is the <strong>number one beginner frustration</strong> in Unity. When you press the Play button, the editor enters <strong>Play Mode</strong>. While Play Mode is active, you can move objects, tweak values, add components &mdash; and everything appears to work. But the moment you press Stop, <strong>every single change you made is erased</strong>. Unity reverts the entire scene to the state it was in before you pressed Play.</p>
+      <p>This isn't a bug &mdash; it's by design. Play Mode is a sandbox for testing. It lets you experiment freely without risk of breaking your project. But if you don't know about it, you'll spend 20 minutes carefully positioning objects, press Stop to take a break, and watch all your work vanish.</p>
+      <p><strong>Solution:</strong> Always stop Play Mode before making permanent changes. If you discover a perfect value during testing (say, a jump height of 7.5), <strong>write it down</strong> on paper or in a note before pressing Stop, then apply it afterwards.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Enable Play Mode Tint &mdash; Do This Right Now</div>
+        <p>Go to <strong>Edit &rarr; Preferences &rarr; Colors &rarr; Playmode tint</strong> and set it to a bright red or orange. This tints the entire editor while Play Mode is active, making it impossible to forget you're in Play Mode. This single setting will save you from this mistake more than any other tip in this chapter.</p>
+      </div>
+
+      <h3>2. "My script doesn't do anything!" &mdash; Script Not Attached</h3>
+      <p>Creating a C# script file in the Project window is only step one. A script that just sits in your Assets folder will <strong>never execute</strong>. None of its methods &mdash; <code>Awake()</code>, <code>Start()</code>, <code>Update()</code> &mdash; will ever be called. For a script to run, it must be <strong>attached to a GameObject</strong> as a component.</p>
+      <p><strong>How to attach a script:</strong></p>
+      <ol class="steps">
+        <li>Select a GameObject in the Hierarchy.</li>
+        <li>In the Inspector, click <strong>Add Component</strong> at the bottom.</li>
+        <li>Type the name of your script in the search box.</li>
+        <li>Click the script name when it appears in the results.</li>
+      </ol>
+      <p>The script now appears as a component in the Inspector, and Unity will call its lifecycle methods.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Quick Debugging Check</div>
+        <p>If your <code>Debug.Log()</code> isn't printing anything to the Console, the very first thing to check is whether the script is actually attached to a GameObject in the scene. Select the GameObject you expect it to be on and look in the Inspector &mdash; your script should appear as a component. If it's not there, that's your problem.</p>
+      </div>
+
+      <h3>3. "I can't find my file!" &mdash; Lost in the Project Window</h3>
+      <p>As your project grows, you'll accumulate dozens of scripts, prefabs, materials, and other assets across many folders. It's easy to lose track of where things are.</p>
+      <p><strong>Solution:</strong> Use the <strong>search bar</strong> at the top of the Project window. It searches recursively through all subfolders. You can also filter by type using special prefixes:</p>
+      <ul>
+        <li><code>t:Script</code> &mdash; Shows only C# scripts</li>
+        <li><code>t:Prefab</code> &mdash; Shows only prefabs</li>
+        <li><code>t:Material</code> &mdash; Shows only materials</li>
+        <li><code>t:Scene</code> &mdash; Shows only scene files</li>
+        <li><code>t:Texture</code> &mdash; Shows only textures and images</li>
+      </ul>
+      <p>You can combine type filters with a name search. For example, <code>t:Script Player</code> will show all scripts with "Player" in the name.</p>
+
+      <h3>4. "Everything looks different from the tutorial!" &mdash; Layout Changes</h3>
+      <p>Unity's panels (Scene, Game, Hierarchy, Inspector, Project, Console) can all be dragged, resized, docked, and rearranged. It's easy to accidentally drag a panel somewhere unexpected, or close a panel entirely. When your layout no longer matches what you see in a tutorial, it can be very disorienting.</p>
+      <p><strong>Solution:</strong> Go to <strong>Window &rarr; Layouts &rarr; Default</strong> to reset the editor layout to Unity's default arrangement. Everything will snap back to its standard position. You can also save your own custom layouts once you find an arrangement you like: <strong>Window &rarr; Layouts &rarr; Save Layout</strong>, give it a name, and you can recall it any time.</p>
+
+      <h3>5. "I see pink/magenta objects!" &mdash; Missing Materials</h3>
+      <p>If an object in your scene appears as a flat, bright pink or magenta color, it means Unity <strong>cannot find the material or shader</strong> assigned to that object. The pink color is Unity's way of saying "I don't know how to render this."</p>
+      <p>This typically happens when:</p>
+      <ul>
+        <li>You imported assets from a package or the Asset Store that were made for a different render pipeline (e.g., assets made for the Built-in Render Pipeline used in a URP project).</li>
+        <li>A material file was deleted or moved outside of Unity.</li>
+        <li>A shader that the material depends on is missing or has errors.</li>
+      </ul>
+      <p><strong>Solution:</strong> Select the pink object. In the Inspector, find the <strong>Mesh Renderer</strong> component and look at the <strong>Materials</strong> section. You can drag a valid material from the Project window onto the material slot. If many objects are pink after switching render pipelines, use <strong>Edit &rarr; Rendering &rarr; Materials &rarr; Convert Built-in Materials to URP</strong> (or the equivalent for your pipeline).</p>
+
+      <h3>6. "My object is there but I can't see it!" &mdash; Common Visibility Issues</h3>
+      <p>You've added an object to the scene. It shows up in the Hierarchy. But it's nowhere to be seen in the Scene or Game View. This is surprisingly common and usually has a simple cause:</p>
+      <ul>
+        <li><strong>Check the Position:</strong> Look at the Transform in the Inspector. Is the object at a reasonable position? It might be thousands of units away from the camera. Select the object and press <strong>F</strong> in the Scene View to focus on it.</li>
+        <li><strong>Check the Scale:</strong> Is the Scale set to <code>(0, 0, 0)</code>? A zero-scale object exists but is infinitely small &mdash; invisible. Reset the scale to <code>(1, 1, 1)</code>.</li>
+        <li><strong>Check the Mesh Renderer:</strong> In the Inspector, find the <strong>Mesh Renderer</strong> component. Is the checkbox next to its name enabled? If the checkbox is unchecked, the renderer is disabled and the object won't be drawn.</li>
+        <li><strong>Check for obstruction:</strong> Another object might be in front of it. The object might also be <em>inside</em> another object at the same position.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; The "F" Key Is Your Best Friend</div>
+        <p>Whenever you can't find an object, select it in the Hierarchy and press <strong>F</strong> (Frame/Focus). The Scene View camera will fly to that object and center it on screen. This works even if the object is invisible &mdash; the camera will still move to its position, and you can then inspect the Transform to figure out what's wrong.</p>
+      </div>
+
+      <!-- Section: Chapter Summary -->
+      <h2>Chapter Summary</h2>
+      <p>You now know your way around the Unity editor. Here's what we covered:</p>
+      <ul>
+        <li><strong>Scene View</strong> &mdash; Your 3D design workspace. Navigate with Alt+click (orbit), middle-mouse (pan), scroll wheel (zoom), and right-click+WASD (fly-through).</li>
+        <li><strong>Game View</strong> &mdash; Preview of what the player sees. Set resolution for testing different screen sizes.</li>
+        <li><strong>Hierarchy</strong> &mdash; Lists every GameObject in the scene. Supports parent-child relationships.</li>
+        <li><strong>Inspector</strong> &mdash; Shows components and properties of the selected object. Add components to give objects new abilities.</li>
+        <li><strong>Project Window</strong> &mdash; File browser for all assets. Never move files outside of Unity.</li>
+        <li><strong>Console</strong> &mdash; Shows logs, warnings, and errors. Check it every time you press Play.</li>
+        <li><strong>GameObjects + Components</strong> &mdash; Unity's core architecture. GameObjects are containers; components give them behavior.</li>
+        <li><strong>Transform</strong> &mdash; Position, Rotation, Scale. On every object, always.</li>
+        <li><strong>Play Mode</strong> &mdash; Tests your game. Changes made during Play Mode are temporary!</li>
+        <li><strong>Common Beginner Mistakes</strong> &mdash; Play Mode edits vanishing, scripts not attached, missing materials (pink objects), lost files, layout issues, and invisible objects.</li>
+      </ul>
+
+      <p>You can now navigate the editor, create objects, add components, and test your game. In the next chapter, we'll learn the programming language that powers everything: C#.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Clean Up Before Moving On</div>
+        <p>Before proceeding to the next chapter, delete the Cube you created (select it and press Delete). Also remove the Rigidbody component if you added one to anything. We want a clean scene &mdash; just the Main Camera and Directional Light. Save your scene with <strong>Ctrl+S</strong>.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="02-unity-setup.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Unity Setup</span></a>
+        <a href="04-csharp-basics.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">C# Basics</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome & What We're Building - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link active"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 1</span>
+        <h1>Welcome &amp; What We're Building</h1>
+        <p class="chapter-desc">An overview of the infinite runner genre, a look at the exact game we'll build, and why production-quality architecture matters from the very first line of code.</p>
+      </div>
+
+      <!-- Section: What is an Infinite Runner? -->
+      <h2>What Is an Infinite Runner?</h2>
+      <p>An <strong>infinite runner</strong> is a type of game where your character moves forward automatically, and the world never ends. There is no finish line. The goal is simply to survive as long as possible, dodging obstacles, collecting items, and racking up a high score. The game gets progressively harder the longer you play, until eventually you make a mistake and it's game over.</p>
+      <p>If you've ever played a game on your phone where you swipe to dodge trains, jump over gaps, or slide under barriers while a character sprints forward endlessly, you've played an infinite runner. They're one of the most popular mobile game genres in the world, and for good reason: they're easy to understand, satisfying to play, and surprisingly deep to build well.</p>
+
+      <h3>Famous Infinite Runners You Might Know</h3>
+      <ul>
+        <li><strong>Subway Surfers</strong> &mdash; The king of 3-lane runners. You play as a graffiti artist dodging trains, jumping over barriers, and collecting coins across a procedurally generated railway. It has been downloaded over 3 billion times. Our game will be heavily inspired by its 3-lane design.</li>
+        <li><strong>Temple Run</strong> &mdash; One of the games that popularized the genre. You escape a temple while being chased by demon monkeys, swiping to turn corners, jump, slide, and tilt to collect coins. It introduced millions of players to the swipe-to-dodge mechanic.</li>
+        <li><strong>Jetpack Joyride</strong> &mdash; A side-scrolling variant where you fly with a jetpack, dodging lasers and missiles. It shows that infinite runners aren't limited to the "running forward" perspective.</li>
+        <li><strong>Crossy Road</strong> &mdash; An endless version of Frogger. It proves the genre can work with completely different visual styles and movement patterns.</li>
+        <li><strong>Alto's Odyssey</strong> &mdash; A beautiful snowboarding runner that emphasizes atmosphere and flow over frantic dodging. It shows that infinite runners can be relaxing too.</li>
+      </ul>
+      <p>What all of these games share is a core loop: <strong>run, react, score, die, retry</strong>. That loop is deceptively simple, but building it <em>well</em> requires real engineering.</p>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; Why Infinite Runners Are Great Learning Projects</div>
+        <p>Infinite runners touch nearly every major game development system: player input, physics, procedural generation, object pooling, UI, audio, animation, scoring, difficulty curves, and optimization. Building one from scratch teaches you more about real game architecture than most other project types. By the end of this course, you'll have practical experience with systems used in professional game studios.</p>
+      </div>
+
+      <!-- Section: What Specifically We'll Build -->
+      <h2>What Exactly Are We Building?</h2>
+      <p>In this course, we're building a <strong>3-lane infinite runner</strong> &mdash; the same style as Subway Surfers. Here's exactly what that means:</p>
+
+      <h3>The Core Gameplay</h3>
+      <ul>
+        <li>The player character runs forward automatically at an ever-increasing speed.</li>
+        <li>The world is divided into <strong>three lanes</strong> (left, center, right). The player can switch between lanes by swiping left/right on mobile or pressing arrow keys on desktop.</li>
+        <li>The player can <strong>jump</strong> to clear low obstacles and <strong>slide</strong> to pass under high ones.</li>
+        <li><strong>Obstacles</strong> appear in the lanes &mdash; barriers, walls, and gaps that must be dodged.</li>
+        <li><strong>Coins and power-ups</strong> are scattered along the path for the player to collect.</li>
+        <li>A <strong>score</strong> increases based on distance traveled and coins collected.</li>
+        <li>The game <strong>speeds up over time</strong>, making it progressively harder.</li>
+        <li>When the player hits an obstacle, the game ends and shows a game-over screen with the score and a retry button.</li>
+      </ul>
+
+      <h3>Complete Feature List</h3>
+      <p>By the time you finish all 25 chapters, your game will include every one of these features:</p>
+
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">System</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Features</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Player</td>
+            <td style="padding: 0.75rem;">3-lane switching, jumping, sliding, collision detection, death animation</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">World</td>
+            <td style="padding: 0.75rem;">Procedural chunk generation, infinite terrain, origin shifting</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Obstacles</td>
+            <td style="padding: 0.75rem;">Multiple obstacle types, random placement, difficulty scaling</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Collectibles</td>
+            <td style="padding: 0.75rem;">Coins, power-ups, magnet effect, score multipliers</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Camera</td>
+            <td style="padding: 0.75rem;">Smooth follow, dynamic offset, shake effects</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">UI</td>
+            <td style="padding: 0.75rem;">Main menu, HUD, game over screen, score display, settings</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Audio</td>
+            <td style="padding: 0.75rem;">Background music, sound effects, volume control</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Polish</td>
+            <td style="padding: 0.75rem;">Particle effects, animations, screen transitions</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-weight: 600;">Data</td>
+            <td style="padding: 0.75rem;">Save system (high scores, settings), ScriptableObject configs</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem; font-weight: 600;">Performance</td>
+            <td style="padding: 0.75rem;">Object pooling, zero-allocation spawning, profiler-guided optimization</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Section: Why Production Architecture Matters -->
+      <h2>Why Production Architecture Matters from Day 1</h2>
+      <p>Most beginner Unity tutorials teach you the <em>fastest</em> way to get something on screen. They'll have you put all your code in one giant script, reference objects by dragging them in the Inspector with no organization, and skip error handling entirely. This approach works for the first 30 minutes. Then the project grows, and everything falls apart.</p>
+      <p>Here's what happens with "tutorial code" as your project scales:</p>
+      <ul>
+        <li><strong>Spaghetti references</strong> &mdash; Every script directly references five other scripts. Changing one thing breaks three others. You spend more time fixing bugs than building features.</li>
+        <li><strong>God objects</strong> &mdash; One script does everything: player movement, scoring, UI updates, audio, and spawning. It's 2,000 lines long and nobody can understand it.</li>
+        <li><strong>Memory leaks</strong> &mdash; Objects are instantiated and destroyed constantly, causing garbage collection spikes that make the game stutter.</li>
+        <li><strong>Floating point errors</strong> &mdash; After playing for 10 minutes, the world starts jittering because position values have gotten too large for floating point precision.</li>
+        <li><strong>Impossible to extend</strong> &mdash; Want to add a new obstacle type? You have to modify 6 different scripts. Want to add a new power-up? Good luck.</li>
+      </ul>
+      <p>In this course, we do things differently. We build <strong>production-grade architecture from the start</strong>. Every system is modular, every component has a single responsibility, and systems communicate through events rather than direct references. This means:</p>
+      <ul>
+        <li>Adding a new obstacle type means creating one new ScriptableObject. No code changes needed in other systems.</li>
+        <li>The UI never directly talks to the player controller. It listens for events.</li>
+        <li>Object pooling eliminates runtime memory allocations for spawned objects.</li>
+        <li>Origin shifting prevents floating point issues even after hours of play.</li>
+        <li>Assembly definitions keep compile times fast even as the project grows.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; This Isn't Over-Engineering</div>
+        <p>You might think "isn't this overkill for a simple runner game?" No. These patterns exist because they solve real problems you <em>will</em> encounter. Learning them now, on a manageable project, means you'll be prepared when you work on larger games. Every pattern we introduce solves a specific, concrete problem that we'll encounter and explain.</p>
+      </div>
+
+      <!-- Section: Systems Overview -->
+      <h2>Overview of All Systems</h2>
+      <p>Our infinite runner is made up of interconnected systems. Here's a high-level map of what we'll build and how the pieces fit together:</p>
+
+      <h3>Part 1: Foundations (Chapters 1&ndash;5)</h3>
+      <p>Before writing any game code, we set up our tools and learn the fundamentals. You'll install Unity, learn to navigate the editor, pick up enough C# to be productive, and design the project's folder structure and architecture. This foundation makes everything that follows smoother.</p>
+
+      <h3>Part 2: Core Systems (Chapters 6&ndash;10)</h3>
+      <p>These are the invisible backbone of the game. The <strong>Game Manager</strong> controls game state (menu, playing, paused, game over). The <strong>Event System</strong> lets all other systems communicate without knowing about each other. The <strong>Input System</strong> translates swipes and key presses into game actions. The <strong>Player Controller</strong> handles lane switching, jumping, and sliding. The <strong>Camera System</strong> follows the player smoothly.</p>
+
+      <h3>Part 3: World Generation (Chapters 11&ndash;14)</h3>
+      <p>This is where the "infinite" part happens. The <strong>Chunk System</strong> defines reusable sections of the world. <strong>Object Pooling</strong> recycles game objects instead of creating and destroying them. The <strong>World Generator</strong> assembles chunks ahead of the player and removes them behind. <strong>Origin Shifting</strong> periodically moves the entire world back to the origin to prevent floating point precision loss.</p>
+
+      <h3>Part 4: Gameplay (Chapters 15&ndash;18)</h3>
+      <p>Now the game gets fun. We create <strong>obstacles</strong> (barriers, walls, gaps) with configurable properties. We add <strong>collectibles</strong> (coins, power-ups) with satisfying pickup effects. The <strong>scoring system</strong> tracks distance and coins. The <strong>difficulty system</strong> gradually increases speed, obstacle density, and complexity over time.</p>
+
+      <h3>Part 5: Polish (Chapters 19&ndash;22)</h3>
+      <p>A game without polish feels like a prototype. We build a complete <strong>UI system</strong> (menus, HUD, game over screen). We add <strong>audio</strong> (background music, sound effects, volume control). <strong>Particle effects</strong> make coin pickups and deaths feel impactful. <strong>Animations</strong> bring the player character to life with run, jump, slide, and stumble animations.</p>
+
+      <h3>Part 6: Ship It (Chapters 23&ndash;25)</h3>
+      <p>The final stretch. We implement a <strong>save system</strong> for high scores and settings. We <strong>optimize</strong> performance using Unity's profiler, eliminating any remaining bottlenecks. Finally, we <strong>build and publish</strong> the game, covering platform-specific settings for PC, WebGL, and mobile.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; How the Systems Connect</div>
+        <p>The beauty of our architecture is how cleanly systems communicate. The <strong>Player Controller</strong> fires an event when the player dies. The <strong>Game Manager</strong> hears it and transitions to the Game Over state. The <strong>UI System</strong> hears that state change and shows the game over screen. The <strong>Audio System</strong> hears it and plays the death sound. No system directly references any other. They all just listen for events. This is the power of event-driven architecture.</p>
+      </div>
+
+      <!-- Section: How to Use This Course -->
+      <h2>How to Use This Course</h2>
+      <p>This course is designed for <strong>absolute beginners</strong>. You don't need to know anything about Unity, C#, or game development. Here's how to get the most out of it:</p>
+
+      <h3>Follow the Chapters in Order</h3>
+      <p>Each chapter builds on the ones before it. Chapter 9 (Player Controller) uses the Event System from Chapter 7 and the Input System from Chapter 8. If you skip ahead, you'll be missing pieces that later chapters depend on. Go through them sequentially, from 1 to 25.</p>
+
+      <h3>Type Every Line of Code Yourself</h3>
+      <p>Do not copy and paste code from this tutorial. Type it yourself, character by character. This might sound tedious, but it is the single most effective way to learn programming. When you type code, your brain processes it differently than when you read it. You'll notice patterns, remember syntax, and build muscle memory. Copying and pasting teaches you nothing.</p>
+
+      <h3>Read the Explanations</h3>
+      <p>Every code block in this course is followed by a detailed explanation of what each line does and <em>why</em> we wrote it that way. Don't skip these explanations. Understanding the "why" is more valuable than memorizing the "what." You'll encounter situations in your own projects where the specific code doesn't apply, but the reasoning behind it does.</p>
+
+      <h3>Experiment and Break Things</h3>
+      <p>After each chapter, try modifying the code. Change a number and see what happens. Add an extra feature. Break something on purpose and figure out how to fix it. The best learning happens when you go off-script and explore on your own. Unity won't bite &mdash; you can always undo your changes.</p>
+
+      <h3>Use the Callout Boxes</h3>
+      <p>Throughout the course, you'll see colored callout boxes:</p>
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Tip</div>
+        <p><strong>Green boxes</strong> contain helpful tips, best practices, and shortcuts that will save you time.</p>
+      </div>
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Warning</div>
+        <p><strong>Yellow boxes</strong> warn you about common mistakes and pitfalls that beginners frequently encounter.</p>
+      </div>
+      <div class="callout info">
+        <div class="callout-title">&#128161; Info</div>
+        <p><strong>Blue boxes</strong> provide additional context, background information, or deeper explanations of concepts.</p>
+      </div>
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Danger</div>
+        <p><strong>Red boxes</strong> highlight critical issues that can cause data loss, crashes, or hard-to-find bugs if ignored.</p>
+      </div>
+
+      <h3>What You'll Need</h3>
+      <ul>
+        <li><strong>A computer</strong> running Windows 10/11, macOS 12+, or Ubuntu 20.04+. Unity runs on all three platforms.</li>
+        <li><strong>At least 10 GB of free disk space</strong> for Unity, Visual Studio, and project files.</li>
+        <li><strong>An internet connection</strong> for downloading Unity and packages.</li>
+        <li><strong>No prior programming experience required.</strong> We cover C# basics in Chapter 4.</li>
+        <li><strong>Time and patience.</strong> Game development is rewarding but takes effort. Give yourself space to learn at your own pace.</li>
+      </ul>
+
+      <!-- Section: Your First Step -->
+      <h2>Your First Step</h2>
+      <p>You've read the overview. You know what we're building and why we're building it the way we are. Now it's time to get your tools set up. In the next chapter, we'll install Unity Hub, download the correct Unity version, set up our code editor, and create the project that will become our infinite runner.</p>
+      <p>Let's get started.</p>
+
+      <div class="chapter-nav">
+        <a href="../index.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Home</span></a>
+        <a href="02-unity-setup.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Unity Setup</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

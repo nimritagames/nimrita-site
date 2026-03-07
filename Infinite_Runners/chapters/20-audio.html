@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link active"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 20</span>
+        <h1>Audio System</h1>
+        <p class="chapter-desc">Build a centralized audio manager with pooled sound effects, looping background music with crossfade, volume controls with persistence, and event-driven sound playback for every game action.</p>
+      </div>
+
+      <!-- SECTION: Introduction -->
+      <section>
+        <h2>Why Audio Matters</h2>
+        <p>Try playing any game with the sound off, then turn it on. The difference is dramatic. Audio provides critical feedback that makes every action feel impactful:</p>
+        <ul>
+          <li>The satisfying <em>ding</em> when you collect a coin confirms the pickup worked before the score even updates.</li>
+          <li>A <em>whoosh</em> on lane changes makes movement feel fast and responsive.</li>
+          <li>Background music sets the mood and builds tension as the game speeds up.</li>
+          <li>The <em>crash</em> on death makes failure feel consequential.</li>
+        </ul>
+        <p>Our audio system needs to handle two fundamentally different types of sound:</p>
+        <ul>
+          <li><strong>Music:</strong> Long, looping tracks played continuously. Only one plays at a time, with smooth crossfades between tracks.</li>
+          <li><strong>Sound Effects (SFX):</strong> Short, one-shot sounds triggered by game events. Multiple SFX can play simultaneously (imagine collecting three coins in rapid succession).</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Audio Architecture -->
+      <section>
+        <h2>Audio Architecture</h2>
+        <p>Unity plays sound through <code>AudioSource</code> components. Each AudioSource can play one clip at a time. For music, we need one or two sources (for crossfading). For SFX, we need a pool of sources because many effects can overlap.</p>
+
+        <p>Our architecture:</p>
+        <ul>
+          <li><strong>AudioManager</strong> (singleton) &mdash; Central controller attached to a persistent GameObject.</li>
+          <li><strong>Music AudioSources</strong> &mdash; Two AudioSource components for crossfading between tracks.</li>
+          <li><strong>SFX AudioSource Pool</strong> &mdash; An array of AudioSource components for playing one-shot effects.</li>
+          <li><strong>AudioConfig</strong> (ScriptableObject) &mdash; Maps SoundType enums to AudioClip references and volume settings.</li>
+        </ul>
+
+        <div class="callout info">
+          <div class="callout-title">Why Pool AudioSources?</div>
+          <p>You might think you can just call <code>AudioSource.PlayClipAtPoint()</code> for SFX. While this works, it creates a new GameObject with an AudioSource every time, which is wasteful. By pre-creating a pool of AudioSource components on the AudioManager, we can reuse them without any allocation. When we need to play a sound, we find an idle source in the pool and use it.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: SoundType Enum -->
+      <section>
+        <h2>Sound Types</h2>
+        <p>We define an enum for every sound in the game. This serves as a clean, type-safe way to request sounds without passing AudioClip references around. Other systems just say "play the Jump sound" and the AudioManager handles the rest.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">SoundType.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Audio
+{
+    /// &lt;summary&gt;
+    /// Enumerates all sound effects in the game.
+    /// Each value maps to a specific AudioClip via the AudioConfig.
+    /// Adding a new sound is a two-step process:
+    /// 1. Add a value to this enum.
+    /// 2. Assign the AudioClip in the AudioConfig ScriptableObject.
+    /// &lt;/summary&gt;
+    public enum SoundType
+    {
+        /// &lt;summary&gt;Player jumps.&lt;/summary&gt;
+        Jump,
+
+        /// &lt;summary&gt;Player slides under an obstacle.&lt;/summary&gt;
+        Slide,
+
+        /// &lt;summary&gt;Player changes lanes.&lt;/summary&gt;
+        LaneChange,
+
+        /// &lt;summary&gt;Player collects a coin.&lt;/summary&gt;
+        Collect,
+
+        /// &lt;summary&gt;Player picks up a power-up.&lt;/summary&gt;
+        PowerUp,
+
+        /// &lt;summary&gt;A power-up effect expires.&lt;/summary&gt;
+        PowerUpExpire,
+
+        /// &lt;summary&gt;Player hits an obstacle and dies.&lt;/summary&gt;
+        Death,
+
+        /// &lt;summary&gt;Shield absorbs a hit.&lt;/summary&gt;
+        ShieldBreak,
+
+        /// &lt;summary&gt;UI button is clicked.&lt;/summary&gt;
+        ButtonClick,
+
+        /// &lt;summary&gt;New high score achieved.&lt;/summary&gt;
+        HighScore,
+
+        /// &lt;summary&gt;Game countdown before start (3, 2, 1).&lt;/summary&gt;
+        Countdown
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: AudioConfig ScriptableObject -->
+      <section>
+        <h2>AudioConfig ScriptableObject</h2>
+        <p>The <code>AudioConfig</code> maps each <code>SoundType</code> to an <code>AudioClip</code> with an associated volume. This decouples the code from specific audio files &mdash; you can swap out any sound effect just by changing the reference in the Inspector.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">AudioConfig.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Audio
+{
+    /// &lt;summary&gt;
+    /// ScriptableObject that maps SoundType values to AudioClip
+    /// references and per-sound volume settings. Create via
+    /// Assets > Create > Infinite Runner > Audio Config.
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "AudioConfig",
+        menuName = "Infinite Runner/Audio Config"
+    )]
+    public class AudioConfig : ScriptableObject
+    {
+        [Tooltip("All sound effect entries. Each maps a SoundType " +
+                 "to an AudioClip with volume settings.")]
+        public SoundEntry[] sounds;
+
+        [Header("Music Tracks")]
+        [Tooltip("Background music tracks. The AudioManager will " +
+                 "cycle through these or play them randomly.")]
+        public MusicTrack[] musicTracks;
+
+        /// &lt;summary&gt;
+        /// Finds the SoundEntry for a given SoundType.
+        /// Returns null if the type is not configured.
+        /// &lt;/summary&gt;
+        public SoundEntry GetSound(SoundType type)
+        {
+            if (sounds == null) return null;
+
+            for (int i = 0; i &lt; sounds.Length; i++)
+            {
+                if (sounds[i].type == type)
+                {
+                    return sounds[i];
+                }
+            }
+
+            Debug.LogWarning($"[AudioConfig] No AudioClip configured " +
+                             $"for SoundType.{type}");
+            return null;
+        }
+    }
+
+    /// &lt;summary&gt;
+    /// Maps a SoundType to an AudioClip with volume and pitch settings.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public class SoundEntry
+    {
+        [Tooltip("Which sound type this entry represents.")]
+        public SoundType type;
+
+        [Tooltip("The audio clip to play.")]
+        public AudioClip clip;
+
+        [Tooltip("Volume for this specific sound (0-1). " +
+                 "Combined with the global SFX volume.")]
+        [Range(0f, 1f)]
+        public float volume = 1f;
+
+        [Tooltip("Random pitch variation range. " +
+                 "Adds variety so repeated sounds don't feel robotic. " +
+                 "E.g., 0.1 means pitch varies from 0.9 to 1.1.")]
+        [Range(0f, 0.5f)]
+        public float pitchVariation = 0f;
+    }
+
+    /// &lt;summary&gt;
+    /// Represents a background music track with volume settings.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public class MusicTrack
+    {
+        [Tooltip("Human-readable name for this track.")]
+        public string trackName;
+
+        [Tooltip("The music audio clip.")]
+        public AudioClip clip;
+
+        [Tooltip("Volume for this track (0-1). " +
+                 "Combined with the global music volume.")]
+        [Range(0f, 1f)]
+        public float volume = 0.5f;
+    }
+}</code></pre></div>
+
+        <h3>Setting Up the AudioConfig</h3>
+        <ol class="steps">
+          <li>Right-click in <code>Assets/Data</code> &gt; <strong>Create &gt; Infinite Runner &gt; Audio Config</strong>.</li>
+          <li>Name it <code>MainAudioConfig</code>.</li>
+          <li>Expand the <strong>Sounds</strong> array and add one entry for each SoundType.</li>
+          <li>For each entry, set the <strong>Type</strong>, drag in an <strong>AudioClip</strong>, and set the <strong>Volume</strong>.</li>
+          <li>For coin collect, set <strong>Pitch Variation</strong> to <code>0.1</code> so repeated collections sound slightly different.</li>
+          <li>Expand the <strong>Music Tracks</strong> array and add your background music clips.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Pitch Variation for Repeated Sounds</div>
+          <p>When the player collects coins rapidly, hearing the exact same sound 10 times in a row sounds monotonous and artificial. By adding a small pitch variation (0.05-0.15), each play has a slightly different pitch. The sound is still recognizable but feels more natural and lively. This tiny detail is used in almost every professional game.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: AudioManager.cs -->
+      <section>
+        <h2>The Complete AudioManager</h2>
+        <p>The <code>AudioManager</code> is the centerpiece of the audio system. It manages music playback with crossfading, maintains a pool of AudioSource components for SFX, handles volume settings, and connects to game events for automatic sound playback.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">AudioManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.Audio
+{
+    /// &lt;summary&gt;
+    /// Centralized audio system that handles all sound playback.
+    /// Features:
+    /// - Pooled AudioSources for SFX (no runtime allocation)
+    /// - Two music AudioSources for crossfading between tracks
+    /// - Volume controls (master, music, SFX) with PlayerPrefs persistence
+    /// - Event-driven sound playback for game events
+    /// - Mute toggle
+    ///
+    /// Setup:
+    /// 1. Create an empty GameObject named "AudioManager".
+    /// 2. Add this component.
+    /// 3. Assign your AudioConfig ScriptableObject.
+    /// 4. Enter Play Mode - the manager creates its AudioSources automatically.
+    /// &lt;/summary&gt;
+    public class AudioManager : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Singleton
+        // ---------------------------------------------------------------
+
+        public static AudioManager Instance { get; private set; }
+
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Configuration")]
+        [Tooltip("The AudioConfig that maps SoundTypes to AudioClips.")]
+        [SerializeField] private AudioConfig audioConfig;
+
+        [Header("SFX Pool")]
+        [Tooltip("Number of AudioSource components to create for SFX. " +
+                 "This is the max number of simultaneous sound effects.")]
+        [SerializeField] private int sfxPoolSize = 10;
+
+        [Header("Music")]
+        [Tooltip("How long music crossfades take in seconds.")]
+        [SerializeField] private float crossfadeDuration = 2f;
+
+        [Tooltip("Whether to start playing music automatically on startup.")]
+        [SerializeField] private bool playMusicOnStart = true;
+
+        [Header("Default Volumes")]
+        [Tooltip("Default master volume (0-1).")]
+        [Range(0f, 1f)]
+        [SerializeField] private float defaultMasterVolume = 1f;
+
+        [Tooltip("Default music volume (0-1).")]
+        [Range(0f, 1f)]
+        [SerializeField] private float defaultMusicVolume = 0.5f;
+
+        [Tooltip("Default SFX volume (0-1).")]
+        [Range(0f, 1f)]
+        [SerializeField] private float defaultSfxVolume = 0.8f;
+
+        // ---------------------------------------------------------------
+        // PlayerPrefs Keys
+        // ---------------------------------------------------------------
+
+        private const string MASTER_VOL_KEY = "Audio_MasterVolume";
+        private const string MUSIC_VOL_KEY = "Audio_MusicVolume";
+        private const string SFX_VOL_KEY = "Audio_SfxVolume";
+        private const string MUTE_KEY = "Audio_Muted";
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // SFX pool - array of reusable AudioSource components.
+        private AudioSource[] sfxSources;
+
+        // Music sources - two for crossfading.
+        private AudioSource musicSourceA;
+        private AudioSource musicSourceB;
+
+        // Which music source is currently "active" (playing the main track).
+        private AudioSource activeMusicSource;
+
+        // Volume settings.
+        private float masterVolume;
+        private float musicVolume;
+        private float sfxVolume;
+        private bool isMuted;
+
+        // Crossfade coroutine reference.
+        private Coroutine crossfadeCoroutine;
+
+        // Current music track index.
+        private int currentTrackIndex = -1;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Singleton with DontDestroyOnLoad.
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // Create audio sources.
+            CreateSFXPool();
+            CreateMusicSources();
+
+            // Load saved volume settings.
+            LoadVolumeSettings();
+        }
+
+        private void Start()
+        {
+            if (playMusicOnStart && audioConfig != null
+                && audioConfig.musicTracks != null
+                && audioConfig.musicTracks.Length > 0)
+            {
+                PlayMusic(0);
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to game events for automatic sound playback.
+            GameEvents.OnCoinCollected += HandleCoinCollected;
+            GameEvents.OnPowerUpCollected += HandlePowerUpCollected;
+            GameEvents.OnPowerUpExpired += HandlePowerUpExpired;
+            GameEvents.OnGameOver += HandleGameOver;
+            GameEvents.OnShieldConsumed += HandleShieldConsumed;
+            GameEvents.OnGameStarted += HandleGameStarted;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnCoinCollected -= HandleCoinCollected;
+            GameEvents.OnPowerUpCollected -= HandlePowerUpCollected;
+            GameEvents.OnPowerUpExpired -= HandlePowerUpExpired;
+            GameEvents.OnGameOver -= HandleGameOver;
+            GameEvents.OnShieldConsumed -= HandleShieldConsumed;
+            GameEvents.OnGameStarted -= HandleGameStarted;
+        }
+
+        // ---------------------------------------------------------------
+        // Initialization
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Creates a pool of AudioSource components for SFX playback.
+        /// All sources are created on this GameObject.
+        /// &lt;/summary&gt;
+        private void CreateSFXPool()
+        {
+            sfxSources = new AudioSource[sfxPoolSize];
+
+            for (int i = 0; i &lt; sfxPoolSize; i++)
+            {
+                AudioSource source = gameObject.AddComponent&lt;AudioSource&gt;();
+                source.playOnAwake = false;
+                source.loop = false;
+                sfxSources[i] = source;
+            }
+
+            Debug.Log($"[AudioManager] Created SFX pool with " +
+                      $"{sfxPoolSize} sources.");
+        }
+
+        /// &lt;summary&gt;
+        /// Creates two AudioSource components for music playback
+        /// (one active, one for crossfading).
+        /// &lt;/summary&gt;
+        private void CreateMusicSources()
+        {
+            musicSourceA = gameObject.AddComponent&lt;AudioSource&gt;();
+            musicSourceA.playOnAwake = false;
+            musicSourceA.loop = true;
+            musicSourceA.priority = 0; // Highest priority for music.
+
+            musicSourceB = gameObject.AddComponent&lt;AudioSource&gt;();
+            musicSourceB.playOnAwake = false;
+            musicSourceB.loop = true;
+            musicSourceB.priority = 0;
+
+            activeMusicSource = musicSourceA;
+        }
+
+        // ---------------------------------------------------------------
+        // SFX Playback
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Plays a sound effect by SoundType. Looks up the clip
+        /// in the AudioConfig and plays it on an available pooled source.
+        /// &lt;/summary&gt;
+        /// &lt;param name="type"&gt;The type of sound to play.&lt;/param&gt;
+        public void PlaySFX(SoundType type)
+        {
+            if (isMuted) return;
+            if (audioConfig == null) return;
+
+            SoundEntry entry = audioConfig.GetSound(type);
+            if (entry == null || entry.clip == null) return;
+
+            PlaySFX(entry.clip, entry.volume, entry.pitchVariation);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays an AudioClip as a sound effect on an available
+        /// pooled AudioSource. If all sources are busy, the oldest
+        /// one is interrupted.
+        /// &lt;/summary&gt;
+        /// &lt;param name="clip"&gt;The audio clip to play.&lt;/param&gt;
+        /// &lt;param name="volume"&gt;Per-sound volume (0-1).&lt;/param&gt;
+        /// &lt;param name="pitchVariation"&gt;Random pitch offset range.&lt;/param&gt;
+        public void PlaySFX(AudioClip clip, float volume = 1f,
+                            float pitchVariation = 0f)
+        {
+            if (isMuted || clip == null) return;
+
+            AudioSource source = GetAvailableSFXSource();
+            if (source == null) return;
+
+            source.clip = clip;
+
+            // Calculate final volume: per-sound * SFX channel * master.
+            source.volume = volume * sfxVolume * masterVolume;
+
+            // Apply pitch variation for natural-sounding repetition.
+            if (pitchVariation > 0f)
+            {
+                source.pitch = 1f + Random.Range(
+                    -pitchVariation, pitchVariation
+                );
+            }
+            else
+            {
+                source.pitch = 1f;
+            }
+
+            source.Play();
+        }
+
+        /// &lt;summary&gt;
+        /// Finds an AudioSource in the pool that is not currently playing.
+        /// If all are busy, returns the one that has been playing longest
+        /// (it will be interrupted).
+        /// &lt;/summary&gt;
+        private AudioSource GetAvailableSFXSource()
+        {
+            // First pass: find a source that is not playing.
+            for (int i = 0; i &lt; sfxSources.Length; i++)
+            {
+                if (!sfxSources[i].isPlaying)
+                {
+                    return sfxSources[i];
+                }
+            }
+
+            // All sources are busy. Find the one with the least
+            // remaining time (closest to finishing).
+            AudioSource oldest = sfxSources[0];
+            float leastTimeRemaining = float.MaxValue;
+
+            for (int i = 0; i &lt; sfxSources.Length; i++)
+            {
+                float remaining = sfxSources[i].clip.length
+                    - sfxSources[i].time;
+
+                if (remaining &lt; leastTimeRemaining)
+                {
+                    leastTimeRemaining = remaining;
+                    oldest = sfxSources[i];
+                }
+            }
+
+            return oldest;
+        }
+
+        // ---------------------------------------------------------------
+        // Music Playback
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Starts playing a music track by index. If music is already
+        /// playing, crossfades to the new track.
+        /// &lt;/summary&gt;
+        /// &lt;param name="trackIndex"&gt;Index into AudioConfig.musicTracks.&lt;/param&gt;
+        public void PlayMusic(int trackIndex)
+        {
+            if (audioConfig == null) return;
+            if (audioConfig.musicTracks == null) return;
+            if (trackIndex &lt; 0 || trackIndex >= audioConfig.musicTracks.Length)
+                return;
+
+            MusicTrack track = audioConfig.musicTracks[trackIndex];
+            if (track.clip == null) return;
+
+            currentTrackIndex = trackIndex;
+
+            // Determine which source to use for the new track.
+            AudioSource newSource = (activeMusicSource == musicSourceA)
+                ? musicSourceB
+                : musicSourceA;
+
+            newSource.clip = track.clip;
+            newSource.volume = 0f; // Start silent for crossfade.
+            newSource.Play();
+
+            // Calculate target volume.
+            float targetVolume = track.volume * musicVolume * masterVolume;
+            if (isMuted) targetVolume = 0f;
+
+            // Start crossfade.
+            if (crossfadeCoroutine != null)
+            {
+                StopCoroutine(crossfadeCoroutine);
+            }
+
+            crossfadeCoroutine = StartCoroutine(
+                CrossfadeMusic(activeMusicSource, newSource,
+                               targetVolume, crossfadeDuration)
+            );
+
+            activeMusicSource = newSource;
+
+            Debug.Log($"[AudioManager] Playing music: {track.trackName}");
+        }
+
+        /// &lt;summary&gt;
+        /// Crossfades between two music AudioSources. The old source
+        /// fades out while the new source fades in simultaneously.
+        /// &lt;/summary&gt;
+        private IEnumerator CrossfadeMusic(
+            AudioSource fadeOut,
+            AudioSource fadeIn,
+            float targetVolume,
+            float duration)
+        {
+            float elapsed = 0f;
+            float startVolume = fadeOut.volume;
+
+            while (elapsed &lt; duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Smooth step for pleasant-sounding fade.
+                float easedT = Mathf.SmoothStep(0f, 1f, t);
+
+                fadeOut.volume = Mathf.Lerp(startVolume, 0f, easedT);
+                fadeIn.volume = Mathf.Lerp(0f, targetVolume, easedT);
+
+                yield return null;
+            }
+
+            // Ensure final values.
+            fadeOut.volume = 0f;
+            fadeOut.Stop();
+            fadeIn.volume = targetVolume;
+
+            crossfadeCoroutine = null;
+        }
+
+        /// &lt;summary&gt;
+        /// Stops all music playback with a fade out.
+        /// &lt;/summary&gt;
+        public void StopMusic(float fadeOutDuration = 1f)
+        {
+            if (crossfadeCoroutine != null)
+            {
+                StopCoroutine(crossfadeCoroutine);
+            }
+
+            crossfadeCoroutine = StartCoroutine(
+                FadeOutMusic(activeMusicSource, fadeOutDuration)
+            );
+        }
+
+        private IEnumerator FadeOutMusic(AudioSource source, float duration)
+        {
+            float startVolume = source.volume;
+            float elapsed = 0f;
+
+            while (elapsed &lt; duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                source.volume = Mathf.Lerp(
+                    startVolume, 0f,
+                    elapsed / duration
+                );
+                yield return null;
+            }
+
+            source.volume = 0f;
+            source.Stop();
+            crossfadeCoroutine = null;
+        }
+
+        // ---------------------------------------------------------------
+        // Volume Controls
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Sets the master volume (affects both music and SFX).
+        /// &lt;/summary&gt;
+        /// &lt;param name="volume"&gt;Volume from 0 (silent) to 1 (full).&lt;/param&gt;
+        public void SetMasterVolume(float volume)
+        {
+            masterVolume = Mathf.Clamp01(volume);
+            UpdateMusicVolume();
+            SaveVolumeSettings();
+        }
+
+        /// &lt;summary&gt;
+        /// Sets the music volume.
+        /// &lt;/summary&gt;
+        /// &lt;param name="volume"&gt;Volume from 0 to 1.&lt;/param&gt;
+        public void SetMusicVolume(float volume)
+        {
+            musicVolume = Mathf.Clamp01(volume);
+            UpdateMusicVolume();
+            SaveVolumeSettings();
+        }
+
+        /// &lt;summary&gt;
+        /// Sets the SFX volume. Applies to the next sound played
+        /// (does not affect currently playing sounds).
+        /// &lt;/summary&gt;
+        /// &lt;param name="volume"&gt;Volume from 0 to 1.&lt;/param&gt;
+        public void SetSFXVolume(float volume)
+        {
+            sfxVolume = Mathf.Clamp01(volume);
+            SaveVolumeSettings();
+        }
+
+        /// &lt;summary&gt;
+        /// Toggles mute on/off. When muted, all audio is silent
+        /// but music continues playing (so unmmuting resumes seamlessly).
+        /// &lt;/summary&gt;
+        public void ToggleMute()
+        {
+            SetMuted(!isMuted);
+        }
+
+        /// &lt;summary&gt;
+        /// Sets the mute state directly.
+        /// &lt;/summary&gt;
+        public void SetMuted(bool muted)
+        {
+            isMuted = muted;
+            UpdateMusicVolume();
+            SaveVolumeSettings();
+        }
+
+        /// &lt;summary&gt;
+        /// Applies the current volume settings to the active music source.
+        /// Called whenever any volume slider changes.
+        /// &lt;/summary&gt;
+        private void UpdateMusicVolume()
+        {
+            if (activeMusicSource == null || !activeMusicSource.isPlaying)
+                return;
+
+            if (isMuted)
+            {
+                activeMusicSource.volume = 0f;
+            }
+            else if (currentTrackIndex >= 0
+                     && currentTrackIndex &lt; audioConfig.musicTracks.Length)
+            {
+                float trackVolume =
+                    audioConfig.musicTracks[currentTrackIndex].volume;
+                activeMusicSource.volume =
+                    trackVolume * musicVolume * masterVolume;
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Volume Persistence
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Saves all volume settings to PlayerPrefs.
+        /// &lt;/summary&gt;
+        private void SaveVolumeSettings()
+        {
+            PlayerPrefs.SetFloat(MASTER_VOL_KEY, masterVolume);
+            PlayerPrefs.SetFloat(MUSIC_VOL_KEY, musicVolume);
+            PlayerPrefs.SetFloat(SFX_VOL_KEY, sfxVolume);
+            PlayerPrefs.SetInt(MUTE_KEY, isMuted ? 1 : 0);
+            PlayerPrefs.Save();
+        }
+
+        /// &lt;summary&gt;
+        /// Loads volume settings from PlayerPrefs, falling back to
+        /// defaults if no saved values exist.
+        /// &lt;/summary&gt;
+        private void LoadVolumeSettings()
+        {
+            masterVolume = PlayerPrefs.GetFloat(
+                MASTER_VOL_KEY, defaultMasterVolume
+            );
+            musicVolume = PlayerPrefs.GetFloat(
+                MUSIC_VOL_KEY, defaultMusicVolume
+            );
+            sfxVolume = PlayerPrefs.GetFloat(
+                SFX_VOL_KEY, defaultSfxVolume
+            );
+            isMuted = PlayerPrefs.GetInt(MUTE_KEY, 0) == 1;
+
+            Debug.Log($"[AudioManager] Loaded audio settings - " +
+                      $"Master: {masterVolume:F2}, " +
+                      $"Music: {musicVolume:F2}, " +
+                      $"SFX: {sfxVolume:F2}, " +
+                      $"Muted: {isMuted}");
+        }
+
+        // ---------------------------------------------------------------
+        // Event Handlers (Automatic Sound Playback)
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Plays the coin collection sound.
+        /// &lt;/summary&gt;
+        private void HandleCoinCollected(int value)
+        {
+            PlaySFX(SoundType.Collect);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays the power-up pickup sound.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpCollected(PowerUpType type, float duration)
+        {
+            PlaySFX(SoundType.PowerUp);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays the power-up expiration sound.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpExpired(PowerUpType type)
+        {
+            PlaySFX(SoundType.PowerUpExpire);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays the death sound.
+        /// &lt;/summary&gt;
+        private void HandleGameOver()
+        {
+            PlaySFX(SoundType.Death);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays the shield break sound.
+        /// &lt;/summary&gt;
+        private void HandleShieldConsumed()
+        {
+            PlaySFX(SoundType.ShieldBreak);
+        }
+
+        /// &lt;summary&gt;
+        /// Resets audio state for a new game.
+        /// Optionally switch to gameplay music.
+        /// &lt;/summary&gt;
+        private void HandleGameStarted()
+        {
+            // If you have different music for menu vs. gameplay,
+            // crossfade to the gameplay track here.
+            // PlayMusic(1); // Index 1 = gameplay track
+        }
+
+        // ---------------------------------------------------------------
+        // Public API (Getters)
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;Returns the current master volume (0-1).&lt;/summary&gt;
+        public float GetMasterVolume() => masterVolume;
+
+        /// &lt;summary&gt;Returns the current music volume (0-1).&lt;/summary&gt;
+        public float GetMusicVolume() => musicVolume;
+
+        /// &lt;summary&gt;Returns the current SFX volume (0-1).&lt;/summary&gt;
+        public float GetSFXVolume() => sfxVolume;
+
+        /// &lt;summary&gt;Returns whether audio is muted.&lt;/summary&gt;
+        public bool IsMuted() => isMuted;
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Playing Sounds from Game Code -->
+      <section>
+        <h2>Playing Sounds from Game Code</h2>
+        <p>While the AudioManager automatically handles many sounds through event subscriptions, some sounds need to be triggered directly from gameplay scripts. Here is how other systems play sounds:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Playing sounds from any script</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using InfiniteRunner.Audio;
+
+// Play a sound by type (recommended approach):
+AudioManager.Instance?.PlaySFX(SoundType.Jump);
+AudioManager.Instance?.PlaySFX(SoundType.LaneChange);
+AudioManager.Instance?.PlaySFX(SoundType.ButtonClick);
+
+// Play a specific AudioClip with custom volume:
+public AudioClip customClip;
+AudioManager.Instance?.PlaySFX(customClip, 0.7f);
+
+// Play a clip with pitch variation:
+AudioManager.Instance?.PlaySFX(customClip, 1f, 0.1f);</code></pre></div>
+
+        <h3>PlayerController Integration Example</h3>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PlayerController.cs (audio excerpt)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using InfiniteRunner.Audio;
+
+// In the jump method:
+private void PerformJump()
+{
+    // ... jump physics ...
+    AudioManager.Instance?.PlaySFX(SoundType.Jump);
+}
+
+// In the slide method:
+private void PerformSlide()
+{
+    // ... slide logic ...
+    AudioManager.Instance?.PlaySFX(SoundType.Slide);
+}
+
+// In the lane change method:
+private void ChangeLane(int direction)
+{
+    // ... lane change logic ...
+    AudioManager.Instance?.PlaySFX(SoundType.LaneChange);
+}</code></pre></div>
+
+        <h3>UI Button Sound</h3>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">UIButtonSound.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.UI;
+using InfiniteRunner.Audio;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Plays a click sound when a UI button is pressed.
+    /// Attach this to any Button that should make a sound.
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Button))]
+    public class UIButtonSound : MonoBehaviour
+    {
+        private void Awake()
+        {
+            GetComponent&lt;Button&gt;().onClick.AddListener(PlayClickSound);
+        }
+
+        private void OnDestroy()
+        {
+            GetComponent&lt;Button&gt;().onClick.RemoveListener(PlayClickSound);
+        }
+
+        private void PlayClickSound()
+        {
+            AudioManager.Instance?.PlaySFX(SoundType.ButtonClick);
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">The Null-Conditional Operator (?.) </div>
+          <p>We use <code>AudioManager.Instance?.PlaySFX()</code> with the <code>?.</code> operator. This means "if Instance is not null, call PlaySFX." If the AudioManager has not been set up yet (maybe in a test scene), the call is simply skipped instead of throwing a NullReferenceException. This is a defensive programming pattern that makes your code more robust.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Volume Settings UI -->
+      <section>
+        <h2>Volume Settings UI</h2>
+        <p>Players need the ability to adjust volume levels. Here is a script that connects UI sliders to the AudioManager. You would add this to your Settings panel.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">AudioSettingsUI.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.UI;
+using InfiniteRunner.Audio;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Connects volume sliders and a mute toggle to the AudioManager.
+    /// Place this on your Settings panel and wire up the UI elements.
+    /// &lt;/summary&gt;
+    public class AudioSettingsUI : MonoBehaviour
+    {
+        [Header("Volume Sliders")]
+        [Tooltip("Slider for master volume (0-1).")]
+        [SerializeField] private Slider masterSlider;
+
+        [Tooltip("Slider for music volume (0-1).")]
+        [SerializeField] private Slider musicSlider;
+
+        [Tooltip("Slider for SFX volume (0-1).")]
+        [SerializeField] private Slider sfxSlider;
+
+        [Header("Mute Toggle")]
+        [Tooltip("Toggle button for muting all audio.")]
+        [SerializeField] private Toggle muteToggle;
+
+        private void OnEnable()
+        {
+            // When the settings panel opens, set the sliders to
+            // match the current audio settings.
+            if (AudioManager.Instance == null) return;
+
+            if (masterSlider != null)
+            {
+                masterSlider.value = AudioManager.Instance.GetMasterVolume();
+                masterSlider.onValueChanged.AddListener(OnMasterVolumeChanged);
+            }
+
+            if (musicSlider != null)
+            {
+                musicSlider.value = AudioManager.Instance.GetMusicVolume();
+                musicSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+            }
+
+            if (sfxSlider != null)
+            {
+                sfxSlider.value = AudioManager.Instance.GetSFXVolume();
+                sfxSlider.onValueChanged.AddListener(OnSfxVolumeChanged);
+            }
+
+            if (muteToggle != null)
+            {
+                muteToggle.isOn = AudioManager.Instance.IsMuted();
+                muteToggle.onValueChanged.AddListener(OnMuteToggled);
+            }
+        }
+
+        private void OnDisable()
+        {
+            // Remove listeners when the panel is hidden to prevent
+            // memory leaks and duplicate subscriptions.
+            if (masterSlider != null)
+                masterSlider.onValueChanged.RemoveListener(OnMasterVolumeChanged);
+
+            if (musicSlider != null)
+                musicSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+
+            if (sfxSlider != null)
+                sfxSlider.onValueChanged.RemoveListener(OnSfxVolumeChanged);
+
+            if (muteToggle != null)
+                muteToggle.onValueChanged.RemoveListener(OnMuteToggled);
+        }
+
+        // ---------------------------------------------------------------
+        // Slider Handlers
+        // ---------------------------------------------------------------
+
+        private void OnMasterVolumeChanged(float value)
+        {
+            AudioManager.Instance?.SetMasterVolume(value);
+        }
+
+        private void OnMusicVolumeChanged(float value)
+        {
+            AudioManager.Instance?.SetMusicVolume(value);
+        }
+
+        private void OnSfxVolumeChanged(float value)
+        {
+            AudioManager.Instance?.SetSFXVolume(value);
+
+            // Play a test sound so the player can hear the new level.
+            AudioManager.Instance?.PlaySFX(SoundType.Collect);
+        }
+
+        private void OnMuteToggled(bool muted)
+        {
+            AudioManager.Instance?.SetMuted(muted);
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Test Sound on SFX Slider</div>
+          <p>Notice that when the SFX slider changes, we play a test sound (<code>SoundType.Collect</code>). This gives the player immediate feedback about the volume level they are setting. Without this, they would have to go back to the game to hear the effect of their change. This is a small UX touch found in most professional games.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Where to Find Audio -->
+      <section>
+        <h2>Where to Find Free Game Audio</h2>
+        <p>You do not need to create your own sound effects and music. There are many excellent free resources available:</p>
+
+        <h3>Sound Effects</h3>
+        <ul>
+          <li><strong><a href="https://freesound.org" target="_blank" rel="noopener">Freesound.org</a></strong> &mdash; Massive library of user-contributed sounds. Many are CC0 (public domain). Always check the individual license.</li>
+          <li><strong><a href="https://kenney.nl/assets?q=audio" target="_blank" rel="noopener">Kenney.nl</a></strong> &mdash; High-quality game assets including sound effects, all CC0. The "Interface Sounds" and "Impact Sounds" packs are perfect for our game.</li>
+          <li><strong><a href="https://sfxr.me" target="_blank" rel="noopener">sfxr.me</a></strong> &mdash; A browser-based tool for generating retro-style sound effects. Great for coin pickups, jumps, and UI clicks. Click "Pickup/Coin" and randomize until you find one you like.</li>
+        </ul>
+
+        <h3>Background Music</h3>
+        <ul>
+          <li><strong><a href="https://incompetech.com" target="_blank" rel="noopener">Incompetech</a></strong> &mdash; Kevin MacLeod's royalty-free music library. Requires attribution. Huge variety of genres and tempos.</li>
+          <li><strong><a href="https://opengameart.org" target="_blank" rel="noopener">OpenGameArt.org</a></strong> &mdash; Community-contributed game assets including music. Various licenses (check each one).</li>
+          <li><strong>Unity Asset Store</strong> &mdash; Search for "free music" or "free SFX." Many publishers offer free sample packs.</li>
+        </ul>
+
+        <div class="callout warning">
+          <div class="callout-title">Always Check the License</div>
+          <p>Free does not always mean "use however you want." Some licenses require attribution (credit the author), some prohibit commercial use, and some require sharing your work under the same license. Always read the license for every asset you use. <strong>CC0</strong> (Creative Commons Zero) is the safest &mdash; it means the creator waived all rights and you can use it for anything. <strong>CC-BY</strong> means you must credit the creator.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Audio Import Settings -->
+      <section>
+        <h2>Audio Import Settings in Unity</h2>
+        <p>How you import audio files affects both quality and performance. Here are recommended settings:</p>
+
+        <h3>Sound Effects</h3>
+        <ol class="steps">
+          <li>Select the audio file in the Project window.</li>
+          <li>In the Inspector, set <strong>Load Type</strong> to <strong>Decompress On Load</strong>. SFX are short, so keeping them decompressed in memory is fine and avoids CPU spikes.</li>
+          <li>Set <strong>Compression Format</strong> to <strong>Vorbis</strong> with quality around <code>70%</code>.</li>
+          <li>Uncheck <strong>Preload Audio Data</strong> if you have many SFX and want to save memory at startup.</li>
+        </ol>
+
+        <h3>Music</h3>
+        <ol class="steps">
+          <li>Select the music file.</li>
+          <li>Set <strong>Load Type</strong> to <strong>Streaming</strong>. Music files are large, and streaming reads them from disk in small chunks instead of loading the entire file into memory.</li>
+          <li>Set <strong>Compression Format</strong> to <strong>Vorbis</strong> with quality around <code>50-70%</code>.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Mono vs. Stereo</div>
+          <p>For most mobile games, SFX should be <strong>mono</strong> (single channel). Mono files are half the size of stereo and for short game sounds, the player will not notice the difference. Set <strong>Force To Mono</strong> on SFX imports. Keep music as <strong>stereo</strong> since it benefits from the wider sound stage.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>Chapter Summary</h2>
+        <p>In this chapter, you built a complete audio system for the infinite runner:</p>
+        <ul>
+          <li><strong>SoundType enum</strong> &mdash; Type-safe identifiers for every sound effect in the game.</li>
+          <li><strong>AudioConfig ScriptableObject</strong> &mdash; Data-driven mapping from SoundType to AudioClip, with per-sound volume and pitch variation settings.</li>
+          <li><strong>AudioManager.cs</strong> &mdash; Singleton manager with:
+            <ul>
+              <li>Pooled AudioSources for SFX (no runtime allocation).</li>
+              <li>Dual AudioSources for music crossfading.</li>
+              <li>Master, music, and SFX volume controls.</li>
+              <li>Mute toggle.</li>
+              <li>Volume persistence via PlayerPrefs.</li>
+              <li>Event-driven automatic sound playback for game events.</li>
+            </ul>
+          </li>
+          <li><strong>UIButtonSound.cs</strong> &mdash; Simple component for adding click sounds to UI buttons.</li>
+          <li><strong>AudioSettingsUI.cs</strong> &mdash; UI panel with volume sliders and mute toggle.</li>
+          <li><strong>Audio asset sources</strong> &mdash; Where to find free, high-quality sound effects and music.</li>
+          <li><strong>Import settings</strong> &mdash; Proper Unity import configuration for SFX (Decompress On Load) and music (Streaming).</li>
+        </ul>
+        <p>Sound transforms a silent tech demo into a game that <em>feels</em> alive. In the next chapter, we will add particle effects to create visual flair for coin collection, power-up activation, and obstacle impacts.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Audio system done. Commit and push.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add audio system with SFX pooling and music crossfade"
+git push</code></pre>
+        </div>
+        <p>Short and sweet. You know the workflow by now.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="19-ui-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">UI System</span></a>
+        <a href="21-particles.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Particle Effects</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tile/Chunk System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link active"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 11</span>
+        <h1>Tile / Chunk System</h1>
+        <p class="chapter-desc">Learn how to break your infinite world into modular, reusable sections called chunks &mdash; the fundamental building blocks of procedural world generation.</p>
+      </div>
+
+      <!-- Section: What Is a Chunk? -->
+      <h2>What Is a "Chunk"?</h2>
+      <p>In an infinite runner, the world stretches out endlessly in front of the player. But you obviously can't build an infinitely long level in the Unity editor &mdash; that would require infinite memory and infinite time. Instead, we use a clever trick: we build a handful of short <strong>sections</strong> of the world, and then stitch them together end-to-end at runtime, recycling old ones as the player passes them. Each of these sections is called a <strong>chunk</strong> (also sometimes called a "tile" or "segment").</p>
+      <p>Think of chunks like LEGO bricks. Each brick is a self-contained piece &mdash; it has its own ground surface, its own obstacle positions, and its own collectible positions. You snap them together in a line to create a road. When the player runs past a brick, you pick it up from behind them and place it at the front of the line. The player never notices that the world behind them is disappearing, because they're always looking forward.</p>
+
+      <h3>What's Inside a Chunk?</h3>
+      <p>A typical chunk in our 3-lane infinite runner contains:</p>
+      <ul>
+        <li><strong>A ground mesh</strong> &mdash; The flat surface the player runs on. This is usually a simple stretched cube or a plane with a road texture. It spans all three lanes.</li>
+        <li><strong>Obstacle spawn points</strong> &mdash; Empty GameObjects placed at specific positions where obstacles can appear. For example, you might have a spawn point on the left lane at the midpoint of the chunk.</li>
+        <li><strong>Collectible spawn points</strong> &mdash; Empty GameObjects placed where coins or power-ups can appear. These are often along the center of a lane at regular intervals.</li>
+        <li><strong>A defined length</strong> &mdash; How many units long this chunk is (measured along the Z-axis, which is our "forward" direction). This is crucial for knowing where to place the next chunk.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">Why Empty GameObjects as Spawn Points?</div>
+        <p>Empty GameObjects are invisible in the game but visible in the editor. They act as position markers &mdash; "put an obstacle here" or "put a coin here." When the chunk spawns at runtime, our code reads these positions and decides what to actually place there. This gives us enormous flexibility: the same chunk can have different obstacles every time it appears, because the spawn points are just positions, not specific objects.</p>
+      </div>
+
+      <!-- Section: Why Modular Chunks? -->
+      <h2>Why Modular Chunks?</h2>
+      <p>You might wonder: why not just generate the world procedurally, placing ground tiles and obstacles one at a time? The chunk-based approach has several major advantages:</p>
+      <ul>
+        <li><strong>Reusability</strong> &mdash; You design a chunk once and it can appear hundreds of times during a single play session. With just 10-15 chunk variants, you can create a world that feels varied enough that players don't notice the repetition.</li>
+        <li><strong>Visual variety</strong> &mdash; Each chunk can have unique visual features: maybe one chunk has road markings, another has street lamps on the sides, another has a slightly different ground color. This makes the world feel alive without expensive runtime generation.</li>
+        <li><strong>Memory efficiency</strong> &mdash; Because chunks are prefabs, Unity stores them efficiently. At runtime, we only need a handful of active chunks (the ones visible to the player). Everything else is in the object pool, waiting to be reused.</li>
+        <li><strong>Design control</strong> &mdash; You can hand-design the spawn point layouts for each chunk to ensure they're fair and fun. Maybe one chunk is "easy" with spawn points only on the edges, while another is "hard" with spawn points clustered in the center.</li>
+        <li><strong>Easy to extend</strong> &mdash; Want to add a new type of world section? Create a new chunk prefab. No code changes needed. The world generator will pick it up automatically.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">How Many Chunks Do You Need?</div>
+        <p>For a polished game, aim for 10-20 chunk variants. For our tutorial, we'll start with 3-4 and add more later. Even with just a few chunks, the randomized obstacle and collectible placement makes each playthrough feel different. Remember: the chunks define <em>where things can appear</em>, but the spawner system (Chapter 15) decides <em>what</em> actually appears there.</p>
+      </div>
+
+      <!-- Section: Designing the Chunk Prefab Structure -->
+      <h2>Designing the Chunk Prefab Structure</h2>
+      <p>Let's establish a clear hierarchy for our chunk prefabs. Every chunk follows the same structure so our code can work with any variant.</p>
+      <p>Here is the GameObject hierarchy for a single chunk:</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Chunk Prefab Hierarchy</span><span class="lang-badge">Unity</span></div><pre><code>Chunk_Straight          (parent - has ChunkData script)
+  |-- Ground            (3D mesh - stretched cube or plane)
+  |-- SpawnPoints
+  |     |-- Obstacle_L_1    (empty GO at left lane, position 1)
+  |     |-- Obstacle_C_1    (empty GO at center lane, position 1)
+  |     |-- Obstacle_R_1    (empty GO at right lane, position 1)
+  |     |-- Obstacle_L_2    (empty GO at left lane, position 2)
+  |     |-- Obstacle_C_2    (empty GO at center lane, position 2)
+  |     |-- Obstacle_R_2    (empty GO at right lane, position 2)
+  |     |-- Coin_L_1        (empty GO at left lane, coin position 1)
+  |     |-- Coin_C_1        (empty GO at center lane, coin position 1)
+  |     |-- Coin_R_1        (empty GO at right lane, coin position 1)
+  |-- SnapPoint_Start   (empty GO at Z = 0, the "back" of the chunk)
+  |-- SnapPoint_End     (empty GO at Z = chunkLength, the "front")</code></pre></div>
+
+      <p>Let's break down each part:</p>
+      <ul>
+        <li><strong>Chunk_Straight</strong> &mdash; The root GameObject. This is what gets moved around when the chunk is positioned in the world. It holds the <code>ChunkData</code> component.</li>
+        <li><strong>Ground</strong> &mdash; A visible 3D mesh. For a 3-lane runner, this is typically about 6 units wide (2 units per lane) and 20-30 units long. We'll use a simple cube scaled to (6, 0.1, 20).</li>
+        <li><strong>SpawnPoints</strong> &mdash; An organizer object that contains all the spawn point markers. The naming convention <code>Obstacle_L_1</code> means "obstacle spawn point, left lane, position 1." This naming helps you keep things organized in the editor.</li>
+        <li><strong>SnapPoint_Start / SnapPoint_End</strong> &mdash; These mark the exact start and end positions of the chunk. When we place chunks end-to-end, we align one chunk's <code>SnapPoint_End</code> with the next chunk's <code>SnapPoint_Start</code>. This ensures seamless connection even if chunks have different lengths.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">Lane Width Consistency</div>
+        <p>Make sure your lane positions are consistent across all chunk variants. If the left lane is at X = -2 in one chunk, it must be at X = -2 in every chunk. If they don't match, players will see objects "jump" sideways when transitioning between chunks. We'll define lane positions as constants: Left = -2f, Center = 0f, Right = 2f.</p>
+      </div>
+
+      <!-- Section: ChunkData Script -->
+      <h2>The ChunkData Script</h2>
+      <p>Every chunk prefab needs a script that tells our code what's inside it. The <code>ChunkData</code> script holds references to the chunk's spawn points, its length, and its snap points. This is the script that the World Generator (Chapter 13) reads when it spawns a chunk.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ChunkData.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Holds all metadata for a single world chunk.
+    /// Attach this to the root GameObject of every chunk prefab.
+    /// &lt;/summary&gt;
+    public class ChunkData : MonoBehaviour
+    {
+        [Header("Chunk Dimensions")]
+        [Tooltip("The length of this chunk along the Z-axis (forward direction).")]
+        [SerializeField] private float chunkLength = 20f;
+
+        [Header("Snap Points")]
+        [Tooltip("The transform at the very start (back) of this chunk.")]
+        [SerializeField] private Transform snapPointStart;
+
+        [Tooltip("The transform at the very end (front) of this chunk.")]
+        [SerializeField] private Transform snapPointEnd;
+
+        [Header("Spawn Points")]
+        [Tooltip("Positions where obstacles can be placed on this chunk.")]
+        [SerializeField] private Transform[] obstacleSpawnPoints;
+
+        [Tooltip("Positions where collectibles (coins, power-ups) can be placed.")]
+        [SerializeField] private Transform[] collectibleSpawnPoints;
+
+        // ---- Public Properties ----
+
+        /// &lt;summary&gt;
+        /// How long this chunk is along the forward (Z) axis.
+        /// Used by the WorldGenerator to know where to place the next chunk.
+        /// &lt;/summary&gt;
+        public float ChunkLength =&gt; chunkLength;
+
+        /// &lt;summary&gt;
+        /// The world-space position of the back edge of this chunk.
+        /// &lt;/summary&gt;
+        public Vector3 StartPosition =&gt; snapPointStart.position;
+
+        /// &lt;summary&gt;
+        /// The world-space position of the front edge of this chunk.
+        /// The next chunk's StartPosition should align with this.
+        /// &lt;/summary&gt;
+        public Vector3 EndPosition =&gt; snapPointEnd.position;
+
+        /// &lt;summary&gt;
+        /// All obstacle spawn point transforms on this chunk.
+        /// The ObstacleSpawner reads these to decide where to place obstacles.
+        /// &lt;/summary&gt;
+        public Transform[] ObstacleSpawnPoints =&gt; obstacleSpawnPoints;
+
+        /// &lt;summary&gt;
+        /// All collectible spawn point transforms on this chunk.
+        /// The CollectibleSpawner reads these to decide where to place coins.
+        /// &lt;/summary&gt;
+        public Transform[] CollectibleSpawnPoints =&gt; collectibleSpawnPoints;
+
+        // ---- Validation ----
+
+        private void OnValidate()
+        {
+            // Auto-calculate chunk length from snap points if both are assigned
+            if (snapPointStart != null &amp;&amp; snapPointEnd != null)
+            {
+                float calculatedLength = snapPointEnd.localPosition.z
+                                       - snapPointStart.localPosition.z;
+
+                if (calculatedLength &gt; 0f)
+                {
+                    chunkLength = calculatedLength;
+                }
+            }
+        }
+
+        // ---- Editor Visualization ----
+
+        private void OnDrawGizmos()
+        {
+            // Draw obstacle spawn points in red
+            if (obstacleSpawnPoints != null)
+            {
+                Gizmos.color = Color.red;
+                foreach (Transform point in obstacleSpawnPoints)
+                {
+                    if (point != null)
+                    {
+                        Gizmos.DrawWireSphere(point.position, 0.3f);
+                        Gizmos.DrawLine(point.position,
+                            point.position + Vector3.up * 2f);
+                    }
+                }
+            }
+
+            // Draw collectible spawn points in yellow
+            if (collectibleSpawnPoints != null)
+            {
+                Gizmos.color = Color.yellow;
+                foreach (Transform point in collectibleSpawnPoints)
+                {
+                    if (point != null)
+                    {
+                        Gizmos.DrawWireSphere(point.position, 0.2f);
+                    }
+                }
+            }
+
+            // Draw chunk bounds in green
+            if (snapPointStart != null &amp;&amp; snapPointEnd != null)
+            {
+                Gizmos.color = Color.green;
+                Gizmos.DrawLine(snapPointStart.position, snapPointEnd.position);
+
+                // Draw start marker
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireCube(snapPointStart.position,
+                    new Vector3(6f, 0.1f, 0.1f));
+
+                // Draw end marker
+                Gizmos.color = Color.magenta;
+                Gizmos.DrawWireCube(snapPointEnd.position,
+                    new Vector3(6f, 0.1f, 0.1f));
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's walk through what each part does:</p>
+      <ul>
+        <li><strong><code>[SerializeField] private</code></strong> &mdash; We use private fields with <code>[SerializeField]</code> instead of public fields. This is a best practice: the fields appear in the Unity Inspector so you can assign them, but other scripts can only read them through the public properties. This prevents accidental modifications.</li>
+        <li><strong><code>chunkLength</code></strong> &mdash; How long this chunk is. The <code>OnValidate</code> method automatically calculates this from the snap points whenever you change something in the Inspector, so you don't have to set it manually.</li>
+        <li><strong><code>snapPointStart</code> / <code>snapPointEnd</code></strong> &mdash; Transforms marking the back and front edges. When the World Generator places chunks, it positions each new chunk so that its start aligns with the previous chunk's end.</li>
+        <li><strong><code>obstacleSpawnPoints</code> / <code>collectibleSpawnPoints</code></strong> &mdash; Arrays of Transforms that mark where things can appear. You drag the empty GameObjects from the hierarchy into these arrays in the Inspector.</li>
+        <li><strong><code>OnDrawGizmos</code></strong> &mdash; This draws visual markers in the Scene view so you can see spawn points without running the game. Red spheres for obstacles, yellow spheres for collectibles, and colored lines for chunk boundaries. This is incredibly helpful when designing chunks.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">What Is OnValidate?</div>
+        <p><code>OnValidate()</code> is a special Unity method that runs whenever you change a value in the Inspector (and when the script first loads). We use it to automatically calculate the chunk length from the snap point positions. This means if you move a snap point, the length updates instantly &mdash; no manual math needed. It only runs in the editor, never in a built game, so there's zero performance cost.</p>
+      </div>
+
+      <!-- Section: ChunkConfig ScriptableObject -->
+      <h2>ChunkConfig ScriptableObject</h2>
+      <p>Each chunk variant has properties beyond what's stored in the prefab itself &mdash; things like how likely it is to appear, what difficulty level it requires, and a human-readable name. We store these in a <strong>ScriptableObject</strong> called <code>ChunkConfig</code>.</p>
+      <p>If you haven't used ScriptableObjects before: they're data containers that live as assets in your project. Unlike MonoBehaviours, they don't need to be attached to a GameObject. Think of them as configuration files that you can edit in the Inspector.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ChunkConfig.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Configuration data for a chunk variant.
+    /// Create instances via: Assets &gt; Create &gt; Infinite Runner &gt; Chunk Config
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewChunkConfig",
+        menuName = "Infinite Runner/Chunk Config",
+        order = 1
+    )]
+    public class ChunkConfig : ScriptableObject
+    {
+        [Header("Identity")]
+        [Tooltip("A human-readable name for this chunk variant.")]
+        [SerializeField] private string chunkName = "New Chunk";
+
+        [Tooltip("The prefab to instantiate for this chunk.")]
+        [SerializeField] private GameObject chunkPrefab;
+
+        [Header("Spawn Settings")]
+        [Tooltip("How likely this chunk is to be selected. Higher = more common. " +
+                 "A weight of 10 is twice as likely as a weight of 5.")]
+        [Range(1, 100)]
+        [SerializeField] private int spawnWeight = 10;
+
+        [Tooltip("The minimum difficulty level before this chunk can appear. " +
+                 "0 = available from the start, 5 = only appears later in the game.")]
+        [Range(0, 10)]
+        [SerializeField] private int minimumDifficulty = 0;
+
+        [Header("Chunk Properties")]
+        [Tooltip("Maximum number of obstacles that can spawn on this chunk.")]
+        [Range(0, 10)]
+        [SerializeField] private int maxObstacles = 3;
+
+        [Tooltip("Maximum number of collectibles that can spawn on this chunk.")]
+        [Range(0, 20)]
+        [SerializeField] private int maxCollectibles = 8;
+
+        [Tooltip("If true, this chunk will never have obstacles " +
+                 "(useful for starting chunks or rest chunks).")]
+        [SerializeField] private bool isSafeZone = false;
+
+        // ---- Public Properties ----
+
+        public string ChunkName =&gt; chunkName;
+        public GameObject ChunkPrefab =&gt; chunkPrefab;
+        public int SpawnWeight =&gt; spawnWeight;
+        public int MinimumDifficulty =&gt; minimumDifficulty;
+        public int MaxObstacles =&gt; maxObstacles;
+        public int MaxCollectibles =&gt; maxCollectibles;
+        public bool IsSafeZone =&gt; isSafeZone;
+
+        // ---- Validation ----
+
+        private void OnValidate()
+        {
+            if (chunkPrefab != null)
+            {
+                // Verify the prefab has a ChunkData component
+                ChunkData data = chunkPrefab.GetComponent&lt;ChunkData&gt;();
+                if (data == null)
+                {
+                    Debug.LogWarning(
+                        $"ChunkConfig '{chunkName}': Assigned prefab " +
+                        $"'{chunkPrefab.name}' is missing a ChunkData component!",
+                        this
+                    );
+                }
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>Key points about this ScriptableObject:</p>
+      <ul>
+        <li><strong><code>[CreateAssetMenu]</code></strong> &mdash; This attribute adds an entry to Unity's Create menu. After writing this script, you can right-click in the Project window and choose <em>Create &gt; Infinite Runner &gt; Chunk Config</em> to make new configuration assets.</li>
+        <li><strong><code>spawnWeight</code></strong> &mdash; Controls how often this chunk appears relative to others. If Chunk A has weight 10 and Chunk B has weight 5, Chunk A will appear roughly twice as often. We'll use this in the World Generator (Chapter 13) for weighted random selection.</li>
+        <li><strong><code>minimumDifficulty</code></strong> &mdash; Prevents hard chunks from appearing at the start of the game. The difficulty system (Chapter 18) increases a difficulty value over time. A chunk with <code>minimumDifficulty = 3</code> won't appear until the difficulty reaches 3.</li>
+        <li><strong><code>isSafeZone</code></strong> &mdash; Marks chunks where no obstacles should spawn. This is useful for the very first chunk (the player needs time to get oriented) and for occasional "rest" chunks that give the player a breather.</li>
+        <li><strong><code>OnValidate</code></strong> &mdash; Checks that the assigned prefab actually has a <code>ChunkData</code> component. If you forget to add it, you'll see a warning in the console immediately rather than a crash at runtime.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">ScriptableObjects Are Your Best Friend</div>
+        <p>ScriptableObjects let designers tweak game parameters without touching code. Once you have the ChunkConfig system set up, adding a new chunk variant is entirely a Unity Editor workflow: create the prefab, create a ChunkConfig asset, fill in the values, and drag the prefab in. Zero lines of code. This is the kind of production workflow that separates hobby projects from professional ones.</p>
+      </div>
+
+      <!-- Section: Creating Chunk Prefabs Step by Step -->
+      <h2>Creating Your First Chunk Prefabs</h2>
+      <p>Now let's build actual chunk prefabs in Unity. We'll create four variants: a basic straight chunk, a chunk with lots of spawn points, a narrow passage chunk, and a safe starting chunk.</p>
+
+      <h3>Step 1: Set Up the Folder Structure</h3>
+      <ol class="steps">
+        <li>In the Project window, navigate to <code>Assets/Prefabs</code>. If this folder doesn't exist, create it.</li>
+        <li>Inside <code>Prefabs</code>, create a subfolder called <code>Chunks</code>.</li>
+        <li>Inside <code>Assets</code>, create a folder called <code>ScriptableObjects</code>, and inside that, create <code>ChunkConfigs</code>.</li>
+      </ol>
+      <p>Your folder structure should look like:</p>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Project Folder Structure</span><span class="lang-badge">Folders</span></div><pre><code>Assets/
+  Prefabs/
+    Chunks/
+      Chunk_Straight.prefab
+      Chunk_Dense.prefab
+      Chunk_Narrow.prefab
+      Chunk_Safe.prefab
+  ScriptableObjects/
+    ChunkConfigs/
+      ChunkConfig_Straight.asset
+      ChunkConfig_Dense.asset
+      ChunkConfig_Narrow.asset
+      ChunkConfig_Safe.asset
+  Scripts/
+    World/
+      ChunkData.cs
+      ChunkConfig.cs</code></pre></div>
+
+      <h3>Step 2: Build the Basic Straight Chunk</h3>
+      <ol class="steps">
+        <li>In the Hierarchy, right-click and choose <strong>Create Empty</strong>. Name it <code>Chunk_Straight</code>. Set its position to (0, 0, 0).</li>
+        <li>Add the <code>ChunkData</code> script to <code>Chunk_Straight</code> (Component &gt; Add Component &gt; search for ChunkData).</li>
+        <li>Right-click <code>Chunk_Straight</code> and choose <strong>3D Object &gt; Cube</strong>. Name it <code>Ground</code>.</li>
+        <li>Select <code>Ground</code> and set its Transform:
+          <ul>
+            <li>Position: (0, -0.05, 10)</li>
+            <li>Scale: (6, 0.1, 20)</li>
+          </ul>
+          This creates a flat platform 6 units wide and 20 units long. The Y position of -0.05 places the top surface exactly at Y = 0, so the player runs on a flat plane.
+        </li>
+        <li>Right-click <code>Chunk_Straight</code> and choose <strong>Create Empty</strong>. Name it <code>SpawnPoints</code>.</li>
+        <li>Inside <code>SpawnPoints</code>, create the following empty GameObjects with these positions:
+          <ul>
+            <li><code>Obstacle_L_1</code> &mdash; Position: (-2, 0, 5)</li>
+            <li><code>Obstacle_C_1</code> &mdash; Position: (0, 0, 5)</li>
+            <li><code>Obstacle_R_1</code> &mdash; Position: (2, 0, 5)</li>
+            <li><code>Obstacle_L_2</code> &mdash; Position: (-2, 0, 15)</li>
+            <li><code>Obstacle_C_2</code> &mdash; Position: (0, 0, 15)</li>
+            <li><code>Obstacle_R_2</code> &mdash; Position: (2, 0, 15)</li>
+            <li><code>Coin_L_1</code> &mdash; Position: (-2, 1, 3)</li>
+            <li><code>Coin_C_1</code> &mdash; Position: (0, 1, 8)</li>
+            <li><code>Coin_R_1</code> &mdash; Position: (2, 1, 13)</li>
+          </ul>
+        </li>
+        <li>Right-click <code>Chunk_Straight</code> and create two more empty GameObjects:
+          <ul>
+            <li><code>SnapPoint_Start</code> &mdash; Position: (0, 0, 0)</li>
+            <li><code>SnapPoint_End</code> &mdash; Position: (0, 0, 20)</li>
+          </ul>
+        </li>
+        <li>Select <code>Chunk_Straight</code> and in the ChunkData component in the Inspector:
+          <ul>
+            <li>Drag <code>SnapPoint_Start</code> into the Snap Point Start field.</li>
+            <li>Drag <code>SnapPoint_End</code> into the Snap Point End field.</li>
+            <li>Drag the six Obstacle GameObjects into the Obstacle Spawn Points array.</li>
+            <li>Drag the three Coin GameObjects into the Collectible Spawn Points array.</li>
+          </ul>
+        </li>
+        <li>Drag <code>Chunk_Straight</code> from the Hierarchy into the <code>Assets/Prefabs/Chunks</code> folder to create the prefab.</li>
+        <li>Delete the <code>Chunk_Straight</code> from the scene (the prefab is saved in the Project window).</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">Verify Your Gizmos</div>
+        <p>After creating the prefab, double-click it in the Project window to open it in Prefab Edit Mode. You should see red wire spheres at obstacle spawn points, yellow wire spheres at collectible spawn points, and colored lines marking the chunk boundaries. If you don't see them, make sure Gizmos are enabled (the Gizmos button in the top-right of the Scene view).</p>
+      </div>
+
+      <h3>Step 3: Build the Dense Chunk</h3>
+      <p>This variant has more spawn points, creating opportunities for tighter obstacle patterns.</p>
+      <ol class="steps">
+        <li>Duplicate the <code>Chunk_Straight</code> prefab (select it in Project window, Ctrl+D). Rename it to <code>Chunk_Dense</code>.</li>
+        <li>Double-click <code>Chunk_Dense</code> to open it in Prefab Edit Mode.</li>
+        <li>Add additional obstacle spawn points inside the SpawnPoints object:
+          <ul>
+            <li><code>Obstacle_L_3</code> &mdash; Position: (-2, 0, 10)</li>
+            <li><code>Obstacle_C_3</code> &mdash; Position: (0, 0, 10)</li>
+            <li><code>Obstacle_R_3</code> &mdash; Position: (2, 0, 10)</li>
+          </ul>
+        </li>
+        <li>Add more collectible spawn points:
+          <ul>
+            <li><code>Coin_L_2</code> &mdash; Position: (-2, 1, 6)</li>
+            <li><code>Coin_C_2</code> &mdash; Position: (0, 1, 11)</li>
+            <li><code>Coin_R_2</code> &mdash; Position: (2, 1, 16)</li>
+          </ul>
+        </li>
+        <li>Update the ChunkData component arrays to include the new spawn points.</li>
+        <li>Save the prefab (Ctrl+S) and exit Prefab Edit Mode.</li>
+      </ol>
+
+      <h3>Step 4: Build the Narrow Chunk</h3>
+      <p>This variant only has spawn points on the left and right lanes, forcing the player to stay in the center or dodge side-to-side.</p>
+      <ol class="steps">
+        <li>Duplicate <code>Chunk_Straight</code> again. Rename it <code>Chunk_Narrow</code>.</li>
+        <li>Open in Prefab Edit Mode. Remove all center-lane obstacle spawn points (delete Obstacle_C_1 and Obstacle_C_2).</li>
+        <li>Move the collectible spawn points so they form a line down the center lane, rewarding the player for staying in the middle.</li>
+        <li>Update the ChunkData arrays. Save and exit.</li>
+      </ol>
+
+      <h3>Step 5: Build the Safe Chunk</h3>
+      <p>This is used at the very start of a run. No obstacles, just collectibles to teach the player to collect coins.</p>
+      <ol class="steps">
+        <li>Duplicate <code>Chunk_Straight</code>. Rename it <code>Chunk_Safe</code>.</li>
+        <li>Open in Prefab Edit Mode. Delete ALL obstacle spawn points.</li>
+        <li>Leave the collectible spawn points (or add a nice line of coins down the center).</li>
+        <li>Clear the Obstacle Spawn Points array in ChunkData (set its size to 0).</li>
+        <li>Save and exit.</li>
+      </ol>
+
+      <!-- Section: Tags and Layers -->
+      <h2>Tags and Layers for Spawn Points</h2>
+      <p>To help our spawner scripts identify what kind of spawn point they're dealing with, we use Unity's <strong>Tag</strong> system. Tags are string labels you can attach to any GameObject.</p>
+
+      <ol class="steps">
+        <li>Go to <strong>Edit &gt; Project Settings &gt; Tags and Layers</strong>.</li>
+        <li>Under Tags, click the <strong>+</strong> button and add:
+          <ul>
+            <li><code>ObstacleSpawn</code></li>
+            <li><code>CollectibleSpawn</code></li>
+          </ul>
+        </li>
+        <li>Under Layers, add a new layer:
+          <ul>
+            <li><code>SpawnPoint</code> (pick any unused layer number, e.g., layer 8)</li>
+          </ul>
+        </li>
+        <li>Open each chunk prefab and assign:
+          <ul>
+            <li>All <code>Obstacle_*</code> spawn points: Tag = <code>ObstacleSpawn</code>, Layer = <code>SpawnPoint</code></li>
+            <li>All <code>Coin_*</code> spawn points: Tag = <code>CollectibleSpawn</code>, Layer = <code>SpawnPoint</code></li>
+          </ul>
+        </li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-title">Why Both Tags AND a Layer?</div>
+        <p>Tags let us distinguish between different <em>types</em> of spawn points (obstacle vs. collectible). The shared <code>SpawnPoint</code> layer lets us find <em>all</em> spawn points quickly using layer masks, and ensures they don't interfere with physics. Spawn point GameObjects have no colliders, but setting them to their own layer is a good organizational practice that prevents accidental raycast hits.</p>
+      </div>
+
+      <!-- Section: SpawnPoint Helper Script -->
+      <h2>SpawnPoint Helper Script</h2>
+      <p>While tags work fine, a small helper script on each spawn point gives us more type safety and extra configuration per point.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">SpawnPoint.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Defines what kind of object can spawn at this point.
+    /// &lt;/summary&gt;
+    public enum SpawnPointType
+    {
+        Obstacle,
+        Collectible
+    }
+
+    /// &lt;summary&gt;
+    /// Identifies which lane this spawn point belongs to.
+    /// &lt;/summary&gt;
+    public enum Lane
+    {
+        Left   = -1,
+        Center =  0,
+        Right  =  1
+    }
+
+    /// &lt;summary&gt;
+    /// Attach this to every spawn point empty GameObject inside a chunk.
+    /// Provides type-safe metadata about the spawn point.
+    /// &lt;/summary&gt;
+    public class SpawnPoint : MonoBehaviour
+    {
+        [SerializeField] private SpawnPointType pointType = SpawnPointType.Obstacle;
+        [SerializeField] private Lane lane = Lane.Center;
+
+        [Tooltip("Optional: Override the spawn height. " +
+                 "0 = use default for the object type.")]
+        [SerializeField] private float spawnHeight = 0f;
+
+        public SpawnPointType PointType =&gt; pointType;
+        public Lane Lane =&gt; lane;
+        public float SpawnHeight =&gt; spawnHeight;
+
+        /// &lt;summary&gt;
+        /// Returns the world position where an object should be spawned,
+        /// accounting for the optional height override.
+        /// &lt;/summary&gt;
+        public Vector3 GetSpawnPosition()
+        {
+            Vector3 pos = transform.position;
+            if (spawnHeight &gt; 0f)
+            {
+                pos.y = spawnHeight;
+            }
+            return pos;
+        }
+
+        private void OnDrawGizmos()
+        {
+            // Color-code by type
+            Gizmos.color = pointType == SpawnPointType.Obstacle
+                ? Color.red
+                : Color.yellow;
+
+            Gizmos.DrawWireSphere(transform.position, 0.25f);
+
+            // Draw a small label showing the lane
+            #if UNITY_EDITOR
+            UnityEditor.Handles.Label(
+                transform.position + Vector3.up * 0.5f,
+                $"{pointType} ({lane})"
+            );
+            #endif
+        }
+    }
+}</code></pre></div>
+
+      <p>This script is optional but recommended. Instead of relying on string-based tags, we now have strongly-typed enums. The spawner code in later chapters can do things like:</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Usage Example</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Get all spawn points on a chunk
+SpawnPoint[] points = chunk.GetComponentsInChildren&lt;SpawnPoint&gt;();
+
+// Filter to just obstacle points on the left lane
+foreach (SpawnPoint point in points)
+{
+    if (point.PointType == SpawnPointType.Obstacle &amp;&amp; point.Lane == Lane.Left)
+    {
+        // Spawn an obstacle here
+        SpawnObstacle(point.GetSpawnPosition());
+    }
+}</code></pre></div>
+
+      <!-- Section: Creating ChunkConfig Assets -->
+      <h2>Creating ChunkConfig Assets</h2>
+      <p>Now let's create the ScriptableObject assets that configure each chunk variant.</p>
+
+      <ol class="steps">
+        <li>In the Project window, navigate to <code>Assets/ScriptableObjects/ChunkConfigs</code>.</li>
+        <li>Right-click and choose <strong>Create &gt; Infinite Runner &gt; Chunk Config</strong>.</li>
+        <li>Name it <code>ChunkConfig_Straight</code>. Select it and fill in:
+          <ul>
+            <li>Chunk Name: "Straight"</li>
+            <li>Chunk Prefab: drag in <code>Chunk_Straight</code> from Prefabs/Chunks</li>
+            <li>Spawn Weight: 10 (most common)</li>
+            <li>Minimum Difficulty: 0 (available from start)</li>
+            <li>Max Obstacles: 3</li>
+            <li>Max Collectibles: 8</li>
+            <li>Is Safe Zone: unchecked</li>
+          </ul>
+        </li>
+        <li>Create <code>ChunkConfig_Dense</code>:
+          <ul>
+            <li>Chunk Name: "Dense"</li>
+            <li>Chunk Prefab: <code>Chunk_Dense</code></li>
+            <li>Spawn Weight: 5 (less common)</li>
+            <li>Minimum Difficulty: 2 (appears after difficulty ramps up)</li>
+            <li>Max Obstacles: 5</li>
+            <li>Max Collectibles: 10</li>
+            <li>Is Safe Zone: unchecked</li>
+          </ul>
+        </li>
+        <li>Create <code>ChunkConfig_Narrow</code>:
+          <ul>
+            <li>Chunk Name: "Narrow"</li>
+            <li>Chunk Prefab: <code>Chunk_Narrow</code></li>
+            <li>Spawn Weight: 3 (rare)</li>
+            <li>Minimum Difficulty: 3 (mid-game and later)</li>
+            <li>Max Obstacles: 4</li>
+            <li>Max Collectibles: 6</li>
+            <li>Is Safe Zone: unchecked</li>
+          </ul>
+        </li>
+        <li>Create <code>ChunkConfig_Safe</code>:
+          <ul>
+            <li>Chunk Name: "Safe Zone"</li>
+            <li>Chunk Prefab: <code>Chunk_Safe</code></li>
+            <li>Spawn Weight: 1 (very rare &mdash; occasional rest)</li>
+            <li>Minimum Difficulty: 0</li>
+            <li>Max Obstacles: 0</li>
+            <li>Max Collectibles: 12</li>
+            <li>Is Safe Zone: checked</li>
+          </ul>
+        </li>
+      </ol>
+
+      <!-- Section: Chunk Registry -->
+      <h2>Chunk Registry: Collecting All Configs</h2>
+      <p>The World Generator needs a way to know about all available chunk configs. We'll create a simple registry ScriptableObject that holds an array of all ChunkConfig assets.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ChunkRegistry.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Central registry of all available chunk configurations.
+    /// The WorldGenerator references this to know what chunks it can spawn.
+    /// Create via: Assets &gt; Create &gt; Infinite Runner &gt; Chunk Registry
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "ChunkRegistry",
+        menuName = "Infinite Runner/Chunk Registry",
+        order = 2
+    )]
+    public class ChunkRegistry : ScriptableObject
+    {
+        [Tooltip("All chunk configurations available for world generation.")]
+        [SerializeField] private ChunkConfig[] chunkConfigs;
+
+        /// &lt;summary&gt;
+        /// Returns all registered chunk configurations.
+        /// &lt;/summary&gt;
+        public ChunkConfig[] AllChunks =&gt; chunkConfigs;
+
+        /// &lt;summary&gt;
+        /// Returns only chunks that are eligible at the given difficulty level.
+        /// &lt;/summary&gt;
+        /// &lt;param name="currentDifficulty"&gt;The current game difficulty (0-10).&lt;/param&gt;
+        /// &lt;returns&gt;List of chunk configs whose minimumDifficulty is met.&lt;/returns&gt;
+        public List&lt;ChunkConfig&gt; GetAvailableChunks(int currentDifficulty)
+        {
+            List&lt;ChunkConfig&gt; available = new List&lt;ChunkConfig&gt;();
+
+            foreach (ChunkConfig config in chunkConfigs)
+            {
+                if (config == null)
+                {
+                    Debug.LogWarning("ChunkRegistry contains a null entry!", this);
+                    continue;
+                }
+
+                if (config.ChunkPrefab == null)
+                {
+                    Debug.LogWarning(
+                        $"ChunkConfig '{config.ChunkName}' has no prefab assigned!",
+                        config
+                    );
+                    continue;
+                }
+
+                if (currentDifficulty &gt;= config.MinimumDifficulty)
+                {
+                    available.Add(config);
+                }
+            }
+
+            if (available.Count == 0)
+            {
+                Debug.LogError(
+                    "No chunks available at difficulty " + currentDifficulty +
+                    "! Returning all chunks as fallback.",
+                    this
+                );
+
+                // Fallback: return everything so the game doesn't break
+                foreach (ChunkConfig config in chunkConfigs)
+                {
+                    if (config != null &amp;&amp; config.ChunkPrefab != null)
+                    {
+                        available.Add(config);
+                    }
+                }
+            }
+
+            return available;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns a random ChunkConfig using weighted selection.
+        /// Chunks with higher SpawnWeight are more likely to be selected.
+        /// &lt;/summary&gt;
+        /// &lt;param name="currentDifficulty"&gt;Current game difficulty level.&lt;/param&gt;
+        /// &lt;returns&gt;A randomly selected ChunkConfig.&lt;/returns&gt;
+        public ChunkConfig GetWeightedRandomChunk(int currentDifficulty)
+        {
+            List&lt;ChunkConfig&gt; available = GetAvailableChunks(currentDifficulty);
+
+            if (available.Count == 0)
+            {
+                Debug.LogError("No chunks available at all!", this);
+                return null;
+            }
+
+            // Calculate total weight
+            int totalWeight = 0;
+            foreach (ChunkConfig config in available)
+            {
+                totalWeight += config.SpawnWeight;
+            }
+
+            // Pick a random value within the total weight
+            int randomValue = Random.Range(0, totalWeight);
+
+            // Walk through the list, subtracting weights until we find our pick
+            int cumulativeWeight = 0;
+            foreach (ChunkConfig config in available)
+            {
+                cumulativeWeight += config.SpawnWeight;
+                if (randomValue &lt; cumulativeWeight)
+                {
+                    return config;
+                }
+            }
+
+            // Fallback (should never reach here due to math, but safety first)
+            return available[available.Count - 1];
+        }
+
+        // ---- Validation ----
+
+        private void OnValidate()
+        {
+            if (chunkConfigs == null || chunkConfigs.Length == 0)
+            {
+                Debug.LogWarning(
+                    "ChunkRegistry has no chunks configured!",
+                    this
+                );
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>The <code>ChunkRegistry</code> gives us two key capabilities:</p>
+      <ul>
+        <li><strong><code>GetAvailableChunks(difficulty)</code></strong> &mdash; Filters chunks by the current difficulty level. Early in the game, only easy chunks appear. As difficulty increases, harder variants become available.</li>
+        <li><strong><code>GetWeightedRandomChunk(difficulty)</code></strong> &mdash; Picks a random chunk using weighted selection. A chunk with <code>SpawnWeight = 10</code> is 10 times more likely to be selected than one with <code>SpawnWeight = 1</code>. This is the method the World Generator will call.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">Always Handle Edge Cases</div>
+        <p>Notice how the code checks for null entries, missing prefabs, and empty available lists at every step. In a real project, someone will accidentally leave a field empty or delete a prefab without updating the registry. Defensive coding like this prevents cryptic NullReferenceExceptions and instead gives clear, actionable error messages. Never assume your data is correct &mdash; always validate.</p>
+      </div>
+
+      <!-- Section: Testing Your Chunks -->
+      <h2>Testing Your Chunks in the Editor</h2>
+      <p>Before moving on to the World Generator, let's verify everything works by placing a few chunks manually in the scene.</p>
+
+      <ol class="steps">
+        <li>Drag <code>Chunk_Straight</code> from the Project window into the Scene. Position it at (0, 0, 0).</li>
+        <li>Drag another <code>Chunk_Straight</code> into the Scene. Position it at (0, 0, 20) &mdash; this places it right at the end of the first chunk.</li>
+        <li>Drag <code>Chunk_Dense</code> into the Scene. Position it at (0, 0, 40).</li>
+        <li>Switch to the Scene view and look at the gizmos. You should see:
+          <ul>
+            <li>Three flat ground surfaces lined up end-to-end with no gaps.</li>
+            <li>Red spheres at obstacle spawn points.</li>
+            <li>Yellow spheres at collectible spawn points.</li>
+            <li>Cyan and magenta lines at chunk boundaries.</li>
+          </ul>
+        </li>
+        <li>If there are gaps between chunks, adjust your SnapPoint_End positions so they match the next chunk's SnapPoint_Start.</li>
+        <li>Once verified, delete all chunks from the scene. The World Generator will handle spawning at runtime.</li>
+      </ol>
+
+      <!-- Section: Summary -->
+      <h2>What We Built</h2>
+      <p>In this chapter, we created the fundamental building block of our infinite world: the chunk system. Here's what we now have:</p>
+      <ul>
+        <li><strong>ChunkData.cs</strong> &mdash; A MonoBehaviour that stores spawn points, chunk length, and snap points on each chunk prefab. Includes editor gizmos for visual debugging.</li>
+        <li><strong>ChunkConfig.cs</strong> &mdash; A ScriptableObject that stores metadata about a chunk variant: spawn weight, difficulty requirement, and obstacle limits.</li>
+        <li><strong>SpawnPoint.cs</strong> &mdash; A helper component on each spawn point with type-safe enums for point type and lane.</li>
+        <li><strong>ChunkRegistry.cs</strong> &mdash; A central ScriptableObject that collects all chunk configs and provides weighted random selection based on difficulty.</li>
+        <li><strong>4 chunk prefabs</strong> &mdash; Straight, Dense, Narrow, and Safe variants, each with appropriate spawn point layouts.</li>
+      </ul>
+      <p>In the next chapter, we'll build the <strong>Object Pooling</strong> system that lets us reuse these chunks efficiently instead of creating and destroying them at runtime.</p>
+
+      <!-- Save Your Progress + Git Branching Lesson -->
+      <h2>Git Branching: The Production Workflow</h2>
+
+      <p>Up to now, we've been committing straight to <code>main</code>. That works for solo beginners, but it's not how professional teams work. Starting with this chapter, we'll use <strong>branches</strong> &mdash; the feature that makes Git truly powerful.</p>
+
+      <h3>What is a Branch?</h3>
+
+      <p>A branch is a <strong>parallel timeline</strong> of your project. You create a branch, make changes on it, and your <code>main</code> branch stays completely untouched. If your experiment works, you <strong>merge</strong> it back into <code>main</code>. If it doesn't, you delete the branch and nothing was harmed.</p>
+
+      <p>Think of it like this: <code>main</code> is your "known working" version. Branches are where you build new things. You never break <code>main</code>.</p>
+
+      <h3>Production Branch Naming Conventions</h3>
+
+      <p>Professional teams use a <strong>prefix/description</strong> naming pattern for branches. The prefix tells you <em>what kind of work</em> is happening:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Prefix</th>
+            <th>When to Use</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>feature/</code></td>
+            <td>Adding new functionality</td>
+            <td><code>feature/world-generation</code></td>
+          </tr>
+          <tr>
+            <td><code>fix/</code></td>
+            <td>Fixing a bug</td>
+            <td><code>fix/player-falls-through-ground</code></td>
+          </tr>
+          <tr>
+            <td><code>hotfix/</code></td>
+            <td>Urgent fix on a released build</td>
+            <td><code>hotfix/crash-on-startup</code></td>
+          </tr>
+          <tr>
+            <td><code>refactor/</code></td>
+            <td>Restructuring code without changing behavior</td>
+            <td><code>refactor/pool-manager-cleanup</code></td>
+          </tr>
+          <tr>
+            <td><code>experiment/</code></td>
+            <td>Trying something that might not work</td>
+            <td><code>experiment/new-obstacle-type</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <div class="callout-title">Naming rules</div>
+        <p>Branch names use <strong>lowercase</strong> with <strong>hyphens</strong> (not spaces or underscores). Keep them short but descriptive. <code>feature/world-generation</code> is good. <code>feature/adding-the-new-world-generation-system-to-the-game</code> is too long. <code>feature/stuff</code> is too vague.</p>
+      </div>
+
+      <h3>The Two-Branch Model</h3>
+
+      <p>For our project, we'll use a simple but effective workflow:</p>
+
+      <ul>
+        <li><strong><code>main</code></strong> &mdash; Always stable, always works. This is the version you could build and ship at any time. You never commit directly to main (after this chapter).</li>
+        <li><strong><code>feature/*</code>, <code>fix/*</code></strong> &mdash; Short-lived branches where work happens. Created from <code>main</code>, merged back when done.</li>
+      </ul>
+
+      <div class="diagram">main:     A---B---C-----------G---H-----------K---L
+                 \         /         \         /
+feature/world:    D---E---F          |         |
+                                      \         /
+feature/gameplay:                      I---J---K</div>
+
+      <p>Each letter is a commit. Feature branches split off from <code>main</code>, get several commits, then merge back. Main only moves forward when complete, tested features are merged in.</p>
+
+      <h3>The Branch Workflow (Step by Step)</h3>
+
+      <ol class="steps">
+        <li><strong>Create a branch</strong> from main when starting a new feature:
+          <div class="code-block" style="margin: 0.5rem 0;">
+            <pre><code>git checkout -b feature/world-generation</code></pre>
+          </div>
+          <p>This creates the branch AND switches to it. You're now on <code>feature/world-generation</code>.</p>
+        </li>
+        <li><strong>Work and commit</strong> on the branch. Multiple commits are fine &mdash; commit after each logical step:
+          <div class="code-block" style="margin: 0.5rem 0;">
+            <pre><code>git add .
+git commit -m "Add chunk system with modular tile design"
+# ... more work ...
+git add .
+git commit -m "Implement object pooling for chunks"</code></pre>
+          </div>
+        </li>
+        <li><strong>Check which branch you're on</strong> at any time:
+          <div class="code-block" style="margin: 0.5rem 0;">
+            <pre><code>git branch</code></pre>
+          </div>
+          <p>The current branch has an asterisk (*) next to it.</p>
+        </li>
+        <li><strong>Merge back to main</strong> when the feature is complete and working:
+          <div class="code-block" style="margin: 0.5rem 0;">
+            <pre><code>git checkout main
+git merge feature/world-generation</code></pre>
+          </div>
+          <p>This brings all your feature commits into <code>main</code>.</p>
+        </li>
+        <li><strong>Delete the branch</strong> (optional, keeps things clean):
+          <div class="code-block" style="margin: 0.5rem 0;">
+            <pre><code>git branch -d feature/world-generation</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <div class="callout warning">
+        <div class="callout-title">What if I'm on the wrong branch?</div>
+        <p>If you accidentally commit to <code>main</code> instead of your feature branch, don't panic. Git has tools to fix this. But the easiest fix is prevention: always run <code>git branch</code> before you start working to confirm you're on the right branch. Make it a habit.</p>
+      </div>
+
+      <h3>When to Use Branches in This Course</h3>
+
+      <p>We'll create a new feature branch for each <strong>Part</strong> of the course:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Branch</th>
+            <th>Chapters</th>
+            <th>Merge After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>feature/world-generation</code></td>
+            <td>Ch 11&ndash;14</td>
+            <td>Ch 14 (Origin Shifting)</td>
+          </tr>
+          <tr>
+            <td><code>feature/gameplay</code></td>
+            <td>Ch 15&ndash;18</td>
+            <td>Ch 18 (Difficulty)</td>
+          </tr>
+          <tr>
+            <td>Direct to <code>main</code></td>
+            <td>Ch 19&ndash;25</td>
+            <td>Each chapter (polish &amp; ship are small, self-contained changes)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>In professional projects, you'd branch for every individual feature, no matter how small. For learning purposes, we're grouping related chapters to practice the full branch-commit-merge cycle twice before going back to simpler main-only commits.</p>
+
+      <div class="callout tip" style="margin-top: 2rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Let's put this into practice right now. Create your first feature branch and commit the chunk system:</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git checkout -b feature/world-generation
+git add .
+git commit -m "Add chunk system with modular tile design"</code></pre>
+        </div>
+        <p>Verify you're on the new branch by running <code>git branch</code>. You should see:</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>  main
+* feature/world-generation</code></pre>
+        </div>
+        <p>The asterisk (*) shows your current branch. Everything we commit from here through Chapter 14 stays on this branch, safe from <code>main</code>.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="10-camera-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Camera System</span></a>
+        <a href="12-object-pooling.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Object Pooling</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

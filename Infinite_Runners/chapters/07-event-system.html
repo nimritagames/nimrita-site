@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link active"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 7</span>
+        <h1>Event System</h1>
+        <p class="chapter-desc">Build a decoupled communication system so your scripts can talk to each other without knowing each other exist.</p>
+      </div>
+
+      <!-- SECTION: The Problem with Direct References -->
+      <section>
+        <h2>Why Events? The Problem with Direct References</h2>
+        <p>Imagine the player picks up a coin. What needs to happen?</p>
+        <ul>
+          <li>The <strong>score</strong> increases by 1.</li>
+          <li>The <strong>UI</strong> updates the score display.</li>
+          <li>A <strong>sound effect</strong> plays.</li>
+          <li>A <strong>particle effect</strong> bursts from the coin.</li>
+          <li>An <strong>achievement system</strong> checks if the player hit 100 coins.</li>
+        </ul>
+
+        <p>Without events, the coin script needs a direct reference to every single one of those systems:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">BadCoin.cs (DO NOT DO THIS)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// BAD: Tight coupling! The coin "knows" about everything.
+public class BadCoin : MonoBehaviour
+{
+    // The coin needs references to ALL these systems
+    public ScoreManager scoreManager;
+    public UIManager uiManager;
+    public AudioManager audioManager;
+    public ParticleManager particleManager;
+    public AchievementManager achievementManager;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        scoreManager.AddScore(1);
+        uiManager.UpdateScoreDisplay();
+        audioManager.PlayCoinSound();
+        particleManager.SpawnCoinParticles(transform.position);
+        achievementManager.CheckCoinMilestone();
+        Destroy(gameObject);
+    }
+}</code></pre>
+        </div>
+
+        <p>This is called <strong>tight coupling</strong>, and it causes serious problems:</p>
+        <ul>
+          <li>If you remove the achievement system, the coin script breaks.</li>
+          <li>If you want to add a new reaction (e.g., a combo multiplier), you must modify the coin script.</li>
+          <li>Every coin prefab in the scene needs all five references dragged into the Inspector.</li>
+          <li>Testing the coin in isolation is impossible &mdash; it depends on everything.</li>
+        </ul>
+
+        <p>With events, the coin simply says <strong>"Hey, I was collected!"</strong> and does not care who is listening:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GoodCoin.cs (Much better!)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// GOOD: The coin does not know about any other system.
+public class GoodCoin : MonoBehaviour
+{
+    [SerializeField] private GameEvent onCoinCollected;
+
+    private void OnTriggerEnter(Collider other)
+    {
+        onCoinCollected.Raise();  // "Something happened!"
+        Destroy(gameObject);
+    }
+}</code></pre>
+        </div>
+
+        <p>The score manager, UI, audio, particles, and achievements each independently listen for the "coin collected" event and react on their own. The coin does not even know they exist. This is called <strong>loose coupling</strong>, and it is the foundation of clean game architecture.</p>
+      </section>
+
+      <!-- SECTION: C# Delegates and Events -->
+      <section>
+        <h2>C# Delegates and Events Explained Simply</h2>
+        <p>Before we build our event system, let us understand the building blocks. If you are new to C#, do not worry &mdash; we will take this step by step.</p>
+
+        <h3>What Is a Delegate?</h3>
+        <p>A <strong>delegate</strong> is a variable that holds a reference to a method. Just like an <code>int</code> variable holds a number, a delegate variable holds a method that you can call later.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">DelegateExample.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Step 1: Declare a delegate TYPE (like declaring a new variable type)
+// This delegate can hold any method that takes no parameters and returns void.
+public delegate void SimpleDelegate();
+
+// Step 2: Create a variable of that type
+SimpleDelegate myDelegate;
+
+// Step 3: Assign a method to it
+myDelegate = SayHello;
+
+// Step 4: Call it (this calls SayHello)
+myDelegate();
+
+void SayHello()
+{
+    Debug.Log("Hello!");
+}</code></pre>
+        </div>
+
+        <h3>What Is an Event?</h3>
+        <p>An <strong>event</strong> is a delegate with restrictions. It can only be <strong>invoked</strong> (fired) from inside the class that owns it. Other classes can only <strong>subscribe</strong> (listen) or <strong>unsubscribe</strong> (stop listening). This is a safety measure &mdash; you do not want random scripts firing your events.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">EventExample.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">public class Player : MonoBehaviour
+{
+    // Declare an event. Only Player can fire this.
+    public event SimpleDelegate OnPlayerDied;
+
+    public void Die()
+    {
+        // Fire the event (notify all listeners)
+        OnPlayerDied?.Invoke();
+    }
+}
+
+public class UIManager : MonoBehaviour
+{
+    [SerializeField] private Player player;
+
+    private void OnEnable()
+    {
+        // Subscribe: "When the player dies, call my ShowGameOver method"
+        player.OnPlayerDied += ShowGameOver;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe: ALWAYS do this to prevent memory leaks
+        player.OnPlayerDied -= ShowGameOver;
+    }
+
+    private void ShowGameOver()
+    {
+        Debug.Log("Showing Game Over screen");
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title">The += and -= Operators</div>
+          <p><code>+=</code> subscribes a method to an event (adds a listener). <code>-=</code> unsubscribes it (removes the listener). Multiple methods can subscribe to the same event &mdash; when the event fires, ALL subscribed methods are called.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Action and Action<T> -->
+      <section>
+        <h2>Action and Action&lt;T&gt; &mdash; The Easy Way</h2>
+        <p>Declaring custom delegate types gets tedious. C# provides built-in delegate types called <code>Action</code> that handle the most common cases:</p>
+
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Meaning</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>Action</code></td><td>A method with no parameters, returns void</td><td><code>event Action OnPlayerDied;</code></td></tr>
+            <tr><td><code>Action&lt;int&gt;</code></td><td>A method with one int parameter, returns void</td><td><code>event Action&lt;int&gt; OnScoreChanged;</code></td></tr>
+            <tr><td><code>Action&lt;int, string&gt;</code></td><td>A method with int and string params, returns void</td><td><code>event Action&lt;int, string&gt; OnAchievement;</code></td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">ActionExample.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using UnityEngine;
+
+public class ScoreManager : MonoBehaviour
+{
+    // Event that sends the new score value when it changes
+    public event Action&lt;int&gt; OnScoreChanged;
+
+    private int _score;
+
+    public void AddScore(int amount)
+    {
+        _score += amount;
+        // Fire the event with the new score value
+        OnScoreChanged?.Invoke(_score);
+    }
+}
+
+public class ScoreUI : MonoBehaviour
+{
+    [SerializeField] private ScoreManager scoreManager;
+
+    private void OnEnable()
+    {
+        scoreManager.OnScoreChanged += UpdateDisplay;
+    }
+
+    private void OnDisable()
+    {
+        scoreManager.OnScoreChanged -= UpdateDisplay;
+    }
+
+    // This method receives the int that was passed to Invoke()
+    private void UpdateDisplay(int newScore)
+    {
+        Debug.Log($"Score: {newScore}");
+    }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: UnityEvents vs C# Events -->
+      <section>
+        <h2>UnityEvents vs C# Events</h2>
+        <p>Unity provides its own event system called <code>UnityEvent</code>. You have probably seen it &mdash; it is the box in the Inspector where you can drag objects and select methods (used on UI Buttons, for example). Let us compare the two approaches:</p>
+
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>C# Events (Action)</th><th>UnityEvent</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Setup</td><td>Code only</td><td>Inspector drag-and-drop</td></tr>
+            <tr><td>Performance</td><td>Faster (no reflection)</td><td>Slightly slower</td></tr>
+            <tr><td>Designer-friendly</td><td>No (requires coding)</td><td>Yes (visual wiring)</td></tr>
+            <tr><td>Type safety</td><td>Compile-time checked</td><td>Runtime checked</td></tr>
+            <tr><td>Serialization</td><td>Not saved in scenes</td><td>Saved in scenes/prefabs</td></tr>
+            <tr><td>Debugging</td><td>Harder to trace</td><td>Visible in Inspector</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout tip">
+          <div class="callout-title">Which Should You Use?</div>
+          <p><strong>Use C# events</strong> for system-to-system communication in code (GameManager to ScoreManager). <strong>Use UnityEvents</strong> when you want designers to wire things up in the Inspector without coding (button clicks, animation events). In this tutorial, we will use a hybrid approach: <strong>ScriptableObject Event Channels</strong> that combine the best of both worlds.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: ScriptableObject Event Channels -->
+      <section>
+        <h2>ScriptableObject Event Channels &mdash; The Production Approach</h2>
+        <p>The problem with C# events: the listener needs a direct reference to the object that fires the event. The ScoreUI needs a reference to ScoreManager. If they are in different scenes or if the ScoreManager is created at runtime, wiring them up is painful.</p>
+
+        <p>The solution is to use a <strong>ScriptableObject</strong> as a middleman &mdash; an "event channel" that lives in your Assets folder. The broadcaster raises the event on the ScriptableObject, and listeners subscribe to that same ScriptableObject. Neither the broadcaster nor the listeners know about each other.</p>
+
+        <p>This pattern is used in production by Unity themselves (it was featured in their "Open Projects" initiative).</p>
+
+        <h3>How It Works</h3>
+        <ol>
+          <li>Create a <code>GameEvent</code> ScriptableObject asset in your project (e.g., "OnCoinCollected").</li>
+          <li>The coin script has a reference to this asset and calls <code>Raise()</code> on it.</li>
+          <li>The ScoreManager, AudioManager, and ParticleManager each have a <code>GameEventListener</code> component that references the same asset.</li>
+          <li>When <code>Raise()</code> is called, all listeners are notified.</li>
+        </ol>
+
+        <h3>Step 1: The GameEvent ScriptableObject</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// A ScriptableObject-based event channel.
+    /// Create instances in the Project window via:
+    /// Right-click &gt; Infinite Runner &gt; Events &gt; Game Event
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewGameEvent",
+        menuName = "Infinite Runner/Events/Game Event",
+        order = 0)]
+    public class GameEvent : ScriptableObject
+    {
+        // All listeners currently registered to this event
+        private readonly List&lt;GameEventListener&gt; _listeners = new List&lt;GameEventListener&gt;();
+
+        // Optional: description for the Inspector
+        [TextArea(2, 5)]
+        [SerializeField] private string description;
+
+        /// &lt;summary&gt;
+        /// Fire this event, notifying all registered listeners.
+        /// Called by the broadcaster (e.g., the coin when collected).
+        /// &lt;/summary&gt;
+        public void Raise()
+        {
+            // Iterate backwards so listeners can safely unregister
+            // during the callback without breaking the loop
+            for (int i = _listeners.Count - 1; i &gt;= 0; i--)
+            {
+                _listeners[i].OnEventRaised();
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Register a listener to this event.
+        /// Called automatically by GameEventListener.OnEnable().
+        /// &lt;/summary&gt;
+        public void RegisterListener(GameEventListener listener)
+        {
+            if (!_listeners.Contains(listener))
+            {
+                _listeners.Add(listener);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Unregister a listener from this event.
+        /// Called automatically by GameEventListener.OnDisable().
+        /// &lt;/summary&gt;
+        public void UnregisterListener(GameEventListener listener)
+        {
+            _listeners.Remove(listener);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Events/GameEvent.cs</code>.</p>
+
+        <div class="callout info">
+          <div class="callout-title">What Is a ScriptableObject?</div>
+          <p>A ScriptableObject is a data container that lives as an asset in your project (like a material or a texture). Unlike MonoBehaviours, it does not need to be attached to a GameObject. It is perfect for shared data and event channels because any script in any scene can reference the same asset.</p>
+        </div>
+
+        <h3>Step 2: The GameEventListener Component</h3>
+        <p>This MonoBehaviour is attached to any GameObject that wants to listen for an event. It bridges the ScriptableObject event to a UnityEvent, so you can wire up responses in the Inspector.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.Events;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Attach this to any GameObject that needs to respond to a GameEvent.
+    /// Drag the GameEvent asset into the "Game Event" field, then
+    /// use the "Response" UnityEvent to wire up what happens.
+    /// &lt;/summary&gt;
+    public class GameEventListener : MonoBehaviour
+    {
+        [Tooltip("The event to listen for.")]
+        [SerializeField] private GameEvent gameEvent;
+
+        [Tooltip("What to do when the event is raised.")]
+        [SerializeField] private UnityEvent response;
+
+        private void OnEnable()
+        {
+            // Register with the event when this object becomes active
+            if (gameEvent != null)
+            {
+                gameEvent.RegisterListener(this);
+            }
+        }
+
+        private void OnDisable()
+        {
+            // Unregister when this object is deactivated or destroyed
+            if (gameEvent != null)
+            {
+                gameEvent.UnregisterListener(this);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called by the GameEvent when it is raised.
+        /// Invokes the UnityEvent response.
+        /// &lt;/summary&gt;
+        public void OnEventRaised()
+        {
+            response?.Invoke();
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Events/GameEventListener.cs</code>.</p>
+      </section>
+
+      <!-- SECTION: Typed Events -->
+      <section>
+        <h2>Typed Events: Passing Data with Events</h2>
+        <p>The basic <code>GameEvent</code> is great for simple notifications ("something happened"), but often you need to send data along with the event. For example, "the score changed to 42" or "the player took 10 damage."</p>
+
+        <p>We will create typed variants using C# generics:</p>
+
+        <h3>Base Typed Event</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">TypedGameEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// A generic event that carries data of type T.
+    /// Subclass this for concrete types (int, float, string, etc.).
+    /// &lt;/summary&gt;
+    public abstract class TypedGameEvent&lt;T&gt; : ScriptableObject
+    {
+        private readonly List&lt;TypedGameEventListener&lt;T&gt;&gt; _listeners
+            = new List&lt;TypedGameEventListener&lt;T&gt;&gt;();
+
+        [TextArea(2, 5)]
+        [SerializeField] private string description;
+
+        /// &lt;summary&gt;
+        /// Raise this event with data.
+        /// &lt;/summary&gt;
+        public void Raise(T value)
+        {
+            for (int i = _listeners.Count - 1; i &gt;= 0; i--)
+            {
+                _listeners[i].OnEventRaised(value);
+            }
+        }
+
+        public void RegisterListener(TypedGameEventListener&lt;T&gt; listener)
+        {
+            if (!_listeners.Contains(listener))
+            {
+                _listeners.Add(listener);
+            }
+        }
+
+        public void UnregisterListener(TypedGameEventListener&lt;T&gt; listener)
+        {
+            _listeners.Remove(listener);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Base Typed Listener</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">TypedGameEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.Events;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Generic listener for typed events.
+    /// Subclass this for concrete types.
+    /// &lt;/summary&gt;
+    public abstract class TypedGameEventListener&lt;T&gt; : MonoBehaviour
+    {
+        [SerializeField] private TypedGameEvent&lt;T&gt; gameEvent;
+        [SerializeField] private UnityEvent&lt;T&gt; response;
+
+        private void OnEnable()
+        {
+            if (gameEvent != null)
+            {
+                gameEvent.RegisterListener(this);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (gameEvent != null)
+            {
+                gameEvent.UnregisterListener(this);
+            }
+        }
+
+        public void OnEventRaised(T value)
+        {
+            response?.Invoke(value);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Concrete Typed Events</h3>
+        <p>Unity cannot serialize generic ScriptableObjects directly, so we create small concrete classes for each type we need:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">IntEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// An event that carries an integer value (score, health, coins, etc.).
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewIntEvent",
+        menuName = "Infinite Runner/Events/Int Event",
+        order = 1)]
+    public class IntEvent : TypedGameEvent&lt;int&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">IntEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Listener for IntEvent. Attach to any GameObject.
+    /// &lt;/summary&gt;
+    public class IntEventListener : TypedGameEventListener&lt;int&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">FloatEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// An event that carries a float value (speed, distance, timer, etc.).
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewFloatEvent",
+        menuName = "Infinite Runner/Events/Float Event",
+        order = 2)]
+    public class FloatEvent : TypedGameEvent&lt;float&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">FloatEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Listener for FloatEvent. Attach to any GameObject.
+    /// &lt;/summary&gt;
+    public class FloatEventListener : TypedGameEventListener&lt;float&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">StringEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// An event that carries a string value (messages, names, etc.).
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewStringEvent",
+        menuName = "Infinite Runner/Events/String Event",
+        order = 3)]
+    public class StringEvent : TypedGameEvent&lt;string&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">StringEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Listener for StringEvent. Attach to any GameObject.
+    /// &lt;/summary&gt;
+    public class StringEventListener : TypedGameEventListener&lt;string&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Need More Types?</div>
+          <p>The pattern is always the same: create a two-line class that extends <code>TypedGameEvent&lt;YourType&gt;</code> with a <code>[CreateAssetMenu]</code> attribute, and a corresponding two-line listener class. You can create events for <code>Vector3</code>, <code>bool</code>, <code>GameState</code>, or any custom struct.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Practical Example -->
+      <section>
+        <h2>Practical Example: Game State Changed Event</h2>
+        <p>Let us wire up a real example. We will create an event channel for game state changes so that any system (UI, audio, spawner) can react when the game state changes &mdash; without a direct reference to the GameManager.</p>
+
+        <h3>Step 1: Create a GameState Event Type</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameStateEvent.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// An event that carries the new GameState value.
+    /// Used to broadcast state transitions globally.
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewGameStateEvent",
+        menuName = "Infinite Runner/Events/Game State Event",
+        order = 10)]
+    public class GameStateEvent : TypedGameEvent&lt;GameState&gt; { }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameStateEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Events
+{
+    /// &lt;summary&gt;
+    /// Listener for GameStateEvent.
+    /// &lt;/summary&gt;
+    public class GameStateEventListener : TypedGameEventListener&lt;GameState&gt; { }
+}</code></pre>
+        </div>
+
+        <h3>Step 2: Create the Event Asset</h3>
+        <ol class="steps">
+          <li>In the Project window, create a folder: <code>Assets/ScriptableObjects/Events/</code></li>
+          <li>Right-click inside that folder.</li>
+          <li>Select <strong>Create &gt; Infinite Runner &gt; Events &gt; Game State Event</strong>.</li>
+          <li>Name it <code>OnGameStateChanged</code>.</li>
+          <li>In the Inspector, add a description like "Fired whenever the game state changes. Carries the new GameState value."</li>
+        </ol>
+
+        <h3>Step 3: Update GameManager to Fire the Event</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameManager.cs (updated)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Events;
+
+namespace InfiniteRunner.Core
+{
+    public class GameManager : Singleton&lt;GameManager&gt;
+    {
+        // Reference to the ScriptableObject event channel
+        [Header("Event Channels")]
+        [SerializeField] private GameStateEvent onGameStateChanged;
+
+        // ... (rest of the GameManager code from Chapter 6) ...
+
+        private void TransitionToState(GameState newState)
+        {
+            _currentState?.Exit();
+            CurrentState = newState;
+
+            _currentState = newState switch
+            {
+                GameState.Menu     =&gt; _menuState,
+                GameState.Playing  =&gt; _playingState,
+                GameState.Paused   =&gt; _pausedState,
+                GameState.GameOver =&gt; _gameOverState,
+                _ =&gt; throw new System.ArgumentOutOfRangeException()
+            };
+
+            _currentState.Enter();
+
+            // Fire the ScriptableObject event channel
+            if (onGameStateChanged != null)
+            {
+                onGameStateChanged.Raise(newState);
+            }
+
+            // Also fire the C# event (for code-only listeners)
+            OnGameStateChanged?.Invoke(newState);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Step 4: Wire It Up in the Inspector</h3>
+        <ol class="steps">
+          <li>Select the <code>[GameManager]</code> GameObject in the Hierarchy.</li>
+          <li>In the Inspector, find the "Event Channels" section.</li>
+          <li>Drag the <code>OnGameStateChanged</code> ScriptableObject asset into the "On Game State Changed" field.</li>
+        </ol>
+
+        <h3>Step 5: Create a Listener</h3>
+        <p>Now any system can listen for state changes. For example, a simple UI panel toggler:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameStateUIToggle.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.Events;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Shows or hides a UI panel based on the game state.
+    /// Attach to any UI panel and set which states it should be visible in.
+    /// &lt;/summary&gt;
+    public class GameStateUIToggle : MonoBehaviour
+    {
+        [Header("Event Channel")]
+        [SerializeField] private GameStateEvent onGameStateChanged;
+
+        [Header("Visible In These States")]
+        [SerializeField] private GameState[] visibleStates;
+
+        private void OnEnable()
+        {
+            if (onGameStateChanged != null)
+            {
+                // We cannot use the GameStateEventListener component here
+                // because we need custom logic. So we register manually
+                // using the C# event on GameManager instead.
+                GameManager.Instance.OnGameStateChanged += HandleStateChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleStateChanged;
+            }
+        }
+
+        private void HandleStateChanged(GameState newState)
+        {
+            bool shouldBeVisible = false;
+
+            foreach (GameState state in visibleStates)
+            {
+                if (state == newState)
+                {
+                    shouldBeVisible = true;
+                    break;
+                }
+            }
+
+            gameObject.SetActive(shouldBeVisible);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Inspector-Only Wiring</div>
+          <p>For simpler cases, you can skip writing a custom script entirely. Add a <code>GameEventListener</code> component to a GameObject, drag in the event asset, and use the UnityEvent dropdown to call built-in methods like <code>GameObject.SetActive(true)</code>. No code needed!</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Architecture Diagram -->
+      <section>
+        <h2>How It All Connects</h2>
+        <p>Here is the flow of communication in our event system:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Event Flow Diagram</span><span class="lang-badge">Architecture</span></div>
+          <pre><code>  BROADCASTER                 EVENT CHANNEL              LISTENERS
+  (fires event)           (ScriptableObject)          (react to event)
+  +--------------+        +------------------+        +---------------+
+  | GameManager  | ----&gt;  | OnGameState      | ----&gt;  | UIManager     |
+  | "state       |  Raise |   Changed        | Notify | "show/hide    |
+  |  changed!"   |        | (lives in Assets)|        |  panels"      |
+  +--------------+        +------------------+        +---------------+
+                                  |
+                                  +----&gt;  +---------------+
+                                  |       | AudioManager  |
+                                  |       | "change music"|
+                                  |       +---------------+
+                                  |
+                                  +----&gt;  +---------------+
+                                          | SpawnManager  |
+                                          | "start/stop   |
+                                          |  spawning"    |
+                                          +---------------+
+
+  Key insight: GameManager does NOT know about UI, Audio, or Spawn.
+  They are completely decoupled via the ScriptableObject event channel.</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Project Files -->
+      <section>
+        <h2>Project Files After This Chapter</h2>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Scripts/
+    Events/
+      GameEvent.cs               &lt;-- Basic void event (no data)
+      GameEventListener.cs       &lt;-- Listener for basic events
+      TypedGameEvent.cs          &lt;-- Generic base for typed events
+      TypedGameEventListener.cs  &lt;-- Generic base for typed listeners
+      IntEvent.cs                &lt;-- Event carrying an int
+      IntEventListener.cs        &lt;-- Listener for int events
+      FloatEvent.cs              &lt;-- Event carrying a float
+      FloatEventListener.cs      &lt;-- Listener for float events
+      StringEvent.cs             &lt;-- Event carrying a string
+      StringEventListener.cs     &lt;-- Listener for string events
+      GameStateEvent.cs          &lt;-- Event carrying a GameState
+      GameStateEventListener.cs  &lt;-- Listener for GameState events
+  ScriptableObjects/
+    Events/
+      OnGameStateChanged.asset   &lt;-- The actual event channel asset</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Common Mistakes -->
+      <section>
+        <h2>Common Mistakes to Avoid</h2>
+
+        <div class="callout danger">
+          <div class="callout-title">Forgetting to Unsubscribe</div>
+          <p>If you subscribe in <code>OnEnable()</code>, you MUST unsubscribe in <code>OnDisable()</code>. Forgetting this causes: (1) memory leaks, (2) errors when destroyed objects still receive events, and (3) events firing multiple times if an object is enabled/disabled repeatedly. The GameEventListener handles this automatically, which is one of its advantages.</p>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">Event Ordering</div>
+          <p>Events do not guarantee the order in which listeners are called. If your AudioManager needs to react BEFORE the UIManager, do not rely on event ordering. Instead, have one listener handle timing-sensitive logic explicitly.</p>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">Too Many Events</div>
+          <p>Events are powerful, but do not go overboard. Not every interaction needs an event channel. Use events for cross-system communication. Within a single system, direct method calls are fine and simpler.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <ul>
+          <li>Understood the problem of <strong>tight coupling</strong> and why events solve it.</li>
+          <li>Learned C# <strong>delegates, events, and Action&lt;T&gt;</strong> from scratch.</li>
+          <li>Compared <strong>UnityEvents vs C# events</strong> and when to use each.</li>
+          <li>Built a complete <strong>ScriptableObject Event Channel</strong> system with:
+            <ul>
+              <li><code>GameEvent</code> &mdash; void event (no data)</li>
+              <li><code>TypedGameEvent&lt;T&gt;</code> &mdash; generic base for data-carrying events</li>
+              <li>Concrete types: <code>IntEvent</code>, <code>FloatEvent</code>, <code>StringEvent</code>, <code>GameStateEvent</code></li>
+              <li>Matching listener components for each type</li>
+            </ul>
+          </li>
+          <li>Connected the <strong>GameManager</strong> to the event system for state change notifications.</li>
+        </ul>
+        <p>In the next chapter, we will build the <strong>Input System</strong> that captures keyboard and touch input and converts it into game actions.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The event system is the communication backbone of our game. This is a big milestone worth saving.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git add .
+git commit -m "Implement event system with ScriptableObject channels"</code></pre>
+        </div>
+        <p>Run <code>git log --oneline</code> to see your growing commit history. Each entry is a save point you can return to.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="06-game-manager.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Game Manager</span></a>
+        <a href="08-input-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Input System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

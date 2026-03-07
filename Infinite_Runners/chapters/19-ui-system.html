@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link active"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 19</span>
+        <h1>UI System</h1>
+        <p class="chapter-desc">Create a complete user interface with main menu, HUD, pause screen, and game over panel. Learn Canvas setup, panel management, UI animations with coroutines, and event-driven display updates.</p>
+      </div>
+
+      <!-- SECTION: Introduction -->
+      <section>
+        <h2>The Role of UI in an Infinite Runner</h2>
+        <p>The user interface is the bridge between your game systems and the player. All the scores, power-ups, and game states we have built in previous chapters are invisible without a UI to display them. A well-designed UI communicates information instantly, responds to player input, and enhances the game's feel with smooth animations.</p>
+        <p>Our UI system will have four distinct panels, each shown during a specific game state:</p>
+        <ul>
+          <li><strong>Main Menu</strong> &mdash; Shown before the game starts. Play button, settings, high score display.</li>
+          <li><strong>HUD (Heads-Up Display)</strong> &mdash; Shown during gameplay. Score, coins, distance, active power-ups.</li>
+          <li><strong>Pause Panel</strong> &mdash; Shown when the game is paused. Resume, restart, main menu buttons.</li>
+          <li><strong>Game Over Panel</strong> &mdash; Shown when the player dies. Final score, high score, restart button.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Canvas Setup -->
+      <section>
+        <h2>Unity Canvas Setup</h2>
+        <p>All Unity UI elements live inside a <strong>Canvas</strong> component. The Canvas determines how UI elements are rendered and how they respond to screen size changes.</p>
+
+        <h3>Step 1: Create the Canvas</h3>
+        <ol class="steps">
+          <li>In the Hierarchy, right-click &gt; <strong>UI &gt; Canvas</strong>. Unity creates a Canvas with an EventSystem automatically.</li>
+          <li>Select the Canvas and find the <strong>Canvas</strong> component in the Inspector.</li>
+          <li>Set <strong>Render Mode</strong> to <strong>Screen Space - Overlay</strong>. This renders UI on top of everything, which is what we want.</li>
+        </ol>
+
+        <h3>Step 2: Configure the Canvas Scaler</h3>
+        <p>The <strong>Canvas Scaler</strong> component determines how UI scales across different screen sizes and resolutions. This is critical for mobile games where screens range from small phones to large tablets.</p>
+        <ol class="steps">
+          <li>On the Canvas object, find the <strong>Canvas Scaler</strong> component.</li>
+          <li>Set <strong>UI Scale Mode</strong> to <strong>Scale With Screen Size</strong>.</li>
+          <li>Set <strong>Reference Resolution</strong> to <code>1080 x 1920</code> (standard portrait mobile resolution).</li>
+          <li>Set <strong>Screen Match Mode</strong> to <strong>Match Width Or Height</strong>.</li>
+          <li>Set <strong>Match</strong> slider to <code>0.5</code> (balanced between width and height matching).</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">Why Scale With Screen Size?</div>
+          <p><strong>Constant Pixel Size</strong> makes UI the same pixel size on every device, which looks too small on high-DPI phones and too large on low-DPI ones. <strong>Scale With Screen Size</strong> makes UI proportionally the same size on every screen, which is almost always what you want for games. The Reference Resolution is your design target &mdash; you build the UI for that resolution and Unity scales it to fit other screens.</p>
+        </div>
+
+        <h3>Step 3: Create Panel GameObjects</h3>
+        <p>Our architecture uses one Canvas with child GameObjects for each panel. Showing a panel means activating its GameObject; hiding means deactivating it.</p>
+        <ol class="steps">
+          <li>Right-click the Canvas &gt; <strong>Create Empty</strong>. Name it <code>MainMenuPanel</code>.</li>
+          <li>On MainMenuPanel, set the <strong>RectTransform</strong> to stretch across the full canvas: hold Alt and click the bottom-right anchor preset (stretch-stretch).</li>
+          <li>Repeat for <code>HUDPanel</code>, <code>PausePanel</code>, and <code>GameOverPanel</code>.</li>
+          <li>Add a <strong>Canvas Group</strong> component to each panel. This lets us fade panels in and out by adjusting the <code>alpha</code> property.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Canvas Group for Fade Effects</div>
+          <p>A <code>CanvasGroup</code> component has three key properties: <code>Alpha</code> (0-1 opacity), <code>Interactable</code> (can buttons be clicked?), and <code>Blocks Raycasts</code> (does the panel block clicks to things behind it?). When hiding a panel, set alpha to 0 and interactable/blocksRaycasts to false. When showing, set alpha to 1 and the others to true.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: UIManager.cs -->
+      <section>
+        <h2>The UIManager</h2>
+        <p>The <code>UIManager</code> is the central controller for all UI panels. It listens for game state changes and shows the appropriate panel. It also provides shared functionality like panel transitions with fade animations.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">UIManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Central UI controller that manages panel visibility based on
+    /// game state. Handles transitions between panels with fade
+    /// animations using coroutines (no external dependencies).
+    ///
+    /// Attach this to the Canvas GameObject. Drag each panel's
+    /// CanvasGroup into the corresponding Inspector field.
+    /// &lt;/summary&gt;
+    public class UIManager : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Singleton
+        // ---------------------------------------------------------------
+
+        public static UIManager Instance { get; private set; }
+
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("UI Panels")]
+        [Tooltip("The main menu panel (shown before gameplay).")]
+        [SerializeField] private CanvasGroup mainMenuPanel;
+
+        [Tooltip("The HUD panel (shown during gameplay).")]
+        [SerializeField] private CanvasGroup hudPanel;
+
+        [Tooltip("The pause panel (shown when game is paused).")]
+        [SerializeField] private CanvasGroup pausePanel;
+
+        [Tooltip("The game over panel (shown after death).")]
+        [SerializeField] private CanvasGroup gameOverPanel;
+
+        [Header("Transition Settings")]
+        [Tooltip("How long panel fade transitions take in seconds.")]
+        [SerializeField] private float transitionDuration = 0.3f;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // The currently active panel (so we know what to hide).
+        private CanvasGroup currentPanel;
+
+        // Running coroutine reference so we can cancel transitions.
+        private Coroutine activeTransition;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            // Start with all panels hidden.
+            HidePanelImmediate(mainMenuPanel);
+            HidePanelImmediate(hudPanel);
+            HidePanelImmediate(pausePanel);
+            HidePanelImmediate(gameOverPanel);
+        }
+
+        private void Start()
+        {
+            // Show the main menu on startup.
+            ShowPanel(mainMenuPanel);
+        }
+
+        private void OnEnable()
+        {
+            GameEvents.OnGameStarted += HandleGameStarted;
+            GameEvents.OnGameOver += HandleGameOver;
+            GameEvents.OnGamePaused += HandleGamePaused;
+            GameEvents.OnGameResumed += HandleGameResumed;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnGameStarted -= HandleGameStarted;
+            GameEvents.OnGameOver -= HandleGameOver;
+            GameEvents.OnGamePaused -= HandleGamePaused;
+            GameEvents.OnGameResumed -= HandleGameResumed;
+        }
+
+        // ---------------------------------------------------------------
+        // Event Handlers
+        // ---------------------------------------------------------------
+
+        private void HandleGameStarted()
+        {
+            TransitionToPanel(hudPanel);
+        }
+
+        private void HandleGameOver()
+        {
+            // Small delay before showing game over so the death
+            // animation has time to play.
+            StartCoroutine(ShowGameOverDelayed(0.8f));
+        }
+
+        private void HandleGamePaused()
+        {
+            ShowPanel(pausePanel);
+        }
+
+        private void HandleGameResumed()
+        {
+            HidePanel(pausePanel);
+        }
+
+        /// &lt;summary&gt;
+        /// Waits a moment before showing the game over panel.
+        /// &lt;/summary&gt;
+        private IEnumerator ShowGameOverDelayed(float delay)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            TransitionToPanel(gameOverPanel);
+        }
+
+        // ---------------------------------------------------------------
+        // Panel Management
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Transitions from the current panel to a new panel with a
+        /// fade animation. Hides the current panel, then shows the new one.
+        /// &lt;/summary&gt;
+        /// &lt;param name="targetPanel"&gt;The panel to show.&lt;/param&gt;
+        public void TransitionToPanel(CanvasGroup targetPanel)
+        {
+            // Cancel any running transition.
+            if (activeTransition != null)
+            {
+                StopCoroutine(activeTransition);
+            }
+
+            activeTransition = StartCoroutine(
+                TransitionCoroutine(targetPanel)
+            );
+        }
+
+        /// &lt;summary&gt;
+        /// Coroutine that fades out the current panel and fades in
+        /// the target panel sequentially.
+        /// &lt;/summary&gt;
+        private IEnumerator TransitionCoroutine(CanvasGroup targetPanel)
+        {
+            // Fade out the current panel (if one is showing).
+            if (currentPanel != null)
+            {
+                yield return StartCoroutine(
+                    FadePanel(currentPanel, 1f, 0f, transitionDuration)
+                );
+                SetPanelInteractable(currentPanel, false);
+                currentPanel.gameObject.SetActive(false);
+            }
+
+            // Fade in the target panel.
+            targetPanel.gameObject.SetActive(true);
+            yield return StartCoroutine(
+                FadePanel(targetPanel, 0f, 1f, transitionDuration)
+            );
+            SetPanelInteractable(targetPanel, true);
+
+            currentPanel = targetPanel;
+            activeTransition = null;
+        }
+
+        /// &lt;summary&gt;
+        /// Shows a panel with a fade-in animation.
+        /// Does not hide the current panel (use for overlays like Pause).
+        /// &lt;/summary&gt;
+        public void ShowPanel(CanvasGroup panel)
+        {
+            if (panel == null) return;
+
+            panel.gameObject.SetActive(true);
+            StartCoroutine(FadePanel(panel, 0f, 1f, transitionDuration));
+            SetPanelInteractable(panel, true);
+            currentPanel = panel;
+        }
+
+        /// &lt;summary&gt;
+        /// Hides a panel with a fade-out animation.
+        /// &lt;/summary&gt;
+        public void HidePanel(CanvasGroup panel)
+        {
+            if (panel == null) return;
+
+            StartCoroutine(HidePanelCoroutine(panel));
+        }
+
+        private IEnumerator HidePanelCoroutine(CanvasGroup panel)
+        {
+            SetPanelInteractable(panel, false);
+            yield return StartCoroutine(
+                FadePanel(panel, 1f, 0f, transitionDuration)
+            );
+            panel.gameObject.SetActive(false);
+        }
+
+        /// &lt;summary&gt;
+        /// Immediately hides a panel without animation.
+        /// Used during initialization.
+        /// &lt;/summary&gt;
+        private void HidePanelImmediate(CanvasGroup panel)
+        {
+            if (panel == null) return;
+
+            panel.alpha = 0f;
+            SetPanelInteractable(panel, false);
+            panel.gameObject.SetActive(false);
+        }
+
+        // ---------------------------------------------------------------
+        // Animation Helpers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Smoothly fades a CanvasGroup's alpha from one value to another
+        /// over a specified duration. Uses unscaled time so it works
+        /// even when the game is paused (Time.timeScale = 0).
+        /// &lt;/summary&gt;
+        private IEnumerator FadePanel(
+            CanvasGroup panel,
+            float fromAlpha,
+            float toAlpha,
+            float duration)
+        {
+            float elapsed = 0f;
+            panel.alpha = fromAlpha;
+
+            while (elapsed &lt; duration)
+            {
+                // Use unscaledDeltaTime so fades work during pause.
+                elapsed += Time.unscaledDeltaTime;
+
+                // Calculate progress (0 to 1).
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Apply easing for a smoother feel.
+                // SmoothStep provides ease-in-ease-out.
+                float easedT = Mathf.SmoothStep(0f, 1f, t);
+
+                panel.alpha = Mathf.Lerp(fromAlpha, toAlpha, easedT);
+
+                yield return null;
+            }
+
+            // Ensure we land exactly on the target value.
+            panel.alpha = toAlpha;
+        }
+
+        /// &lt;summary&gt;
+        /// Sets whether a panel can receive input and block raycasts.
+        /// &lt;/summary&gt;
+        private void SetPanelInteractable(CanvasGroup panel, bool interactable)
+        {
+            panel.interactable = interactable;
+            panel.blocksRaycasts = interactable;
+        }
+
+        // ---------------------------------------------------------------
+        // Scale Animation (for popups and buttons)
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Animates a RectTransform from zero scale to full scale with
+        /// an elastic overshoot for a "pop in" effect.
+        /// Call this when showing game over stats, new high score, etc.
+        /// &lt;/summary&gt;
+        public void PopIn(RectTransform target, float duration = 0.4f)
+        {
+            StartCoroutine(PopInCoroutine(target, duration));
+        }
+
+        private IEnumerator PopInCoroutine(RectTransform target, float duration)
+        {
+            float elapsed = 0f;
+            target.localScale = Vector3.zero;
+
+            while (elapsed &lt; duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+
+                // Custom elastic ease-out curve.
+                // This creates an overshoot effect: scales past 1.0
+                // then settles back, like a rubber band.
+                float easedT = 1f - Mathf.Cos(t * Mathf.PI * 0.5f);
+                float overshoot = Mathf.Sin(t * Mathf.PI) * 0.15f;
+                float scale = easedT + overshoot;
+
+                target.localScale = new Vector3(scale, scale, scale);
+                yield return null;
+            }
+
+            target.localScale = Vector3.one;
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Shows the main menu panel. Called by buttons.
+        /// &lt;/summary&gt;
+        public void ShowMainMenu()
+        {
+            TransitionToPanel(mainMenuPanel);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the CanvasGroup for the HUD panel.
+        /// Other scripts may need this to add power-up indicators.
+        /// &lt;/summary&gt;
+        public CanvasGroup GetHUDPanel()
+        {
+            return hudPanel;
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Why Unscaled Time?</div>
+          <p>When the game is paused, we set <code>Time.timeScale = 0</code>, which stops all physics and <code>Time.deltaTime</code>-based calculations. But our UI transitions still need to animate! <code>Time.unscaledDeltaTime</code> gives us the real elapsed time regardless of timeScale, so our fade animations keep working during pause.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Main Menu UI -->
+      <section>
+        <h2>Main Menu Panel</h2>
+        <p>The main menu is the first thing players see. It should be clean, inviting, and get the player into the game quickly.</p>
+
+        <h3>Building the Main Menu in Unity</h3>
+        <ol class="steps">
+          <li>Select <code>MainMenuPanel</code> in the Hierarchy.</li>
+          <li>Right-click &gt; <strong>UI &gt; Text - TextMeshPro</strong>. Name it <code>TitleText</code>. Set the text to your game title, font size 72, centered.</li>
+          <li>Right-click MainMenuPanel &gt; <strong>UI &gt; Button - TextMeshPro</strong>. Name it <code>PlayButton</code>. Set the button text to "PLAY".</li>
+          <li>Duplicate the button and rename to <code>SettingsButton</code>. Set text to "SETTINGS".</li>
+          <li>Right-click MainMenuPanel &gt; <strong>UI &gt; Text - TextMeshPro</strong>. Name it <code>HighScoreText</code>. This will display the all-time best score.</li>
+          <li>Position the elements using the RectTransform anchors &mdash; title near the top, play button in the center, high score near the bottom.</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">MainMenuUI.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Controls the Main Menu panel. Displays the game title,
+    /// high score, and provides buttons to start the game or
+    /// open settings.
+    ///
+    /// Attach this to the MainMenuPanel GameObject.
+    /// &lt;/summary&gt;
+    public class MainMenuUI : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Text Elements")]
+        [Tooltip("The game title text.")]
+        [SerializeField] private TMP_Text titleText;
+
+        [Tooltip("Displays the all-time high score.")]
+        [SerializeField] private TMP_Text highScoreText;
+
+        [Header("Buttons")]
+        [Tooltip("Button that starts the game.")]
+        [SerializeField] private Button playButton;
+
+        [Tooltip("Button that opens the settings panel.")]
+        [SerializeField] private Button settingsButton;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Wire up button click listeners.
+            // AddListener connects a method to the button's OnClick event.
+            if (playButton != null)
+            {
+                playButton.onClick.AddListener(OnPlayButtonClicked);
+            }
+
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.AddListener(OnSettingsButtonClicked);
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Update the high score display every time the menu is shown.
+            // This ensures it reflects the latest score after a game over.
+            UpdateHighScoreDisplay();
+        }
+
+        private void OnDestroy()
+        {
+            // Remove listeners to prevent memory leaks.
+            if (playButton != null)
+            {
+                playButton.onClick.RemoveListener(OnPlayButtonClicked);
+            }
+            if (settingsButton != null)
+            {
+                settingsButton.onClick.RemoveListener(OnSettingsButtonClicked);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Button Handlers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when the Play button is clicked.
+        /// Fires the game start event which the GameManager handles.
+        /// &lt;/summary&gt;
+        private void OnPlayButtonClicked()
+        {
+            Debug.Log("[MainMenuUI] Play button clicked.");
+            GameEvents.OnGameStarted?.Invoke();
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the Settings button is clicked.
+        /// Opens the settings panel (to be implemented).
+        /// &lt;/summary&gt;
+        private void OnSettingsButtonClicked()
+        {
+            Debug.Log("[MainMenuUI] Settings button clicked.");
+            // TODO: Open settings panel.
+        }
+
+        // ---------------------------------------------------------------
+        // Display Updates
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Updates the high score text element with the latest
+        /// persisted high score from the ScoreManager.
+        /// &lt;/summary&gt;
+        private void UpdateHighScoreDisplay()
+        {
+            if (highScoreText == null) return;
+
+            // Try to get the high score from ScoreManager.
+            if (ScoreManager.Instance != null)
+            {
+                int highScore = ScoreManager.Instance.GetHighScore();
+                highScoreText.text = highScore > 0
+                    ? $"Best: {ScoreManager.FormatScore(highScore)}"
+                    : "Best: ---";
+            }
+            else
+            {
+                // ScoreManager not yet initialized - try PlayerPrefs.
+                int highScore = PlayerPrefs.GetInt("InfiniteRunner_HighScore", 0);
+                highScoreText.text = highScore > 0
+                    ? $"Best: {highScore:N0}"
+                    : "Best: ---";
+            }
+        }
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: HUD Panel -->
+      <section>
+        <h2>HUD Panel (Heads-Up Display)</h2>
+        <p>The HUD is shown during gameplay and must communicate critical information at a glance without obstructing the player's view of the game world.</p>
+
+        <h3>Building the HUD in Unity</h3>
+        <ol class="steps">
+          <li>Select <code>HUDPanel</code> in the Hierarchy.</li>
+          <li>Create a <strong>Text - TextMeshPro</strong> child named <code>ScoreText</code>. Anchor to top-center. Font size 48. Align center.</li>
+          <li>Create <code>CoinText</code>. Anchor to top-left. Font size 32. Show a coin icon + count.</li>
+          <li>Create <code>DistanceText</code>. Anchor to top-right. Font size 32.</li>
+          <li>Create an empty child named <code>PowerUpIndicators</code>. Anchor to mid-left. This will hold active power-up icons.</li>
+          <li>Create <code>MultiplierText</code>. Anchor below the score. Font size 36. Only visible when a multiplier is active.</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">HUDUI.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Controls the in-game HUD panel. Updates score, coin count,
+    /// distance, and active power-up indicators in real-time.
+    ///
+    /// Attach this to the HUDPanel GameObject.
+    /// &lt;/summary&gt;
+    public class HUDUI : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Score Display")]
+        [Tooltip("Shows the current total score.")]
+        [SerializeField] private TMP_Text scoreText;
+
+        [Tooltip("Shows 'x2' when a score multiplier is active.")]
+        [SerializeField] private TMP_Text multiplierText;
+
+        [Header("Stats Display")]
+        [Tooltip("Shows the number of coins collected this run.")]
+        [SerializeField] private TMP_Text coinText;
+
+        [Tooltip("Shows the distance traveled this run.")]
+        [SerializeField] private TMP_Text distanceText;
+
+        [Header("Power-up Indicators")]
+        [Tooltip("Parent transform for power-up indicator icons.")]
+        [SerializeField] private Transform powerUpContainer;
+
+        [Tooltip("Icon shown when Magnet is active.")]
+        [SerializeField] private GameObject magnetIndicator;
+
+        [Tooltip("Icon shown when Shield is active.")]
+        [SerializeField] private GameObject shieldIndicator;
+
+        [Tooltip("Icon shown when Score Multiplier is active.")]
+        [SerializeField] private GameObject multiplierIndicator;
+
+        [Header("Power-up Timer Bars")]
+        [Tooltip("Fill image for the Magnet timer.")]
+        [SerializeField] private Image magnetTimerFill;
+
+        [Tooltip("Fill image for the Shield timer.")]
+        [SerializeField] private Image shieldTimerFill;
+
+        [Tooltip("Fill image for the Multiplier timer.")]
+        [SerializeField] private Image multiplierTimerFill;
+
+        [Header("Animation")]
+        [Tooltip("How much the score text scales up on coin collect.")]
+        [SerializeField] private float scorePunchScale = 1.2f;
+
+        [Tooltip("Duration of the score punch animation.")]
+        [SerializeField] private float scorePunchDuration = 0.15f;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // Cached original scale for the score punch animation.
+        private Vector3 scoreOriginalScale;
+
+        // Running coroutine for score punch so we can cancel it.
+        private Coroutine scorePunchCoroutine;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            if (scoreText != null)
+            {
+                scoreOriginalScale = scoreText.transform.localScale;
+            }
+
+            // Hide all power-up indicators initially.
+            SetPowerUpIndicator(magnetIndicator, false);
+            SetPowerUpIndicator(shieldIndicator, false);
+            SetPowerUpIndicator(multiplierIndicator, false);
+
+            // Hide multiplier text initially.
+            if (multiplierText != null)
+            {
+                multiplierText.gameObject.SetActive(false);
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to scoring events.
+            GameEvents.OnScoreUpdated += HandleScoreUpdated;
+            GameEvents.OnCoinCollected += HandleCoinCollected;
+
+            // Subscribe to power-up events.
+            GameEvents.OnPowerUpActivated += HandlePowerUpActivated;
+            GameEvents.OnPowerUpExpired += HandlePowerUpExpired;
+            GameEvents.OnPowerUpTimerUpdated += HandlePowerUpTimerUpdated;
+            GameEvents.OnMultiplierChanged += HandleMultiplierChanged;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnScoreUpdated -= HandleScoreUpdated;
+            GameEvents.OnCoinCollected -= HandleCoinCollected;
+            GameEvents.OnPowerUpActivated -= HandlePowerUpActivated;
+            GameEvents.OnPowerUpExpired -= HandlePowerUpExpired;
+            GameEvents.OnPowerUpTimerUpdated -= HandlePowerUpTimerUpdated;
+            GameEvents.OnMultiplierChanged -= HandleMultiplierChanged;
+        }
+
+        // ---------------------------------------------------------------
+        // Score Display
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Updates all HUD text elements with the latest score data.
+        /// Called periodically by the ScoreManager (every 0.1s).
+        /// &lt;/summary&gt;
+        private void HandleScoreUpdated(ScoreData data)
+        {
+            // Update score text.
+            if (scoreText != null)
+            {
+                scoreText.text = ScoreManager.FormatScore(data.TotalScore);
+            }
+
+            // Update coin count.
+            if (coinText != null)
+            {
+                coinText.text = data.CoinsCollected.ToString();
+            }
+
+            // Update distance.
+            if (distanceText != null)
+            {
+                distanceText.text = ScoreManager.FormatDistance(
+                    data.DistanceTraveled
+                );
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Plays a "punch" scale animation on the score text when a
+        /// coin is collected. This gives satisfying visual feedback.
+        /// &lt;/summary&gt;
+        private void HandleCoinCollected(int value)
+        {
+            if (scoreText == null) return;
+
+            // Cancel any running punch animation.
+            if (scorePunchCoroutine != null)
+            {
+                StopCoroutine(scorePunchCoroutine);
+            }
+
+            scorePunchCoroutine = StartCoroutine(ScorePunchAnimation());
+        }
+
+        /// &lt;summary&gt;
+        /// Quickly scales the score text up and back down for a
+        /// satisfying "pop" effect.
+        /// &lt;/summary&gt;
+        private IEnumerator ScorePunchAnimation()
+        {
+            Transform target = scoreText.transform;
+            float halfDuration = scorePunchDuration * 0.5f;
+
+            // Scale up.
+            float elapsed = 0f;
+            while (elapsed &lt; halfDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / halfDuration;
+                target.localScale = Vector3.Lerp(
+                    scoreOriginalScale,
+                    scoreOriginalScale * scorePunchScale,
+                    t
+                );
+                yield return null;
+            }
+
+            // Scale back down.
+            elapsed = 0f;
+            while (elapsed &lt; halfDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / halfDuration;
+                target.localScale = Vector3.Lerp(
+                    scoreOriginalScale * scorePunchScale,
+                    scoreOriginalScale,
+                    t
+                );
+                yield return null;
+            }
+
+            target.localScale = scoreOriginalScale;
+            scorePunchCoroutine = null;
+        }
+
+        // ---------------------------------------------------------------
+        // Power-up Display
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Shows the indicator for an activated power-up.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpActivated(PowerUpType type, float duration)
+        {
+            switch (type)
+            {
+                case PowerUpType.Magnet:
+                    SetPowerUpIndicator(magnetIndicator, true);
+                    break;
+                case PowerUpType.Shield:
+                    SetPowerUpIndicator(shieldIndicator, true);
+                    break;
+                case PowerUpType.ScoreMultiplier:
+                    SetPowerUpIndicator(multiplierIndicator, true);
+                    break;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Hides the indicator for an expired power-up.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpExpired(PowerUpType type)
+        {
+            switch (type)
+            {
+                case PowerUpType.Magnet:
+                    SetPowerUpIndicator(magnetIndicator, false);
+                    break;
+                case PowerUpType.Shield:
+                    SetPowerUpIndicator(shieldIndicator, false);
+                    break;
+                case PowerUpType.ScoreMultiplier:
+                    SetPowerUpIndicator(multiplierIndicator, false);
+                    break;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Updates the timer fill bar for an active power-up.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpTimerUpdated(
+            PowerUpType type,
+            float normalizedTime)
+        {
+            Image fillImage = type switch
+            {
+                PowerUpType.Magnet => magnetTimerFill,
+                PowerUpType.Shield => shieldTimerFill,
+                PowerUpType.ScoreMultiplier => multiplierTimerFill,
+                _ => null
+            };
+
+            if (fillImage != null)
+            {
+                fillImage.fillAmount = normalizedTime;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Shows or hides the multiplier text (e.g., "x2").
+        /// &lt;/summary&gt;
+        private void HandleMultiplierChanged(int multiplier)
+        {
+            if (multiplierText == null) return;
+
+            if (multiplier > 1)
+            {
+                multiplierText.gameObject.SetActive(true);
+                multiplierText.text = $"x{multiplier}";
+            }
+            else
+            {
+                multiplierText.gameObject.SetActive(false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Shows or hides a power-up indicator GameObject.
+        /// &lt;/summary&gt;
+        private void SetPowerUpIndicator(GameObject indicator, bool show)
+        {
+            if (indicator != null)
+            {
+                indicator.SetActive(show);
+            }
+        }
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Game Over Panel -->
+      <section>
+        <h2>Game Over Panel</h2>
+        <p>The game over screen is the most important UI panel because it is what the player sees after every run. It must clearly show how well they did, celebrate new high scores, and make it easy to play again.</p>
+
+        <h3>Building the Game Over Panel in Unity</h3>
+        <ol class="steps">
+          <li>Select <code>GameOverPanel</code> in the Hierarchy.</li>
+          <li>Add a semi-transparent black <strong>Image</strong> as a background (color: 0,0,0 with alpha 0.7). Set its RectTransform to stretch-stretch.</li>
+          <li>Create a child empty named <code>StatsContainer</code>. This holds all the stats text elements.</li>
+          <li>Inside StatsContainer, create <strong>Text - TextMeshPro</strong> elements:
+            <ul>
+              <li><code>GameOverTitle</code> &mdash; "GAME OVER", font size 60.</li>
+              <li><code>FinalScoreLabel</code> &mdash; "Score", font size 28.</li>
+              <li><code>FinalScoreValue</code> &mdash; dynamic, font size 52.</li>
+              <li><code>HighScoreText</code> &mdash; "Best: 12,345" or "NEW!", font size 32.</li>
+              <li><code>CoinsCollectedText</code> &mdash; "Coins: 47", font size 28.</li>
+              <li><code>DistanceText</code> &mdash; "Distance: 1,234.5m", font size 28.</li>
+            </ul>
+          </li>
+          <li>Add a <strong>Button</strong> named <code>RestartButton</code> with text "PLAY AGAIN".</li>
+          <li>Add a <strong>Button</strong> named <code>MainMenuButton</code> with text "MAIN MENU".</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameOverUI.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Controls the Game Over panel. Displays final score, high score,
+    /// coins collected, distance traveled, and provides restart/menu buttons.
+    /// Features animated stat reveals and a "NEW!" high score indicator.
+    ///
+    /// Attach this to the GameOverPanel GameObject.
+    /// &lt;/summary&gt;
+    public class GameOverUI : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Score Display")]
+        [Tooltip("Shows the final total score.")]
+        [SerializeField] private TMP_Text finalScoreText;
+
+        [Tooltip("Shows the high score. Includes 'NEW!' if beaten.")]
+        [SerializeField] private TMP_Text highScoreText;
+
+        [Tooltip("The 'NEW!' indicator that appears for new high scores.")]
+        [SerializeField] private GameObject newHighScoreIndicator;
+
+        [Header("Stats Display")]
+        [Tooltip("Shows total coins collected this run.")]
+        [SerializeField] private TMP_Text coinsCollectedText;
+
+        [Tooltip("Shows total distance traveled this run.")]
+        [SerializeField] private TMP_Text distanceText;
+
+        [Header("Buttons")]
+        [Tooltip("Button to restart the game immediately.")]
+        [SerializeField] private Button restartButton;
+
+        [Tooltip("Button to return to the main menu.")]
+        [SerializeField] private Button mainMenuButton;
+
+        [Header("Animation")]
+        [Tooltip("The container holding all stats for animated reveal.")]
+        [SerializeField] private RectTransform statsContainer;
+
+        [Tooltip("Delay between revealing each stat element.")]
+        [SerializeField] private float statRevealDelay = 0.2f;
+
+        [Tooltip("All stat text elements in reveal order.")]
+        [SerializeField] private CanvasGroup[] statElements;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            if (restartButton != null)
+            {
+                restartButton.onClick.AddListener(OnRestartClicked);
+            }
+
+            if (mainMenuButton != null)
+            {
+                mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+            }
+
+            // Hide the new high score indicator by default.
+            if (newHighScoreIndicator != null)
+            {
+                newHighScoreIndicator.SetActive(false);
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Listen for the final score event.
+            GameEvents.OnFinalScoreCalculated += HandleFinalScore;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnFinalScoreCalculated -= HandleFinalScore;
+        }
+
+        private void OnDestroy()
+        {
+            if (restartButton != null)
+            {
+                restartButton.onClick.RemoveListener(OnRestartClicked);
+            }
+            if (mainMenuButton != null)
+            {
+                mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Score Display
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Populates the game over screen with the final score data
+        /// and starts the animated reveal sequence.
+        /// &lt;/summary&gt;
+        private void HandleFinalScore(ScoreData data)
+        {
+            // Populate text fields.
+            if (finalScoreText != null)
+            {
+                finalScoreText.text = ScoreManager.FormatScore(data.TotalScore);
+            }
+
+            if (highScoreText != null)
+            {
+                highScoreText.text =
+                    $"Best: {ScoreManager.FormatScore(data.HighScore)}";
+            }
+
+            if (coinsCollectedText != null)
+            {
+                coinsCollectedText.text =
+                    $"Coins: {data.CoinsCollected}";
+            }
+
+            if (distanceText != null)
+            {
+                distanceText.text =
+                    $"Distance: {ScoreManager.FormatDistance(data.DistanceTraveled)}";
+            }
+
+            // Show "NEW!" if this is a new high score.
+            if (newHighScoreIndicator != null)
+            {
+                newHighScoreIndicator.SetActive(data.IsNewHighScore);
+            }
+
+            // Start the animated reveal.
+            StartCoroutine(RevealStatsSequence());
+        }
+
+        /// &lt;summary&gt;
+        /// Reveals each stat element one at a time with a fade-in,
+        /// creating a dramatic reveal effect.
+        /// &lt;/summary&gt;
+        private IEnumerator RevealStatsSequence()
+        {
+            // Hide all stat elements initially.
+            if (statElements != null)
+            {
+                for (int i = 0; i &lt; statElements.Length; i++)
+                {
+                    if (statElements[i] != null)
+                    {
+                        statElements[i].alpha = 0f;
+                    }
+                }
+            }
+
+            // Pop in the stats container.
+            if (statsContainer != null)
+            {
+                UIManager.Instance?.PopIn(statsContainer, 0.4f);
+            }
+
+            // Wait for the container to appear.
+            yield return new WaitForSecondsRealtime(0.3f);
+
+            // Reveal each stat element with a delay.
+            if (statElements != null)
+            {
+                for (int i = 0; i &lt; statElements.Length; i++)
+                {
+                    if (statElements[i] == null) continue;
+
+                    // Fade in this stat element.
+                    StartCoroutine(FadeInElement(statElements[i], 0.25f));
+
+                    // Wait before revealing the next one.
+                    yield return new WaitForSecondsRealtime(statRevealDelay);
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Fades a CanvasGroup from 0 to 1 alpha over the given duration.
+        /// &lt;/summary&gt;
+        private IEnumerator FadeInElement(CanvasGroup element, float duration)
+        {
+            float elapsed = 0f;
+            element.alpha = 0f;
+
+            while (elapsed &lt; duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                element.alpha = Mathf.Clamp01(elapsed / duration);
+                yield return null;
+            }
+
+            element.alpha = 1f;
+        }
+
+        // ---------------------------------------------------------------
+        // Button Handlers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Restarts the game. Fires the game start event.
+        /// &lt;/summary&gt;
+        private void OnRestartClicked()
+        {
+            Debug.Log("[GameOverUI] Restart clicked.");
+            GameEvents.OnGameStarted?.Invoke();
+        }
+
+        /// &lt;summary&gt;
+        /// Returns to the main menu.
+        /// &lt;/summary&gt;
+        private void OnMainMenuClicked()
+        {
+            Debug.Log("[GameOverUI] Main Menu clicked.");
+            UIManager.Instance?.ShowMainMenu();
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">The Stat Reveal Sequence</div>
+          <p>Instead of showing all stats at once, we reveal them one at a time with a short delay between each. This creates a dramatic, slot-machine-like effect where the player watches their stats appear: score... coins... distance... and finally, the high score with a potential "NEW!" celebration. This small touch makes the game over screen feel polished and professional.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Pause Panel -->
+      <section>
+        <h2>Pause Panel</h2>
+        <p>The pause panel overlays on top of the HUD when the player pauses the game. It provides resume, restart, and main menu options.</p>
+
+        <h3>Building the Pause Panel in Unity</h3>
+        <ol class="steps">
+          <li>Select <code>PausePanel</code> in the Hierarchy.</li>
+          <li>Add a semi-transparent black <strong>Image</strong> background (same as game over).</li>
+          <li>Add <strong>Text - TextMeshPro</strong>: "PAUSED", font size 60, centered.</li>
+          <li>Add three <strong>Buttons</strong>: Resume, Restart, Main Menu.</li>
+          <li>Position buttons vertically in the center of the panel.</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PauseUI.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.UI;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Controls the Pause panel. Provides resume, restart, and
+    /// main menu buttons. Pausing sets Time.timeScale to 0.
+    ///
+    /// Attach this to the PausePanel GameObject.
+    /// &lt;/summary&gt;
+    public class PauseUI : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Buttons")]
+        [SerializeField] private Button resumeButton;
+        [SerializeField] private Button restartButton;
+        [SerializeField] private Button mainMenuButton;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            if (resumeButton != null)
+                resumeButton.onClick.AddListener(OnResumeClicked);
+
+            if (restartButton != null)
+                restartButton.onClick.AddListener(OnRestartClicked);
+
+            if (mainMenuButton != null)
+                mainMenuButton.onClick.AddListener(OnMainMenuClicked);
+        }
+
+        private void OnDestroy()
+        {
+            if (resumeButton != null)
+                resumeButton.onClick.RemoveListener(OnResumeClicked);
+
+            if (restartButton != null)
+                restartButton.onClick.RemoveListener(OnRestartClicked);
+
+            if (mainMenuButton != null)
+                mainMenuButton.onClick.RemoveListener(OnMainMenuClicked);
+        }
+
+        // ---------------------------------------------------------------
+        // Button Handlers
+        // ---------------------------------------------------------------
+
+        private void OnResumeClicked()
+        {
+            // Restore normal time scale.
+            Time.timeScale = 1f;
+            GameEvents.OnGameResumed?.Invoke();
+        }
+
+        private void OnRestartClicked()
+        {
+            // Restore time scale before restarting.
+            Time.timeScale = 1f;
+            GameEvents.OnGameStarted?.Invoke();
+        }
+
+        private void OnMainMenuClicked()
+        {
+            Time.timeScale = 1f;
+            UIManager.Instance?.ShowMainMenu();
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout warning">
+          <div class="callout-title">Always Restore Time.timeScale</div>
+          <p>When pausing, we set <code>Time.timeScale = 0</code> to freeze the game. It is <strong>critical</strong> to reset it to <code>1</code> before resuming, restarting, or going to the main menu. If you forget, the game will remain frozen even after the pause menu is dismissed. Every button handler in PauseUI sets <code>Time.timeScale = 1f</code> as its first action.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Required Events -->
+      <section>
+        <h2>Required Event Declarations</h2>
+        <p>Add these to your <code>GameEvents</code> class for the UI system:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameEvents.cs (UI additions)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System;
+
+namespace InfiniteRunner.Core
+{
+    public static partial class GameEvents
+    {
+        // --- Pause Events ---
+        /// &lt;summary&gt;Fired when the game is paused.&lt;/summary&gt;
+        public static Action OnGamePaused;
+
+        /// &lt;summary&gt;Fired when the game is resumed from pause.&lt;/summary&gt;
+        public static Action OnGameResumed;
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>Chapter Summary</h2>
+        <p>In this chapter, you built a complete UI system for the infinite runner:</p>
+        <ul>
+          <li><strong>Canvas Setup</strong> &mdash; Screen Space Overlay with Canvas Scaler set to Scale With Screen Size for responsive layout across all devices.</li>
+          <li><strong>UIManager.cs</strong> &mdash; Central controller that manages panel transitions with smooth fade animations using coroutines and CanvasGroup.</li>
+          <li><strong>MainMenuUI.cs</strong> &mdash; Title screen with play button, settings button, and persistent high score display.</li>
+          <li><strong>HUDUI.cs</strong> &mdash; In-game display showing score (with punch animation on coin collect), coin count, distance, multiplier text, and power-up indicators with timer bars.</li>
+          <li><strong>GameOverUI.cs</strong> &mdash; Results screen with animated stat reveals, "NEW!" high score indicator, and restart/menu buttons.</li>
+          <li><strong>PauseUI.cs</strong> &mdash; Overlay panel with resume, restart, and main menu buttons, properly managing Time.timeScale.</li>
+          <li><strong>Scene Management</strong> &mdash; Transitioning between MenuScene and GameScene using SceneManager, keeping managers alive with DontDestroyOnLoad, and async loading with a progress bar via SceneLoader.cs.</li>
+        </ul>
+        <p>The UI system is entirely event-driven. It does not directly reference game systems &mdash; it listens for events and updates its display accordingly. This means you can change the scoring system, power-up system, or game state machine without touching the UI code. In the next chapter, we will add audio to bring the game to life with sound effects and music.</p>
+      </section>
+
+      <!-- SECTION: Scene Management -->
+      <section>
+        <h2>Scene Management</h2>
+        <p>Right now, our entire game runs in a single scene. The main menu, HUD, game over screen, and all gameplay objects all live together. We show and hide panels to create the illusion of different screens. This works &mdash; and for a small game like ours, it works well. But production games take a different approach: <strong>multiple scenes</strong>.</p>
+
+        <p>Understanding scene management now will serve you well as your projects grow, and it also solves some real problems even in small games. Let's explore how it works.</p>
+
+        <h3>Why Scene Management Matters</h3>
+        <p>The single-scene approach has limitations that become painful as a game grows:</p>
+        <ul>
+          <li><strong>Startup time</strong> &mdash; Every object in the scene must be loaded before anything appears. A menu scene with just a Canvas and a camera loads almost instantly. A gameplay scene with terrain, obstacles, particle systems, and audio takes longer. With separate scenes, the player sees the menu immediately while the heavy gameplay scene loads only when they click "Play".</li>
+          <li><strong>Memory footprint</strong> &mdash; When everything is in one scene, all gameplay objects sit in memory even while the player is on the menu. Separate scenes mean the menu only loads what it needs.</li>
+          <li><strong>Clean separation</strong> &mdash; Menu logic and gameplay logic are fundamentally different concerns. Keeping them in separate scenes prevents accidental coupling and makes each scene easier to understand.</li>
+          <li><strong>Team collaboration</strong> &mdash; If two people work on the same scene, Unity scene files create merge conflicts that are nearly impossible to resolve. Separate scenes mean different team members can work on different parts of the game without conflicts.</li>
+        </ul>
+
+        <p>A typical production setup uses at least two scenes:</p>
+        <ul>
+          <li><strong>MenuScene</strong> &mdash; Lightweight. Contains a camera, the menu Canvas, and a background. Loads fast.</li>
+          <li><strong>GameScene</strong> &mdash; Heavy. Contains all gameplay objects: the player, spawners, terrain, the game camera, and the gameplay Canvas (HUD, pause, game over).</li>
+        </ul>
+        <p>Some games add a third <strong>LoadingScene</strong> that shows a progress bar while the game scene loads in the background. We will build that capability too.</p>
+
+        <h3>Adding Scenes to Build Settings</h3>
+        <p>Unity needs to know which scenes are part of your game. Scenes that are not registered in the Build Settings cannot be loaded at runtime.</p>
+
+        <ol class="steps">
+          <li>Open <strong>File &rarr; Build Settings</strong> (or press <kbd>Ctrl+Shift+B</kbd>).</li>
+          <li>With your current scene open, click <strong>Add Open Scenes</strong>. The scene appears in the list with a checkbox and an index number.</li>
+          <li>The <strong>first scene (index 0)</strong> is the one that loads automatically when the game starts. This should be your MenuScene.</li>
+          <li>You can <strong>drag scenes</strong> to reorder them. Each scene gets an index number (0, 1, 2, and so on).</li>
+          <li>Create a second scene for gameplay: <strong>File &rarr; New Scene</strong>, set it up with your gameplay objects, save it as <code>GameScene</code>, then add it to Build Settings as well.</li>
+        </ol>
+
+        <p>Your Build Settings should look like this:</p>
+        <ul>
+          <li><code>MenuScene</code> &mdash; index 0 (loads on game start)</li>
+          <li><code>GameScene</code> &mdash; index 1 (loaded when the player clicks "Play")</li>
+        </ul>
+
+        <h3>Loading Scenes</h3>
+        <p>Unity provides the <code>SceneManager</code> class for loading scenes at runtime. You need to include the <code>UnityEngine.SceneManagement</code> namespace:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Scene Loading Basics</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine.SceneManagement;
+
+// Load by name (recommended — more readable)
+SceneManager.LoadScene("GameScene");
+
+// Load by index (faster but harder to maintain)
+SceneManager.LoadScene(1);</code></pre></div>
+
+        <p>Loading by name is recommended because it makes your code self-documenting. If you reorder scenes in the Build Settings, name-based loading still works. Index-based loading would break.</p>
+
+        <div class="callout warning">
+          <div class="callout-title">LoadScene Is Destructive</div>
+          <p><code>SceneManager.LoadScene</code> <strong>unloads the current scene and destroys ALL GameObjects in it</strong>. Every object that is not marked with <code>DontDestroyOnLoad</code> is gone permanently. This is usually what you want &mdash; when you leave the menu, you do not need the menu objects anymore. But it means you need to be deliberate about which objects survive the transition. More on this in the next section.</p>
+        </div>
+
+        <h3>DontDestroyOnLoad &mdash; Persistent Managers</h3>
+        <p>Some objects <em>need</em> to survive scene changes. The two most common examples:</p>
+        <ul>
+          <li><strong>AudioManager</strong> &mdash; Background music should not stop when you transition from the menu to gameplay. If the AudioManager is destroyed and recreated, the music restarts from the beginning.</li>
+          <li><strong>GameManager</strong> &mdash; Tracks global game state like settings, player data, or analytics. Destroying and recreating it would lose that data.</li>
+        </ul>
+
+        <p>Unity provides <code>DontDestroyOnLoad(gameObject)</code> to mark an object as persistent. When a scene is unloaded, objects marked this way are moved to a special internal scene and survive the transition.</p>
+
+        <p>The best place to add this is in our Singleton base class, so <em>every</em> manager that uses the Singleton pattern automatically persists across scenes:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Singleton&lt;T&gt; with DontDestroyOnLoad</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// In Singleton&lt;T&gt;.Awake(), add DontDestroyOnLoad:
+protected virtual void Awake()
+{
+    if (instance != null &amp;&amp; instance != this)
+    {
+        Destroy(gameObject);
+        return;
+    }
+
+    instance = this as T;
+    DontDestroyOnLoad(gameObject); // Survive scene loads
+}</code></pre></div>
+
+        <p>This simple addition gives us two critical behaviors:</p>
+        <ol>
+          <li><strong>Persistence</strong> &mdash; The first instance of each manager survives scene loads. The AudioManager created in the MenuScene is still alive when the GameScene loads.</li>
+          <li><strong>Duplicate prevention</strong> &mdash; If the GameScene also has an AudioManager in its Hierarchy, the Singleton check catches it. The <code>if (instance != null &amp;&amp; instance != this)</code> block destroys the duplicate immediately. This is exactly why we wrote the Singleton pattern this way in an earlier chapter.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Spotting Persistent Objects in the Editor</div>
+          <p>During Play Mode, objects marked with <code>DontDestroyOnLoad</code> appear in a special <strong>"DontDestroyOnLoad"</strong> section at the bottom of the Hierarchy window. This is not a real scene &mdash; it is Unity's way of showing you which objects have been marked as persistent. If you see unexpected objects piling up there, you likely have a duplicate-creation bug. Check that your Singleton base class properly destroys duplicates.</p>
+        </div>
+
+        <h3>Async Scene Loading with Progress</h3>
+        <p><code>SceneManager.LoadScene</code> is synchronous &mdash; it freezes the entire game until the new scene is fully loaded. For small scenes this freeze is barely noticeable. For larger scenes, the player stares at a frozen screen with no feedback, which feels like a crash.</p>
+
+        <p>The solution is <strong>async scene loading</strong>. Unity loads the scene in the background across multiple frames while we show a loading screen with a progress bar. The player sees smooth feedback instead of a freeze.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">SceneLoader.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
+namespace InfiniteRunner.UI
+{
+    /// &lt;summary&gt;
+    /// Handles scene transitions with a loading screen.
+    /// Attach to a persistent object (DontDestroyOnLoad).
+    /// &lt;/summary&gt;
+    public class SceneLoader : MonoBehaviour
+    {
+        [Header("Loading Screen")]
+        [SerializeField] private GameObject loadingScreen;
+        [SerializeField] private Slider progressBar;
+
+        /// &lt;summary&gt;
+        /// Load a scene with a loading screen and progress bar.
+        /// &lt;/summary&gt;
+        public void LoadScene(string sceneName)
+        {
+            StartCoroutine(LoadSceneAsync(sceneName));
+        }
+
+        private IEnumerator LoadSceneAsync(string sceneName)
+        {
+            // Show loading screen
+            if (loadingScreen != null)
+            {
+                loadingScreen.SetActive(true);
+            }
+
+            // Start loading the scene in the background
+            AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+
+            // Don't let the scene activate until we're ready
+            operation.allowSceneActivation = false;
+
+            while (!operation.isDone)
+            {
+                // Unity reports progress from 0 to 0.9
+                // (0.9 means "ready to activate")
+                float progress = Mathf.Clamp01(operation.progress / 0.9f);
+
+                if (progressBar != null)
+                {
+                    progressBar.value = progress;
+                }
+
+                // When loading reaches 90%, activate the scene
+                if (operation.progress &gt;= 0.9f)
+                {
+                    // Optional: wait a moment so the player sees 100%
+                    yield return new WaitForSeconds(0.5f);
+                    operation.allowSceneActivation = true;
+                }
+
+                yield return null;
+            }
+
+            // Hide loading screen
+            if (loadingScreen != null)
+            {
+                loadingScreen.SetActive(false);
+            }
+        }
+    }
+}</code></pre></div>
+
+        <p>Let's break down each part of this script:</p>
+        <ul>
+          <li><strong><code>SceneManager.LoadSceneAsync(sceneName)</code></strong> &mdash; Starts loading the scene in the background without freezing the game. Returns an <code>AsyncOperation</code> that we can monitor.</li>
+          <li><strong><code>operation.progress</code></strong> &mdash; Goes from 0 to 0.9. This is a Unity quirk: the value 0.9 means "loading is complete, ready to activate." It never reaches 1.0 until the scene is actually activated. We divide by 0.9 to normalize it to a 0&ndash;1 range for the progress bar.</li>
+          <li><strong><code>operation.allowSceneActivation = false</code></strong> &mdash; Tells Unity "don't switch to the new scene yet, even when it's ready." This gives us control over exactly when the transition happens. Without this, the scene would switch the instant loading finishes, potentially cutting off the loading animation.</li>
+          <li><strong>The progress bar</strong> &mdash; Fills smoothly so the player knows something is happening. Even if loading is fast, the brief 0.5-second wait at 100% gives the player a moment to register that loading is complete before the scene switches.</li>
+        </ul>
+
+        <div class="callout info">
+          <div class="callout-title">The SceneLoader Must Be Persistent</div>
+          <p>The <code>SceneLoader</code> uses a coroutine to manage the loading process. If the SceneLoader's GameObject is destroyed when the old scene unloads, the coroutine stops and the new scene never activates. That is why the SceneLoader must live on a <code>DontDestroyOnLoad</code> object. Attach it to one of your persistent managers or create a dedicated persistent object for it.</p>
+        </div>
+
+        <h3>The Complete Game Flow</h3>
+        <p>With scene management in place, here is the full flow of the game from start to finish:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Game Flow Diagram</span><span class="lang-badge">text</span></div><pre><code>Game Start
+    |
+    v
+MenuScene (loads first -- index 0)
+    |
+    +-- Player clicks "Play"
+    |       |
+    |       v
+    |   Loading Screen (brief)
+    |       |
+    |       v
+    |   GameScene (gameplay)
+    |       |
+    |       +-- Player dies --> Game Over panel
+    |       |       |
+    |       |       +-- "Restart" --> Reload GameScene
+    |       |       |
+    |       |       +-- "Main Menu" --> Load MenuScene
+    |       |
+    |       +-- Player pauses --> Pause panel
+    |               |
+    |               +-- "Main Menu" --> Load MenuScene
+    |
+    +-- Player clicks "Quit"
+            |
+            v
+        Application.Quit()</code></pre></div>
+
+        <p>Every arrow that crosses a scene boundary (<code>MenuScene &rarr; GameScene</code> or <code>GameScene &rarr; MenuScene</code>) is a <code>SceneManager.LoadScene</code> call. Every arrow that stays within a scene (showing the game over panel, showing the pause panel) is a panel toggle handled by the UIManager.</p>
+
+        <h3>Updating Our UI Scripts</h3>
+        <p>Now that we understand scene management, let's update our existing UI scripts to use scene loading for transitions between the menu and gameplay.</p>
+
+        <h4>MainMenuUI &mdash; Starting the Game</h4>
+        <p>The Play button should load the GameScene instead of just toggling a panel:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">MainMenuUI.cs (updated for scene loading)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace InfiniteRunner.UI
+{
+    public class MainMenuUI : MonoBehaviour
+    {
+        public void OnPlayClicked()
+        {
+            SceneManager.LoadScene("GameScene");
+            // Or for a loading screen with progress bar:
+            // FindFirstObjectByType&lt;SceneLoader&gt;().LoadScene("GameScene");
+        }
+
+        public void OnQuitClicked()
+        {
+            #if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+            #else
+                Application.Quit();
+            #endif
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Application.Quit Does Nothing in the Editor</div>
+          <p><code>Application.Quit()</code> only works in a built game. In the Unity Editor, it does nothing &mdash; the game keeps running. The <code>#if UNITY_EDITOR</code> preprocessor directive lets us use <code>EditorApplication.isPlaying = false</code> instead, which stops Play Mode in the editor. This code is stripped from builds automatically, so there is no performance or security concern.</p>
+        </div>
+
+        <h4>GameOverUI &mdash; Restart and Main Menu</h4>
+        <p>The game over panel needs two scene-related buttons: restart (reload the current scene) and return to menu (load the MenuScene):</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameOverUI.cs (updated button handlers)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">public void OnRestartClicked()
+{
+    // Reload the current scene — gets the name dynamically
+    // so this works regardless of what the scene is called.
+    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+}
+
+public void OnMainMenuClicked()
+{
+    // CRITICAL: Reset time scale before changing scenes.
+    // If the player paused, then died, timeScale might still be 0.
+    Time.timeScale = 1f;
+    SceneManager.LoadScene("MenuScene");
+}</code></pre></div>
+
+        <p>Notice the <code>Time.timeScale = 1f</code> call in <code>OnMainMenuClicked</code>. This is a defensive measure. If the player paused the game (setting <code>timeScale</code> to 0), then somehow reached the game over screen, the time scale might still be zero. Loading a new scene does <em>not</em> automatically reset <code>Time.timeScale</code> &mdash; it is a global setting that persists across scene loads. If you forget to reset it, the MenuScene loads with time frozen and nothing works.</p>
+
+        <h3>Additive Scene Loading (Advanced)</h3>
+        <p>Everything we have covered so far uses <strong>single mode</strong> loading, where loading a new scene destroys the old one. Unity also supports <strong>additive mode</strong>, where a new scene is loaded <em>on top of</em> the current scene without unloading anything:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Additive Scene Loading</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Load a scene additively (does NOT unload the current scene)
+SceneManager.LoadScene("UIScene", LoadSceneMode.Additive);
+
+// Later, unload the additive scene when you no longer need it
+SceneManager.UnloadSceneAsync("UIScene");</code></pre></div>
+
+        <p>Additive loading is useful for:</p>
+        <ul>
+          <li><strong>Persistent UI overlays</strong> &mdash; A shared UI scene that stays loaded across multiple gameplay scenes.</li>
+          <li><strong>Streaming large worlds</strong> &mdash; Loading and unloading chunks of the world as the player moves through it.</li>
+          <li><strong>Shared elements</strong> &mdash; A lighting scene or audio scene that multiple gameplay scenes share.</li>
+        </ul>
+
+        <div class="callout info">
+          <div class="callout-title">Do We Need Additive Loading?</div>
+          <p>For our infinite runner, the single-scene load approach is the right choice. We have two scenes (menu and gameplay) with clean transitions between them. Additive loading is more common in larger games with open worlds or shared UI layers. It is good to know it exists, but do not add complexity you do not need. You can always refactor to additive loading later if your game outgrows the simple approach.</p>
+        </div>
+
+        <h3>Testing Scene Transitions</h3>
+        <p>Scene transitions introduce a new category of bugs &mdash; things that work perfectly when you test within a single scene but break when you actually load between scenes. Here is a systematic checklist for verifying everything works:</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Scene Transition Testing Checklist</div>
+          <ol>
+            <li><strong>Add both scenes to Build Settings</strong> &mdash; Open <strong>File &rarr; Build Settings</strong> and click <strong>Add Open Scenes</strong> for each scene. Verify that MenuScene is index 0.</li>
+            <li><strong>Play from MenuScene</strong> &mdash; Always start testing from the scene that loads first. If you play from GameScene, you skip the menu flow and may miss bugs.</li>
+            <li><strong>Click Play</strong> &mdash; Verify that GameScene loads. The menu should disappear and gameplay should start.</li>
+            <li><strong>Die and verify Game Over</strong> &mdash; Play until you die. The Game Over panel should appear with correct stats.</li>
+            <li><strong>Click Restart</strong> &mdash; Verify that the game reloads cleanly. Score resets to zero, obstacles are fresh, the player is at the starting position.</li>
+            <li><strong>Click Main Menu</strong> &mdash; Verify that MenuScene loads and the main menu appears correctly.</li>
+            <li><strong>Verify audio continuity</strong> &mdash; If your AudioManager uses <code>DontDestroyOnLoad</code>, background music should continue playing across scene transitions without restarting.</li>
+            <li><strong>Check for duplicate managers</strong> &mdash; After returning to MenuScene, open the Hierarchy and look at the DontDestroyOnLoad section. There should be exactly one instance of each manager, not duplicates. If you see duplicates, your Singleton base class is not destroying them properly.</li>
+            <li><strong>Repeat the full loop</strong> &mdash; Go Menu &rarr; Game &rarr; Die &rarr; Menu &rarr; Game &rarr; Die &rarr; Restart &rarr; Die &rarr; Menu. Each cycle should work identically. Memory leaks and duplicate objects tend to accumulate over multiple cycles.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The UI system is substantial — menus, HUD, pause, game over. This is worth introducing one more Git concept: <strong>GitHub</strong>.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Implement complete UI system with menus, HUD, and game over"</code></pre>
+        </div>
+        <p>Your commits are only on your local machine. If your hard drive dies, everything is lost. Let's back it up to <strong>GitHub</strong> — a free website that hosts Git repositories. Here's how:</p>
+        <ol>
+          <li>Go to <code>github.com</code> and create a free account (if you don't have one).</li>
+          <li>Click <strong>New Repository</strong>. Name it <code>infinite-runner</code>. Keep it private or public — your choice. Do NOT add a README (we already have files).</li>
+          <li>GitHub will show you commands. Run these in your terminal:</li>
+        </ol>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git remote add origin https://github.com/YOUR-USERNAME/infinite-runner.git
+git push -u origin main</code></pre>
+        </div>
+        <p>Your entire project history is now backed up on GitHub. From now on, after committing, you can run <code>git push</code> to upload your latest commits. We'll remind you.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="18-difficulty.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Difficulty Progression</span></a>
+        <a href="20-audio.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Audio System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

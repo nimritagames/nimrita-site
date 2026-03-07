@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance &amp; Optimization - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link active"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 24</span>
+        <h1>Performance &amp; Optimization</h1>
+        <p class="chapter-desc">Profile your game, identify bottlenecks, reduce draw calls, eliminate garbage collection spikes, and ensure a silky-smooth 60 FPS on every target platform.</p>
+      </div>
+
+      <!-- SECTION: Why Optimization Matters -->
+      <section>
+        <h2>Why Optimization Matters</h2>
+        <p>Your game might run perfectly on your development PC. But most infinite runners are played on <strong>mobile phones</strong> &mdash; devices with limited CPU, GPU, and memory. A game that stutters, drops frames, or heats up the phone will be uninstalled in seconds. Players expect a <strong>consistent 60 frames per second</strong> (or 30 FPS minimum on low-end devices).</p>
+        <p>Optimization is not about making code "fast" in the abstract &mdash; it is about finding the specific things that are slow and fixing them. That is why we <strong>profile first, optimize second</strong>. Never guess where the bottleneck is.</p>
+
+        <div class="callout danger">
+          <div class="callout-title">The Golden Rule</div>
+          <p><strong>Measure, do not guess.</strong> Developers waste enormous amounts of time optimizing code that was never the bottleneck. Always use the Unity Profiler to identify the actual problem before changing anything. If the Profiler says rendering takes 90% of your frame time, optimizing your C# scripts will not help.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Unity Profiler -->
+      <section>
+        <h2>Unity Profiler Walkthrough</h2>
+        <p>The Unity Profiler is a built-in tool that shows you exactly where your game spends its time each frame. It is your most important optimization tool.</p>
+
+        <h3>Opening the Profiler</h3>
+        <ol class="steps">
+          <li>In Unity, go to <strong>Window &gt; Analysis &gt; Profiler</strong> (or press <strong>Ctrl+7</strong> on Windows, <strong>Cmd+7</strong> on Mac).</li>
+          <li>Press <strong>Play</strong> in the Editor. The Profiler immediately starts recording data.</li>
+          <li>Play your game for 10&ndash;30 seconds to capture a representative sample.</li>
+          <li>Click anywhere on the timeline at the top to inspect a specific frame.</li>
+        </ol>
+
+        <h3>CPU Usage Panel</h3>
+        <p>This is the most important panel. It shows how much time each system takes per frame.</p>
+        <ul>
+          <li><strong>PlayerLoop</strong> &mdash; The total frame time. At 60 FPS, each frame has a budget of 16.67 milliseconds. If any frame exceeds this, you drop below 60 FPS.</li>
+          <li><strong>Scripts</strong> (green) &mdash; Time spent in your C# code (Update, FixedUpdate, coroutines).</li>
+          <li><strong>Rendering</strong> (dark blue) &mdash; Time the GPU spends drawing everything.</li>
+          <li><strong>Physics</strong> (orange) &mdash; Time spent on physics calculations (collisions, rigidbodies).</li>
+          <li><strong>GC.Alloc</strong> &mdash; The column that shows how many bytes of garbage were allocated this frame. This is crucial &mdash; any allocation will eventually trigger the garbage collector, causing a stutter.</li>
+        </ul>
+
+        <p>Click on a frame that shows a spike (a tall bar). In the bottom panel, you will see a hierarchy of every method that ran. Sort by <strong>Time ms</strong> to find the slowest methods, or sort by <strong>GC Alloc</strong> to find the worst allocators.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Deep Profile Mode</div>
+          <p>Enable <strong>Deep Profile</strong> in the Profiler toolbar for a complete call stack of every method. This is much slower but shows you exactly which line of code is responsible for each cost. Use it for investigation, then disable it for normal testing.</p>
+        </div>
+
+        <h3>Memory Panel</h3>
+        <p>Switch to the <strong>Memory</strong> module in the Profiler to see overall memory usage:</p>
+        <ul>
+          <li><strong>Total Reserved</strong> &mdash; Memory Unity has allocated from the OS.</li>
+          <li><strong>Total Used</strong> &mdash; Memory actually in use.</li>
+          <li><strong>GC Reserved</strong> &mdash; Memory managed by the garbage collector (C# objects, strings, arrays).</li>
+          <li><strong>Texture Memory</strong> &mdash; Often the biggest category on mobile. Large textures consume massive amounts of memory.</li>
+        </ul>
+
+        <h3>Rendering Panel</h3>
+        <p>The <strong>Rendering</strong> module shows GPU-related statistics:</p>
+        <ul>
+          <li><strong>Batches (Draw Calls)</strong> &mdash; How many separate draw commands are sent to the GPU. Each draw call has overhead. Fewer is better. A typical mobile game aims for under 100 draw calls.</li>
+          <li><strong>Triangles</strong> &mdash; Total triangle count being rendered. More triangles = more GPU work.</li>
+          <li><strong>SetPass Calls</strong> &mdash; How many times the GPU switches shaders/materials. Very expensive. Minimize material variety in your scene.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Draw Call Optimization -->
+      <section>
+        <h2>Draw Call Optimization</h2>
+        <p>Every time Unity tells the GPU to draw something, that is a <strong>draw call</strong> (also called a "batch"). Each draw call has fixed overhead &mdash; it is like sending a letter through the postal system. Sending 100 tiny letters (100 draw calls for 100 small objects) is far slower than sending one big package (1 draw call for 100 objects batched together).</p>
+
+        <h3>Static Batching</h3>
+        <p>For objects that <strong>never move</strong> (scenery, decorations, buildings), mark them as <strong>Static</strong> in the Inspector (the checkbox at the top right of the Inspector). Unity will combine their meshes at build time into a single draw call.</p>
+        <ol class="steps">
+          <li>Select all non-moving environment objects (fences, trees, ground decorations).</li>
+          <li>In the Inspector, check the <strong>Static</strong> checkbox (or specifically <strong>Batching Static</strong> in the dropdown).</li>
+          <li>Play the game and check the Profiler's Rendering panel &mdash; you should see fewer Batches.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Do NOT Mark Moving Objects as Static</div>
+          <p>Only static (non-moving) objects should be marked Static. If a moving object is marked Static, Unity will not update its position after the initial batch, causing it to appear frozen or to render in the wrong place. Obstacles and collectibles that move with the world should NOT be static.</p>
+        </div>
+
+        <h3>Dynamic Batching</h3>
+        <p>Unity can automatically batch <strong>small</strong> meshes (under 300 vertices) that share the same material, even if they move. This is enabled by default in URP (Universal Render Pipeline). To benefit:</p>
+        <ul>
+          <li>Keep obstacle and collectible meshes simple (low vertex count).</li>
+          <li>Use the <strong>same material</strong> for as many objects as possible. Ten different colored cubes with ten different materials = 10 draw calls. Ten cubes with one material using vertex colors = 1 draw call.</li>
+        </ul>
+
+        <h3>GPU Instancing</h3>
+        <p>If you have many copies of the same mesh with the same material (e.g., hundreds of coins), enable <strong>GPU Instancing</strong> on the material:</p>
+        <ol class="steps">
+          <li>Select the material in the Project window.</li>
+          <li>In the Inspector, check <strong>Enable GPU Instancing</strong>.</li>
+          <li>Unity will now render all instances in a single draw call (or very few).</li>
+        </ol>
+
+        <h3>SRP Batcher (URP)</h3>
+        <p>If you are using the Universal Render Pipeline (recommended), the <strong>SRP Batcher</strong> is active by default. It does not reduce draw calls but makes each draw call faster by caching shader properties. You do not need to do anything &mdash; just make sure your materials use SRP-compatible shaders (any shader from the "Universal Render Pipeline" category).</p>
+      </section>
+
+      <!-- SECTION: Object Pooling Review -->
+      <section>
+        <h2>Object Pooling Review</h2>
+        <p>We built an object pooling system in Chapter 12. Let us review why it is one of the most important optimizations:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Without Pooling (BAD)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Every frame, this creates a new obstacle and destroys old ones.
+// Each Instantiate() allocates memory. Each Destroy() generates garbage.
+// The garbage collector runs periodically to clean up, causing stutters.
+
+void SpawnObstacle()
+{
+    GameObject obstacle = Instantiate(obstaclePrefab);  // ALLOCATION!
+    // ... set position, etc. ...
+}
+
+void RemoveObstacle(GameObject obstacle)
+{
+    Destroy(obstacle);  // GARBAGE! GC will stutter later.
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">With Pooling (GOOD)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Objects are created once at startup and recycled.
+// No runtime allocations, no garbage, no GC stutters.
+
+void SpawnObstacle()
+{
+    GameObject obstacle = pool.Get();    // Just activates an existing object
+    obstacle.SetActive(true);
+    // ... set position, etc. ...
+}
+
+void RemoveObstacle(GameObject obstacle)
+{
+    obstacle.SetActive(false);
+    pool.Return(obstacle);               // Returns to pool for reuse
+}</code></pre>
+        </div>
+
+        <p>If you followed Chapter 12, your obstacles, collectibles, and particles are already pooled. If anything is still using Instantiate/Destroy at runtime, fix it now.</p>
+      </section>
+
+      <!-- SECTION: LOD -->
+      <section>
+        <h2>LOD (Level of Detail)</h2>
+        <p>LOD is a technique where objects far from the camera use simpler (fewer triangles) meshes. As the camera gets closer, higher-detail meshes swap in. This reduces the GPU workload for distant objects.</p>
+
+        <ol class="steps">
+          <li>Create 2&ndash;3 versions of your obstacle/environment mesh at different detail levels (e.g., 1000 tris, 300 tris, 50 tris).</li>
+          <li>Create an empty GameObject and add a <strong>LOD Group</strong> component.</li>
+          <li>In the LOD Group Inspector, you will see LOD levels (LOD 0, LOD 1, LOD 2, Culled). Drag each mesh version into its corresponding LOD slot.</li>
+          <li>Adjust the distance thresholds by dragging the LOD bars.</li>
+          <li>The "Culled" level means the object is invisible beyond a certain distance &mdash; free performance!</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">LOD for Our Runner</div>
+          <p>In an infinite runner, LOD is especially valuable because the camera always faces forward. Objects far down the track can use very simple meshes (or be culled entirely), and the player will never notice because they are so far away. Environment decorations on the sides of the track are great candidates for aggressive LOD.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Texture Optimization -->
+      <section>
+        <h2>Texture Atlasing and Compression</h2>
+        <p>Textures are often the biggest memory consumer, especially on mobile. Here are the key optimization strategies:</p>
+
+        <h3>Texture Compression</h3>
+        <ul>
+          <li>Select a texture in the Project window and look at the Inspector.</li>
+          <li>Under <strong>Platform-specific overrides</strong>, set compression for each platform:
+            <ul>
+              <li><strong>Android:</strong> Use ASTC (best quality-to-size ratio) or ETC2.</li>
+              <li><strong>iOS:</strong> Use ASTC.</li>
+              <li><strong>PC:</strong> Use DXT (BC) compression.</li>
+            </ul>
+          </li>
+          <li>Set <strong>Max Size</strong> to the smallest resolution that still looks good. A 2048x2048 texture on a coin that is 20 pixels on screen is wasteful &mdash; use 128x128 or 256x256.</li>
+          <li>Disable <strong>Generate Mip Maps</strong> for UI textures and sprites (they are always at a fixed distance).</li>
+        </ul>
+
+        <h3>Texture Atlasing</h3>
+        <p>A texture atlas combines multiple small textures into one large texture. Instead of 20 draw calls for 20 objects with 20 different textures, you get 1 draw call because they all share one atlas material.</p>
+        <ul>
+          <li>For 2D sprites, Unity's <strong>Sprite Atlas</strong> system does this automatically: right-click in the Project &gt; Create &gt; 2D &gt; Sprite Atlas, then drag your sprites into it.</li>
+          <li>For 3D objects, you can manually create atlases in an image editor or use an asset like TexturePacker.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Camera Culling -->
+      <section>
+        <h2>Camera Culling and Occlusion</h2>
+        <p>The camera's <strong>Clipping Planes</strong> determine the visible range:</p>
+        <ul>
+          <li><strong>Near Clip:</strong> How close objects can be before they are not rendered. Default is 0.3. Keep it as high as possible without clipping visible geometry.</li>
+          <li><strong>Far Clip:</strong> How far objects can be before they are not rendered. Set this to only slightly beyond the furthest visible part of your track. If your track is visible 100 units ahead, set Far Clip to 120 &mdash; not the default 1000.</li>
+        </ul>
+
+        <p>Reducing the Far Clip plane means fewer objects are sent to the GPU each frame. Combined with LOD culling, objects beyond the visible range cost zero performance.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Fog as a Visual Trick</div>
+          <p>Add distance fog to your scene (Lighting &gt; Environment &gt; Other Settings &gt; Fog). Set the fog end distance to match your Far Clip plane. This hides the popping that occurs when objects suddenly appear at the edge of the camera's range, making the culling invisible to the player.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Reducing GC Allocations -->
+      <section>
+        <h2>Reducing Garbage Collection Allocations</h2>
+        <p>The C# <strong>garbage collector</strong> (GC) periodically scans memory for objects that are no longer referenced and frees them. This scan causes a <strong>frame stutter</strong> &mdash; sometimes 10&ndash;50 milliseconds, which is a visible hitch at 60 FPS. The solution is to avoid creating garbage in the first place.</p>
+
+        <h3>Common Allocation Traps and Fixes</h3>
+
+        <table>
+          <thead>
+            <tr><th>Trap</th><th>Fix</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Instantiate / Destroy</strong> every frame</td>
+              <td>Use object pooling (Chapter 12)</td>
+            </tr>
+            <tr>
+              <td><strong>GetComponent&lt;T&gt;()</strong> every frame</td>
+              <td>Cache the result in <code>Awake()</code> or <code>Start()</code></td>
+            </tr>
+            <tr>
+              <td><strong>String concatenation</strong> in Update (e.g., <code>"Score: " + score</code>)</td>
+              <td>Use <code>StringBuilder</code> or <code>TextMeshPro.SetText("{0}", score)</code></td>
+            </tr>
+            <tr>
+              <td><strong>LINQ queries</strong> (e.g., <code>.Where()</code>, <code>.Select()</code>)</td>
+              <td>Use plain for/foreach loops &mdash; LINQ allocates iterators</td>
+            </tr>
+            <tr>
+              <td><strong>Lambda closures</strong> that capture variables</td>
+              <td>Use cached delegates or avoid closures in hot paths</td>
+            </tr>
+            <tr>
+              <td><strong>new arrays/lists</strong> every frame</td>
+              <td>Allocate once in <code>Awake()</code> and reuse</td>
+            </tr>
+            <tr>
+              <td><strong>Boxing value types</strong> (e.g., passing int to object parameter)</td>
+              <td>Use generic methods to avoid boxing</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Detailed Examples</h3>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GC Traps vs. Fixes</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// ═══════════════════════════════════════════════════════
+// TRAP 1: GetComponent every frame
+// ═══════════════════════════════════════════════════════
+
+// BAD — allocates and searches every frame
+void Update()
+{
+    Rigidbody rb = GetComponent&lt;Rigidbody&gt;(); // SLOW + possible GC
+    rb.AddForce(Vector3.forward);
+}
+
+// GOOD — cache it once
+private Rigidbody _rb;
+
+void Awake()
+{
+    _rb = GetComponent&lt;Rigidbody&gt;(); // Called once
+}
+
+void Update()
+{
+    _rb.AddForce(Vector3.forward); // Fast, no allocation
+}
+
+// ═══════════════════════════════════════════════════════
+// TRAP 2: String concatenation in Update
+// ═══════════════════════════════════════════════════════
+
+// BAD — creates new strings every frame (strings are immutable in C#)
+void Update()
+{
+    scoreText.text = "Score: " + score.ToString(); // 2 allocations!
+}
+
+// GOOD — use TextMeshPro's SetText with format specifiers
+// (no allocation because it uses an internal char buffer)
+void Update()
+{
+    scoreText.SetText("Score: {0}", score); // ZERO allocations!
+}
+
+// ALSO GOOD — only update when the value changes
+private int _lastDisplayedScore = -1;
+
+void Update()
+{
+    if (score != _lastDisplayedScore)
+    {
+        _lastDisplayedScore = score;
+        scoreText.SetText("Score: {0}", score);
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// TRAP 3: Using structs vs. classes for small data
+// ═══════════════════════════════════════════════════════
+
+// BAD — class (heap allocated, creates garbage when no longer referenced)
+public class DamageInfo
+{
+    public int amount;
+    public Vector3 hitPoint;
+}
+
+// GOOD — struct (stack allocated, no garbage collection)
+public struct DamageInfo
+{
+    public int amount;
+    public Vector3 hitPoint;
+}
+
+// ═══════════════════════════════════════════════════════
+// TRAP 4: Creating arrays every frame
+// ═══════════════════════════════════════════════════════
+
+// BAD — creates a new array every frame
+void Update()
+{
+    Collider[] hits = Physics.OverlapSphere(pos, radius); // ALLOCATION!
+}
+
+// GOOD — pre-allocate and use the NonAlloc version
+private Collider[] _hitBuffer = new Collider[20];
+
+void Update()
+{
+    int hitCount = Physics.OverlapSphereNonAlloc(pos, radius, _hitBuffer);
+    for (int i = 0; i &lt; hitCount; i++)
+    {
+        // Process _hitBuffer[i]
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Finding GC Allocations</div>
+          <p>In the Profiler's CPU panel, look at the <strong>GC Alloc</strong> column. Sort by it (click the column header). Any method showing allocations in Update, FixedUpdate, or LateUpdate is a problem. The Profiler tells you exactly which methods allocate and how many bytes. Fix the biggest offenders first.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Mobile-Specific Tips -->
+      <section>
+        <h2>Mobile-Specific Optimization Tips</h2>
+        <p>Mobile devices have much less processing power than a desktop PC. Here are platform-specific tips:</p>
+
+        <h3>Target Frame Rate</h3>
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Setting Target Frame Rate</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Set this in your GameManager's Awake() or Start()
+// 60 FPS is ideal, but 30 FPS is acceptable on low-end devices.
+void Start()
+{
+    // Disable VSync so our target frame rate takes effect
+    QualitySettings.vSyncCount = 0;
+
+    // Set target to 60 FPS
+    Application.targetFrameRate = 60;
+}
+
+// For low-end device detection, you could check SystemInfo:
+void SetQualityBasedOnDevice()
+{
+    int memoryMB = SystemInfo.systemMemorySize;
+
+    if (memoryMB &lt; 2048) // Less than 2 GB RAM
+    {
+        // Low-end device
+        Application.targetFrameRate = 30;
+        QualitySettings.SetQualityLevel(0); // Lowest quality
+    }
+    else if (memoryMB &lt; 4096) // 2-4 GB RAM
+    {
+        // Mid-range device
+        Application.targetFrameRate = 60;
+        QualitySettings.SetQualityLevel(1); // Medium quality
+    }
+    else
+    {
+        // High-end device
+        Application.targetFrameRate = 60;
+        QualitySettings.SetQualityLevel(2); // High quality
+    }
+}</code></pre>
+        </div>
+
+        <h3>Quality Settings</h3>
+        <ul>
+          <li>Open <strong>Edit &gt; Project Settings &gt; Quality</strong>.</li>
+          <li>Create 2&ndash;3 quality levels: Low, Medium, High.</li>
+          <li>For each level, adjust:
+            <ul>
+              <li><strong>Shadows:</strong> Disable on Low, Soft Shadows on Medium, Hard/Soft on High.</li>
+              <li><strong>Anti-Aliasing:</strong> Off on Low, 2x on Medium, 4x on High.</li>
+              <li><strong>Texture Quality:</strong> Half Res on Low, Full Res on Medium/High.</li>
+              <li><strong>Particle Raycast Budget:</strong> Lower on Low quality.</li>
+            </ul>
+          </li>
+          <li>Set the default quality level for each platform (Android defaults to Low, PC defaults to High).</li>
+        </ul>
+
+        <h3>Reduce Post-Processing</h3>
+        <p>Post-processing effects (bloom, vignette, color grading, ambient occlusion) look beautiful but are expensive on mobile GPUs. On the Low quality level:</p>
+        <ul>
+          <li>Disable Bloom and Ambient Occlusion entirely.</li>
+          <li>Reduce Color Grading to a simple LUT (Look-Up Table).</li>
+          <li>Disable Motion Blur (it is not useful in an endless runner anyway since the camera does not rotate much).</li>
+        </ul>
+
+        <h3>Test on Actual Devices</h3>
+        <div class="callout danger">
+          <div class="callout-title">Do Not Trust the Editor</div>
+          <p>The Unity Editor runs <strong>much slower</strong> than a real build because of all the editor overhead (Inspector, Scene view, Profiler itself). A game that runs at 30 FPS in the Editor might run at 60 FPS on a real device &mdash; or vice versa. You MUST test on actual target devices. Build an APK, install it on a real Android phone, and check performance there. The Profiler can connect to a running device over USB for remote profiling.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Frame Debugger -->
+      <section>
+        <h2>Using the Frame Debugger</h2>
+        <p>The <strong>Frame Debugger</strong> shows you every single draw call in a single frame, one at a time. It is invaluable for understanding why you have so many draw calls and which objects are responsible.</p>
+
+        <ol class="steps">
+          <li>Go to <strong>Window &gt; Analysis &gt; Frame Debugger</strong>.</li>
+          <li>Press <strong>Play</strong>, then click <strong>Enable</strong> in the Frame Debugger window.</li>
+          <li>The game pauses and the Frame Debugger shows a numbered list of draw events.</li>
+          <li>Click through each event to see what it draws. The Scene view highlights the affected geometry.</li>
+          <li>Look for patterns:
+            <ul>
+              <li>Many separate draw calls for objects that share a material? They are not being batched &mdash; check if they can be marked Static or use GPU Instancing.</li>
+              <li>Redundant draw calls from UI elements? Combine UI elements into fewer canvases.</li>
+              <li>Unexpected draw calls from invisible objects? Something off-screen is still being rendered &mdash; check your culling settings.</li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Batching Broken?</div>
+          <p>The Frame Debugger tells you <em>why</em> batching failed for a specific draw call. Select a draw call and look at the "Why this draw call can't be batched with the previous one" message. Common reasons: different materials, different lightmaps, different render queues, or exceeding the vertex limit for dynamic batching.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Optimization Checklist -->
+      <section>
+        <h2>Optimization Checklist</h2>
+        <p>Use this checklist before building your final release:</p>
+
+        <table>
+          <thead>
+            <tr><th>Category</th><th>Check</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Rendering</td><td>Draw calls under 100 on mobile</td><td></td></tr>
+            <tr><td>Rendering</td><td>GPU Instancing enabled on repeated-object materials</td><td></td></tr>
+            <tr><td>Rendering</td><td>Static batching on non-moving environment objects</td><td></td></tr>
+            <tr><td>Rendering</td><td>Camera Far Clip set to minimum necessary distance</td><td></td></tr>
+            <tr><td>Rendering</td><td>LOD Groups on complex environment meshes</td><td></td></tr>
+            <tr><td>Memory</td><td>All runtime spawning uses object pools (no Instantiate/Destroy)</td><td></td></tr>
+            <tr><td>Memory</td><td>Textures compressed and appropriately sized</td><td></td></tr>
+            <tr><td>Memory</td><td>No GC allocations in Update/FixedUpdate/LateUpdate</td><td></td></tr>
+            <tr><td>Code</td><td>GetComponent results cached in Awake/Start</td><td></td></tr>
+            <tr><td>Code</td><td>No string concatenation in hot paths</td><td></td></tr>
+            <tr><td>Code</td><td>Using NonAlloc physics methods</td><td></td></tr>
+            <tr><td>Code</td><td>No LINQ in Update loops</td><td></td></tr>
+            <tr><td>Mobile</td><td>Application.targetFrameRate set appropriately</td><td></td></tr>
+            <tr><td>Mobile</td><td>Quality levels configured for low/mid/high devices</td><td></td></tr>
+            <tr><td>Mobile</td><td>Post-processing reduced or disabled on low quality</td><td></td></tr>
+            <tr><td>Mobile</td><td>Tested on at least one real target device</td><td></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Covered</h2>
+        <p>In this chapter, we learned how to find and fix performance problems:</p>
+        <ul>
+          <li>The <strong>Unity Profiler</strong> &mdash; CPU, Memory, and Rendering panels for identifying bottlenecks.</li>
+          <li><strong>Draw call reduction</strong> &mdash; Static batching, dynamic batching, GPU Instancing, and the SRP Batcher.</li>
+          <li><strong>Object pooling</strong> (review) &mdash; Eliminating Instantiate/Destroy overhead.</li>
+          <li><strong>LOD Groups</strong> &mdash; Reducing geometry for distant objects.</li>
+          <li><strong>Texture optimization</strong> &mdash; Compression, max size limits, and atlasing.</li>
+          <li><strong>GC allocation elimination</strong> &mdash; Caching GetComponent, avoiding string concatenation, using structs, pre-allocating buffers, and using NonAlloc physics methods.</li>
+          <li><strong>Mobile-specific tips</strong> &mdash; Target frame rate, quality levels, reduced post-processing, and testing on real devices.</li>
+          <li>The <strong>Frame Debugger</strong> &mdash; Stepping through draw calls to understand rendering costs.</li>
+        </ul>
+        <p>In the final chapter, we will <strong>build and publish</strong> our game &mdash; creating builds for PC, Android, WebGL, and iOS, configuring player settings, and shipping to platforms like itch.io and the Google Play Store.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Optimization knowledge is locked in. Commit.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Apply performance optimizations and profiling"
+git push</code></pre>
+        </div>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="23-save-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Save System</span></a>
+        <a href="25-build-publish.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Build &amp; Publish</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

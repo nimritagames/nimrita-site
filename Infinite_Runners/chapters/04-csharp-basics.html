@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# Crash Course for Unity - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link active"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 4</span>
+        <h1>C# Crash Course for Unity</h1>
+        <p class="chapter-desc">Everything you need to know about C# to start building game systems in Unity. Variables, methods, classes, the MonoBehaviour lifecycle, and more &mdash; explained with practical, game-focused examples.</p>
+      </div>
+
+      <p>C# (pronounced "C sharp") is the programming language Unity uses. If you've never programmed before, this chapter will teach you everything you need to write the scripts in this course. If you've programmed in another language, this will get you up to speed on C#'s Unity-specific patterns quickly.</p>
+
+      <p>We're not trying to teach you all of C# &mdash; that would take an entire book. Instead, we're covering the subset you'll actually use when building our infinite runner. Every concept is demonstrated with code you could paste into a Unity script and run.</p>
+
+      <!-- Section: Creating Your First Script -->
+      <h2>Creating Your First C# Script</h2>
+      <p>Let's create a script and break down every line Unity generates for us.</p>
+
+      <ol class="steps">
+        <li>In Unity, right-click in the Project window on the <code>Assets</code> folder.</li>
+        <li>Choose <strong>Create &rarr; C# Script</strong>.</li>
+        <li>Name it <code>MyFirstScript</code>. The name is important &mdash; it must match the class name inside the file exactly (including capitalization).</li>
+        <li>Double-click the script to open it in your code editor.</li>
+      </ol>
+
+      <p>You'll see this code:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">MyFirstScript.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class MyFirstScript : MonoBehaviour
+{
+    void Start()
+    {
+
+    }
+
+    void Update()
+    {
+
+    }
+}</code></pre>
+      </div>
+
+      <p>Let's break down every single piece:</p>
+      <ul>
+        <li><code>using UnityEngine;</code> &mdash; This line imports Unity's core library so you can use things like <code>MonoBehaviour</code>, <code>Debug</code>, <code>Vector3</code>, <code>Transform</code>, etc. You'll have this line at the top of every Unity script.</li>
+        <li><code>public class MyFirstScript : MonoBehaviour</code> &mdash; This declares a <strong>class</strong> named <code>MyFirstScript</code> that <strong>inherits from</strong> <code>MonoBehaviour</code>. MonoBehaviour is Unity's base class for any script that attaches to a GameObject. The <code>: MonoBehaviour</code> part gives your script access to all of Unity's built-in functions like <code>Start()</code>, <code>Update()</code>, and the ability to be attached to GameObjects.</li>
+        <li><code>void Start()</code> &mdash; A method that Unity calls <strong>once</strong>, when the GameObject this script is attached to first becomes active. Use it for initialization.</li>
+        <li><code>void Update()</code> &mdash; A method that Unity calls <strong>every single frame</strong>. If your game runs at 60 fps, this method is called 60 times per second. Use it for things that need to happen continuously, like checking for input or moving objects.</li>
+      </ul>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Script Name Must Match Class Name</div>
+        <p>If you name your file <code>PlayerController.cs</code>, the class inside <strong>must</strong> be called <code>PlayerController</code>. If they don't match, Unity will show an error and refuse to attach the script to any GameObject. If you rename a script file in the Project window, you must also rename the class inside the file manually.</p>
+      </div>
+
+      <!-- Section: MonoBehaviour Lifecycle -->
+      <h2>The MonoBehaviour Lifecycle</h2>
+      <p>Unity calls certain methods on your scripts automatically at specific times. You don't call these methods yourself &mdash; Unity calls them. You just define them and write code inside. Here are the ones you'll use most, in the order Unity calls them:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">LifecycleDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class LifecycleDemo : MonoBehaviour
+{
+    // Called ONCE when the script instance is loaded.
+    // Runs before Start(). Use for setting up references
+    // that other scripts might need in their Start().
+    void Awake()
+    {
+        Debug.Log("Awake - I exist!");
+    }
+
+    // Called when the script/GameObject is enabled.
+    // Can be called multiple times if you disable and re-enable.
+    void OnEnable()
+    {
+        Debug.Log("OnEnable - I'm active!");
+    }
+
+    // Called ONCE, on the first frame the script is active.
+    // Runs after Awake(). Use for initialization that depends
+    // on other objects already being set up.
+    void Start()
+    {
+        Debug.Log("Start - Let's go!");
+    }
+
+    // Called every frame. The time between calls varies
+    // depending on frame rate. Use for input, visuals,
+    // and non-physics game logic.
+    void Update()
+    {
+        // This runs 60+ times per second!
+    }
+
+    // Called at a FIXED time interval (default: 50 times/sec).
+    // Use for physics calculations. The interval is consistent
+    // regardless of frame rate.
+    void FixedUpdate()
+    {
+        // Physics code goes here
+    }
+
+    // Called every frame AFTER all Update() methods have run.
+    // Use for camera movement that needs to follow objects
+    // that moved during Update().
+    void LateUpdate()
+    {
+        // Camera follow code goes here
+    }
+
+    // Called when the script/GameObject is disabled.
+    void OnDisable()
+    {
+        Debug.Log("OnDisable - I'm off!");
+    }
+
+    // Called when the GameObject is destroyed.
+    // Use for cleanup: unsubscribing from events, etc.
+    void OnDestroy()
+    {
+        Debug.Log("OnDestroy - Goodbye!");
+    }
+}</code></pre>
+      </div>
+
+      <p>The order is: <strong>Awake &rarr; OnEnable &rarr; Start &rarr; (Update / FixedUpdate / LateUpdate loop) &rarr; OnDisable &rarr; OnDestroy</strong>.</p>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; When to Use Update vs. FixedUpdate</div>
+        <p><strong>Update()</strong> runs once per frame. Frame rate varies &mdash; it might run 30 times/sec on a slow device and 144 times/sec on a fast one. Use Update for input handling, UI updates, and visual logic. <strong>FixedUpdate()</strong> runs at a fixed interval (every 0.02 seconds by default, or 50 times/sec). Use FixedUpdate for physics: applying forces, moving Rigidbody objects, and anything that needs consistent timing regardless of frame rate. In our runner, player input will be in Update, but physics-based movement will be in FixedUpdate.</p>
+      </div>
+
+      <!-- Section: Variables and Types -->
+      <h2>Variables and Data Types</h2>
+      <p>A <strong>variable</strong> is a named container that holds a value. Think of it as a labeled box. The label is the variable name, and the contents are the value. In C#, every variable has a <strong>type</strong> that defines what kind of value it can hold.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">VariablesDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class VariablesDemo : MonoBehaviour
+{
+    // Integer: whole numbers (no decimal point)
+    // Use for: scores, lives, lane index, counts
+    int score = 0;
+    int lives = 3;
+    int currentLane = 1; // 0 = left, 1 = center, 2 = right
+
+    // Float: decimal numbers (must end with 'f')
+    // Use for: speed, positions, timers, percentages
+    float moveSpeed = 10.5f;
+    float jumpHeight = 2.0f;
+    float timer = 0f;
+
+    // Bool: true or false (only two possible values)
+    // Use for: is the player alive? is the game paused?
+    bool isAlive = true;
+    bool isJumping = false;
+    bool isGameOver = false;
+
+    // String: text (wrapped in double quotes)
+    // Use for: player name, UI text, messages
+    string playerName = "Runner";
+    string gameOverMessage = "Game Over!";
+
+    // Vector3: three floats grouped together (x, y, z)
+    // Use for: positions, directions, movement
+    Vector3 startPosition = new Vector3(0f, 1f, 0f);
+    Vector3 moveDirection = Vector3.forward;
+
+    // Vector2: two floats grouped together (x, y)
+    // Use for: 2D positions, screen coordinates, touch input
+    Vector2 screenCenter = new Vector2(960f, 540f);
+
+    void Start()
+    {
+        Debug.Log("Player: " + playerName);
+        Debug.Log("Speed: " + moveSpeed);
+        Debug.Log("Alive: " + isAlive);
+        Debug.Log("Start pos: " + startPosition);
+    }
+}</code></pre>
+      </div>
+
+      <h3>The Most Common Types You'll Use</h3>
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Type</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">What It Holds</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">int</td>
+            <td style="padding: 0.75rem;">Whole numbers</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">42, -7, 0, 1000</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">float</td>
+            <td style="padding: 0.75rem;">Decimal numbers</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">3.14f, -0.5f, 100.0f</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">bool</td>
+            <td style="padding: 0.75rem;">True or false</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">true, false</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">string</td>
+            <td style="padding: 0.75rem;">Text</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">"hello", "Game Over"</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Vector3</td>
+            <td style="padding: 0.75rem;">3D coordinates (x, y, z)</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">new Vector3(1f, 2f, 3f)</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Vector2</td>
+            <td style="padding: 0.75rem;">2D coordinates (x, y)</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">new Vector2(5f, 10f)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Don't Forget the 'f' on Floats</div>
+        <p>In C#, decimal numbers are <code>double</code> by default (double-precision). Unity uses <code>float</code> (single-precision) for almost everything. You must add an <code>f</code> suffix to tell the compiler "this is a float": <code>10.5f</code>, not <code>10.5</code>. Forgetting the <code>f</code> will cause a compile error. This trips up every beginner at least once.</p>
+      </div>
+
+      <!-- Section: Access Modifiers -->
+      <h2>Access Modifiers: public, private, and [SerializeField]</h2>
+      <p>Access modifiers control who can see and change a variable. This is crucial in Unity because they also determine what appears in the Inspector.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">AccessModifiers.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class AccessModifiers : MonoBehaviour
+{
+    // PUBLIC: visible in Inspector, accessible from other scripts.
+    // Use sparingly - it exposes your internals to everything.
+    public float moveSpeed = 10f;
+
+    // PRIVATE: hidden from Inspector, only this script can access it.
+    // This is the default if you don't write any modifier.
+    private int currentLane = 1;
+
+    // Same as above - no modifier means private.
+    bool isJumping = false;
+
+    // [SerializeField] PRIVATE: visible in Inspector but NOT
+    // accessible from other scripts. THIS IS THE BEST PRACTICE.
+    // You get Inspector editing without exposing your internals.
+    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private int maxLives = 3;
+    [SerializeField] private GameObject obstaclePrefab;
+
+    void Start()
+    {
+        // You can use all of these inside this script
+        Debug.Log("Speed: " + moveSpeed);
+        Debug.Log("Lane: " + currentLane);
+        Debug.Log("Jump force: " + jumpForce);
+    }
+}</code></pre>
+      </div>
+
+      <p>The key takeaway:</p>
+      <ul>
+        <li>Use <code>public</code> only when other scripts genuinely need to access this variable.</li>
+        <li>Use <code>[SerializeField] private</code> when you want to edit a value in the Inspector but keep it private to this script. <strong>This is the pattern we'll use most in this course.</strong></li>
+        <li>Use <code>private</code> (or no modifier) for internal state that should never be edited from outside or from the Inspector.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Why [SerializeField] Is Better Than public</div>
+        <p>Making everything <code>public</code> is a common beginner habit because it's easy: public variables show up in the Inspector and can be accessed anywhere. But it means any other script can change your player's speed, lives, or anything else at any time, making bugs very hard to track down. <code>[SerializeField] private</code> gives you Inspector editing while keeping your variables protected. It's a small extra effort that prevents big headaches later.</p>
+      </div>
+
+      <!-- Section: if/else and switch -->
+      <h2>Conditional Logic: if/else and switch</h2>
+      <p>Conditional statements let your code make decisions. "If the player is in lane 0 and tries to move left, don't let them because there's no lane to the left."</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Conditionals.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class Conditionals : MonoBehaviour
+{
+    [SerializeField] private int lives = 3;
+    [SerializeField] private int currentLane = 1;
+
+    void Update()
+    {
+        // ----- IF / ELSE IF / ELSE -----
+
+        // Simple if: runs the block only when the condition is true
+        if (lives <= 0)
+        {
+            Debug.Log("Game Over!");
+        }
+
+        // if/else: one block runs if true, the other if false
+        if (lives > 1)
+        {
+            Debug.Log("You have multiple lives.");
+        }
+        else
+        {
+            Debug.Log("Last life! Be careful!");
+        }
+
+        // if/else if/else: check multiple conditions in order
+        if (currentLane == 0)
+        {
+            Debug.Log("Left lane");
+        }
+        else if (currentLane == 1)
+        {
+            Debug.Log("Center lane");
+        }
+        else if (currentLane == 2)
+        {
+            Debug.Log("Right lane");
+        }
+        else
+        {
+            Debug.LogError("Invalid lane: " + currentLane);
+        }
+
+        // ----- COMPARISON OPERATORS -----
+        // ==  equals
+        // !=  not equals
+        // >   greater than
+        // <   less than
+        // >=  greater than or equal
+        // <=  less than or equal
+
+        // ----- LOGICAL OPERATORS -----
+        // &&  AND (both must be true)
+        // ||  OR (at least one must be true)
+        // !   NOT (inverts true/false)
+
+        bool isAlive = lives > 0;
+        bool isInBounds = currentLane >= 0 && currentLane <= 2;
+
+        if (isAlive && isInBounds)
+        {
+            // Player can keep running
+        }
+    }
+}</code></pre>
+      </div>
+
+      <h3>Switch Statements</h3>
+      <p>When you're checking one variable against many specific values, a <code>switch</code> statement is cleaner than a chain of <code>if/else if</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">SwitchExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">void HandleGameState(GameState state)
+{
+    switch (state)
+    {
+        case GameState.Menu:
+            Debug.Log("Show main menu");
+            break;
+        case GameState.Playing:
+            Debug.Log("Game is running");
+            break;
+        case GameState.Paused:
+            Debug.Log("Game is paused");
+            break;
+        case GameState.GameOver:
+            Debug.Log("Show game over screen");
+            break;
+        default:
+            Debug.LogError("Unknown state: " + state);
+            break;
+    }
+}</code></pre>
+      </div>
+
+      <p>Each <code>case</code> checks if the value matches. The <code>break</code> keyword exits the switch block. The <code>default</code> case runs if none of the other cases match.</p>
+
+      <!-- Section: Loops -->
+      <h2>Loops: for and foreach</h2>
+      <p>Loops let you repeat code multiple times. You'll use them for iterating over collections of objects (all obstacles, all coins, etc.).</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">LoopsDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class LoopsDemo : MonoBehaviour
+{
+    void Start()
+    {
+        // ----- FOR LOOP -----
+        // Runs a specific number of times.
+        // i starts at 0, runs while i < 5, adds 1 each time.
+        for (int i = 0; i < 5; i++)
+        {
+            Debug.Log("Spawning obstacle #" + i);
+        }
+        // Output: #0, #1, #2, #3, #4
+
+        // ----- FOREACH LOOP -----
+        // Iterates over every item in a collection.
+        string[] laneNames = { "Left", "Center", "Right" };
+
+        foreach (string lane in laneNames)
+        {
+            Debug.Log("Lane: " + lane);
+        }
+        // Output: Left, Center, Right
+
+        // ----- WHILE LOOP -----
+        // Runs as long as the condition is true.
+        // Be careful: if the condition never becomes false,
+        // you'll get an infinite loop that freezes Unity!
+        int countdown = 3;
+        while (countdown > 0)
+        {
+            Debug.Log("Countdown: " + countdown);
+            countdown--; // subtract 1
+        }
+        // Output: 3, 2, 1
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Beware Infinite Loops</div>
+        <p>A <code>while</code> loop that never stops will <strong>freeze Unity completely</strong>. You'll have to force-quit the editor and lose any unsaved changes. Always make sure your while loops have a condition that will eventually become false. For this reason, <code>for</code> and <code>foreach</code> loops are usually safer &mdash; they have a built-in end point.</p>
+      </div>
+
+      <!-- Section: Methods -->
+      <h2>Methods (Functions)</h2>
+      <p>A <strong>method</strong> is a named block of code that performs a specific task. Instead of writing the same code over and over, you put it in a method and call that method whenever you need it. Methods can also accept <strong>parameters</strong> (input values) and <strong>return</strong> a result.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">MethodsDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class MethodsDemo : MonoBehaviour
+{
+    [SerializeField] private int score = 0;
+    [SerializeField] private int lives = 3;
+
+    void Start()
+    {
+        // Calling methods
+        AddScore(100);
+        AddScore(50);
+        TakeDamage();
+
+        bool alive = IsAlive();
+        Debug.Log("Is alive: " + alive);
+
+        float doubled = DoubleValue(21f);
+        Debug.Log("Doubled: " + doubled); // 42
+    }
+
+    // A method with no return value (void) that takes a parameter
+    void AddScore(int points)
+    {
+        score += points; // same as: score = score + points
+        Debug.Log("Score is now: " + score);
+    }
+
+    // A method with no parameters
+    void TakeDamage()
+    {
+        lives--;
+        Debug.Log("Lives remaining: " + lives);
+
+        if (lives <= 0)
+        {
+            Die();
+        }
+    }
+
+    // A method that returns a bool (true/false)
+    bool IsAlive()
+    {
+        return lives > 0;
+    }
+
+    // A method that takes a float and returns a float
+    float DoubleValue(float input)
+    {
+        return input * 2f;
+    }
+
+    // A method that takes multiple parameters
+    void SpawnObstacle(int lane, float zPosition)
+    {
+        Debug.Log("Spawning obstacle in lane " + lane
+                  + " at z=" + zPosition);
+    }
+
+    void Die()
+    {
+        Debug.Log("Player died!");
+    }
+}</code></pre>
+      </div>
+
+      <p>Breaking down the syntax: <code>void AddScore(int points)</code></p>
+      <ul>
+        <li><code>void</code> = the return type. <code>void</code> means "this method doesn't return anything."</li>
+        <li><code>AddScore</code> = the method name. Use descriptive verbs.</li>
+        <li><code>(int points)</code> = the parameter list. This method requires an integer input called <code>points</code>.</li>
+      </ul>
+
+      <!-- Section: Classes and Objects -->
+      <h2>Classes and Objects</h2>
+      <p>A <strong>class</strong> is a blueprint. An <strong>object</strong> is a thing built from that blueprint. Every C# script you write is a class. When you attach that script to a GameObject, Unity creates an <strong>instance</strong> (an object) of that class.</p>
+
+      <p>You can also create classes that are <em>not</em> MonoBehaviours &mdash; plain data classes that just hold information:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">ObstacleData.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">// This class does NOT inherit from MonoBehaviour.
+// It's just a container for data.
+// It cannot be attached to a GameObject.
+
+[System.Serializable] // Makes it visible in the Inspector
+public class ObstacleData
+{
+    public string obstacleName;
+    public int damageAmount;
+    public float spawnChance;
+
+    // Constructor: called when you create a new instance
+    public ObstacleData(string name, int damage, float chance)
+    {
+        obstacleName = name;
+        damageAmount = damage;
+        spawnChance = chance;
+    }
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">ObstacleSpawner.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class ObstacleSpawner : MonoBehaviour
+{
+    void Start()
+    {
+        // Creating objects from the ObstacleData class
+        ObstacleData barrier = new ObstacleData("Barrier", 1, 0.5f);
+        ObstacleData wall = new ObstacleData("Wall", 1, 0.3f);
+
+        Debug.Log(barrier.obstacleName + " does "
+                  + barrier.damageAmount + " damage");
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; MonoBehaviour vs. Plain Classes</div>
+        <p><strong>MonoBehaviour classes</strong> are scripts you attach to GameObjects. They have access to lifecycle methods (Start, Update), can reference transforms and other components, and live in the scene. <strong>Plain classes</strong> are just data or logic containers. They can't be attached to GameObjects, don't have Update/Start, but are useful for organizing data. We'll use both. For example, our <code>PlayerController</code> will be a MonoBehaviour (attached to the player), but our obstacle configuration data will be a plain class or ScriptableObject.</p>
+      </div>
+
+      <!-- Section: Arrays vs Lists -->
+      <h2>Arrays vs. Lists</h2>
+      <p>Both arrays and lists store multiple values of the same type. The difference is that arrays have a <strong>fixed size</strong> (set when created) while lists can <strong>grow and shrink</strong> dynamically.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">CollectionsDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+using System.Collections.Generic; // Required for List&lt;T&gt;
+
+public class CollectionsDemo : MonoBehaviour
+{
+    void Start()
+    {
+        // ----- ARRAYS -----
+        // Fixed size. Fast. Use when the count won't change.
+
+        // Declare an array of 3 lane positions
+        float[] lanePositions = new float[3];
+        lanePositions[0] = -2.5f; // Left lane
+        lanePositions[1] = 0f;    // Center lane
+        lanePositions[2] = 2.5f;  // Right lane
+
+        // Shorthand: declare and fill at the same time
+        string[] laneNames = { "Left", "Center", "Right" };
+
+        // Access by index (starts at 0!)
+        Debug.Log("Center lane X: " + lanePositions[1]); // 0
+
+        // Array length
+        Debug.Log("Number of lanes: " + lanePositions.Length); // 3
+
+        // Loop through an array
+        for (int i = 0; i < laneNames.Length; i++)
+        {
+            Debug.Log("Lane " + i + ": " + laneNames[i]);
+        }
+
+        // ----- LISTS -----
+        // Dynamic size. Slightly slower. Use when items are
+        // added/removed at runtime.
+
+        // Declare an empty list of GameObjects
+        List&lt;GameObject&gt; activeObstacles = new List&lt;GameObject&gt;();
+
+        // Add items
+        // activeObstacles.Add(someObstacle);
+
+        // Remove items
+        // activeObstacles.Remove(someObstacle);
+        // activeObstacles.RemoveAt(0); // remove first item
+
+        // Check count
+        Debug.Log("Active obstacles: " + activeObstacles.Count);
+
+        // Check if list contains something
+        // bool hasIt = activeObstacles.Contains(someObstacle);
+
+        // Clear all items
+        activeObstacles.Clear();
+
+        // Lists also support foreach
+        foreach (GameObject obstacle in activeObstacles)
+        {
+            // Do something with each obstacle
+        }
+    }
+}</code></pre>
+      </div>
+
+      <p><strong>Rule of thumb:</strong> Use arrays when the collection has a fixed, known size (like lane positions &mdash; always 3). Use lists when items are added or removed during gameplay (like the currently active obstacles in the world).</p>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Index Out of Range</div>
+        <p>If you have an array with 3 elements, the valid indices are 0, 1, and 2. Trying to access index 3 (or higher) will crash your game with an <code>IndexOutOfRangeException</code>. This is one of the most common beginner errors. Always check that your index is within bounds: <code>if (index >= 0 && index < array.Length)</code>.</p>
+      </div>
+
+      <!-- Section: Enums -->
+      <h2>Enums</h2>
+      <p>An <strong>enum</strong> (short for "enumeration") is a custom type that defines a set of named constants. Instead of using cryptic numbers (0 = menu, 1 = playing, 2 = paused), you use readable names.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">GameEnums.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">// Enums are usually defined outside of a class,
+// or in their own file, so multiple scripts can use them.
+
+public enum GameState
+{
+    Menu,
+    Playing,
+    Paused,
+    GameOver
+}
+
+public enum Lane
+{
+    Left = 0,
+    Center = 1,
+    Right = 2
+}
+
+public enum PowerUpType
+{
+    SpeedBoost,
+    Shield,
+    Magnet,
+    ScoreMultiplier
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">EnumUsage.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class EnumUsage : MonoBehaviour
+{
+    private GameState currentState = GameState.Menu;
+    private Lane currentLane = Lane.Center;
+
+    void Update()
+    {
+        // Compare enum values
+        if (currentState == GameState.Playing)
+        {
+            // Game logic only runs during gameplay
+        }
+
+        // Use in switch statements (very common pattern)
+        switch (currentState)
+        {
+            case GameState.Menu:
+                // Show menu UI
+                break;
+            case GameState.Playing:
+                // Run game logic
+                break;
+            case GameState.Paused:
+                // Freeze everything
+                break;
+            case GameState.GameOver:
+                // Show results
+                break;
+        }
+    }
+
+    public void ChangeState(GameState newState)
+    {
+        Debug.Log("State changed from " + currentState
+                  + " to " + newState);
+        currentState = newState;
+    }
+}</code></pre>
+      </div>
+
+      <p>Enums make your code much more readable. <code>if (currentLane == Lane.Left)</code> is immediately clear, while <code>if (currentLane == 0)</code> requires you to remember what 0 means. We'll use enums extensively for game states, lane identifiers, obstacle types, and more.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Enums in the Inspector</div>
+        <p>When you expose an enum field in the Inspector (using <code>public</code> or <code>[SerializeField]</code>), Unity automatically creates a dropdown menu with all the enum values. This is a great user experience for designers who don't need to look at code. They just pick from a dropdown instead of remembering magic numbers.</p>
+      </div>
+
+      <!-- Section: Important Unity-Specific C# Patterns -->
+      <h2>Unity-Specific C# Patterns</h2>
+      <p>Here are some C# patterns that are unique to Unity development. These will come up constantly in the remaining chapters.</p>
+
+      <h3>GetComponent: Accessing Other Components</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">GetComponentDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class GetComponentDemo : MonoBehaviour
+{
+    private Rigidbody rb;
+    private Collider col;
+
+    void Awake()
+    {
+        // Get a component on the SAME GameObject
+        rb = GetComponent&lt;Rigidbody&gt;();
+        col = GetComponent&lt;Collider&gt;();
+
+        // Always check if the component exists
+        if (rb == null)
+        {
+            Debug.LogError("No Rigidbody found on " + gameObject.name);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // Now you can use the Rigidbody
+        rb.AddForce(Vector3.forward * 10f);
+    }
+}</code></pre>
+      </div>
+
+      <h3>Instantiate and Destroy: Creating and Removing Objects</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">SpawnDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class SpawnDemo : MonoBehaviour
+{
+    [SerializeField] private GameObject coinPrefab;
+
+    void Start()
+    {
+        // Create a copy of the prefab at a specific position and rotation
+        Vector3 spawnPos = new Vector3(0f, 1f, 10f);
+        GameObject newCoin = Instantiate(coinPrefab, spawnPos, Quaternion.identity);
+
+        // Destroy an object (removes it from the scene)
+        Destroy(newCoin, 5f); // Destroy after 5 seconds
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; We'll Replace Instantiate/Destroy with Object Pooling</div>
+        <p><code>Instantiate()</code> and <code>Destroy()</code> work, but they allocate and deallocate memory every time. In an infinite runner where obstacles and coins are constantly appearing and disappearing, this causes <strong>garbage collection spikes</strong> that make the game stutter. In Chapter 12, we'll build an Object Pool that <strong>recycles</strong> objects instead of creating and destroying them. For now, just know these methods exist.</p>
+      </div>
+
+      <h3>Time.deltaTime: Frame-Rate Independent Movement</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">MovementDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class MovementDemo : MonoBehaviour
+{
+    [SerializeField] private float speed = 5f;
+
+    void Update()
+    {
+        // WITHOUT deltaTime: moves 5 units per FRAME.
+        // At 60fps = 300 units/sec. At 30fps = 150 units/sec.
+        // The speed depends on frame rate! BAD.
+        // transform.Translate(Vector3.forward * speed);
+
+        // WITH deltaTime: moves 5 units per SECOND.
+        // At 60fps: 5 * 0.0167 = 0.083 per frame, 60 * 0.083 = 5/sec
+        // At 30fps: 5 * 0.0333 = 0.167 per frame, 30 * 0.167 = 5/sec
+        // Same speed regardless of frame rate! GOOD.
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+    }
+}</code></pre>
+      </div>
+
+      <p><code>Time.deltaTime</code> is the time in seconds since the last frame. Multiplying any per-frame movement by <code>Time.deltaTime</code> makes it frame-rate independent. <strong>Always use Time.deltaTime with movement in Update().</strong> This is one of the most important patterns in game development.</p>
+
+      <!-- Section: Debugging Your Code -->
+      <h2>Debugging Your Code</h2>
+      <p>Here's a truth about game development: you will spend more time <strong>debugging</strong> (finding and fixing problems) than writing new code. This is normal. Even experienced developers spend most of their time figuring out why something doesn't work the way they expected. The difference between a beginner and a professional is not that the professional writes bug-free code &mdash; it's that the professional knows how to find bugs quickly. This section teaches you the tools and techniques to do exactly that.</p>
+
+      <h3>Debug.Log &mdash; Your Best Friend</h3>
+      <p>The simplest and most frequently used debugging tool is <code>Debug.Log()</code>. It prints a message to the Unity Console. You can use it to verify that code is running, check the values of variables, and trace the flow of your program.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">DebugLogExamples.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class DebugLogExamples : MonoBehaviour
+{
+    [SerializeField] private float health = 100f;
+    [SerializeField] private int score = 0;
+
+    void Start()
+    {
+        // Basic message - prints white text to Console
+        Debug.Log("Game started!");
+
+        // Warning - prints yellow text
+        Debug.LogWarning("Low memory - consider reducing quality settings.");
+
+        // Error - prints red text
+        Debug.LogError("Failed to load player data!");
+
+        // Printing variable values to see what's happening
+        Debug.Log("Player health: " + health);
+        Debug.Log("Current score: " + score);
+
+        // String interpolation (cleaner way to include variables)
+        Debug.Log($"Player health: {health}, score: {score}");
+        Debug.Log($"Player position: {transform.position}");
+
+        // Tracking when methods are called and on which object
+        Debug.Log("Start() was called on " + gameObject.name);
+    }
+
+    void Update()
+    {
+        // Be careful logging in Update - it prints EVERY FRAME
+        // Only do this temporarily when tracking down a bug
+        // Debug.Log($"Frame {Time.frameCount}: health = {health}");
+    }
+
+    void TakeDamage(float amount)
+    {
+        Debug.Log($"TakeDamage called with amount: {amount}");
+        health -= amount;
+        Debug.Log($"Health is now: {health}");
+
+        if (health <= 0f)
+        {
+            Debug.Log("Player is dead!");
+        }
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Use String Interpolation ($"...")</div>
+        <p>Instead of concatenating strings with <code>+</code> signs (<code>"Health: " + health + " Score: " + score</code>), use string interpolation: <code>$"Health: {health} Score: {score}"</code>. The <code>$</code> before the opening quote lets you embed variables directly inside curly braces. It's cleaner, easier to read, and less error-prone.</p>
+      </div>
+
+      <h3>Reading Error Messages</h3>
+      <p>When something goes wrong in your code, Unity prints an error to the Console. These error messages have <strong>two critical parts</strong>: the <strong>message</strong> (what went wrong) and the <strong>stack trace</strong> (where it went wrong). Learning to read these will save you enormous amounts of time.</p>
+
+      <p>Here's an example of a real Unity error:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Console Error Example</span><span class="lang-badge">Error</span></div>
+        <pre><code>NullReferenceException: Object reference not set to an instance of an object
+PlayerController.Update () (at Assets/_Project/Scripts/Player/PlayerController.cs:42)</code></pre>
+      </div>
+
+      <p>Let's break this down piece by piece:</p>
+      <ul>
+        <li><strong><code>NullReferenceException</code></strong> &mdash; The type of error. This specific one means you tried to use a variable that is <code>null</code> (points to nothing). This is the single most common error in Unity.</li>
+        <li><strong><code>Object reference not set to an instance of an object</code></strong> &mdash; A human-readable description of the error. Translation: "You tried to use something that doesn't exist."</li>
+        <li><strong><code>PlayerController.Update()</code></strong> &mdash; The error occurred inside the <code>Update</code> method of the <code>PlayerController</code> class.</li>
+        <li><strong><code>Assets/_Project/Scripts/Player/PlayerController.cs:42</code></strong> &mdash; The exact file and <strong>line number</strong>. The error is on line 42 of <code>PlayerController.cs</code>.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; Double-Click Errors to Jump to the Code</div>
+        <p>In the Unity Console, you can <strong>double-click</strong> on any error message and Unity will open your code editor and jump directly to the exact line that caused the error. This is the fastest way to find the problem. Get in the habit of doing this every time you see an error.</p>
+      </div>
+
+      <h3>The Most Common Error: NullReferenceException</h3>
+      <p>You will see this error more than any other. <code>null</code> means "nothing" &mdash; a variable that was supposed to point to an object, but doesn't point to anything. When you try to use a null variable (call a method on it, read a property from it), Unity throws a <code>NullReferenceException</code>.</p>
+
+      <p>The <strong>four most common causes</strong> of NullReferenceException in Unity:</p>
+      <ol>
+        <li><strong>Forgot to assign a [SerializeField] reference in the Inspector.</strong> You declared a <code>[SerializeField] private GameObject player;</code> but never dragged a GameObject into the slot in the Inspector. The variable is still null.
+          <br><em>Fix: Select the GameObject with your script, find the empty slot in the Inspector, and drag the correct object into it.</em></li>
+        <li><strong>Called <code>GetComponent&lt;T&gt;()</code> but the component doesn't exist.</strong> You wrote <code>GetComponent&lt;Rigidbody&gt;()</code> but the GameObject doesn't actually have a Rigidbody attached.
+          <br><em>Fix: Make sure the component exists on the GameObject, or add a null check before using it.</em></li>
+        <li><strong>Tried to use an object that was Destroyed.</strong> You called <code>Destroy(someObject)</code> and then later tried to access <code>someObject</code> on a subsequent frame.
+          <br><em>Fix: Set the variable to null after destroying, and check for null before using it.</em></li>
+        <li><strong>Forgot to check if something exists before using it.</strong> A method like <code>FindObjectOfType&lt;T&gt;()</code> can return null if no matching object exists in the scene.
+          <br><em>Fix: Always check the return value before using it.</em></li>
+      </ol>
+
+      <p><strong>How to fix any NullReferenceException:</strong></p>
+      <ol class="steps">
+        <li>Look at the <strong>line number</strong> in the error message.</li>
+        <li>Go to that line in your code.</li>
+        <li>Identify every variable being used on that line (anything before a <code>.</code> dot operator).</li>
+        <li>Figure out which one is null &mdash; add <code>Debug.Log()</code> statements for each to check.</li>
+        <li>Trace back to where that variable should have been assigned, and fix the assignment.</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">NullCheckExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">// Preventing NullReferenceException with null checks
+[SerializeField] private AudioSource audioSource;
+
+void PlaySound()
+{
+    // BAD: Will crash if audioSource is null
+    // audioSource.Play();
+
+    // GOOD: Check first, then use
+    if (audioSource != null)
+    {
+        audioSource.Play();
+    }
+    else
+    {
+        Debug.LogWarning("AudioSource is not assigned on " + gameObject.name);
+    }
+}</code></pre>
+      </div>
+
+      <h3>Visual Debugging</h3>
+      <p>Sometimes you need to see what's happening in 3D space &mdash; where a raycast is pointing, what direction an object is facing, or where a spawn point is. Unity provides methods that draw lines and rays directly in the Scene View.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">VisualDebugDemo.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class VisualDebugDemo : MonoBehaviour
+{
+    void Update()
+    {
+        // Draw a red ray downward from this object (great for ground checks)
+        Debug.DrawRay(transform.position, Vector3.down * 1.5f, Color.red);
+
+        // Draw a green line between two points
+        Debug.DrawLine(
+            transform.position,
+            transform.position + transform.forward * 5f,
+            Color.green
+        );
+
+        // Draw a blue ray showing the object's forward direction
+        Debug.DrawRay(transform.position, transform.forward * 3f, Color.blue);
+    }
+}</code></pre>
+      </div>
+
+      <p><strong>Important:</strong> These debug lines only appear in the <strong>Scene View</strong>, not in the Game View. You need to have the Scene View visible while the game is running to see them. They are extremely useful for visualizing things like ground-check raycasts, attack directions, and spawn zones.</p>
+
+      <h3>Using Breakpoints (Visual Studio / VS Code)</h3>
+      <p>Debug.Log is great for quick checks, but for complex bugs, <strong>breakpoints</strong> are far more powerful. A breakpoint is a marker you place on a line of code that says "stop execution here." When your code reaches that line, the entire game pauses, and you can inspect the value of every variable at that exact moment.</p>
+
+      <p><strong>How to use breakpoints:</strong></p>
+      <ol class="steps">
+        <li><strong>Set a breakpoint:</strong> In Visual Studio or VS Code, click in the <strong>gutter</strong> (the left margin) next to a line number. A red dot appears &mdash; that's your breakpoint.</li>
+        <li><strong>Attach the debugger:</strong> In Visual Studio, click the <strong>"Attach to Unity"</strong> button in the toolbar (it looks like a play button with the Unity logo). In VS Code, use the <strong>"Attach to Unity"</strong> debug configuration.</li>
+        <li><strong>Play the game in Unity:</strong> Press Play as normal. When the code execution reaches your breakpoint, the game freezes and your IDE highlights the current line.</li>
+        <li><strong>Inspect variables:</strong> Hover over any variable to see its current value. The <strong>Locals</strong> and <strong>Watch</strong> windows show all variables in scope.</li>
+        <li><strong>Step through code:</strong> Press <strong>F10</strong> (Step Over) to execute the current line and move to the next. Press <strong>F11</strong> (Step Into) to dive into a method call. Press <strong>F5</strong> to continue running until the next breakpoint.</li>
+        <li><strong>Remove the breakpoint:</strong> Click the red dot again to remove it. Press <strong>F5</strong> or detach the debugger to let the game resume normally.</li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; When to Use Debug.Log vs. Breakpoints</div>
+        <p>Use <strong>Debug.Log</strong> for quick checks and when you need to see values <em>over time</em> (like tracking a variable every frame, or logging events as they happen in sequence). Use <strong>breakpoints</strong> when you need to understand the exact state of your program at a specific moment, when you have a complex bug that involves multiple variables and conditions, or when you can't figure out the problem from log messages alone. Breakpoints let you freeze time and examine everything, which is 10x more powerful for complex issues.</p>
+      </div>
+
+      <!-- Section: Coroutines -->
+      <h2>Coroutines</h2>
+      <p>So far, every method we've written runs from start to finish in a single frame. But what if you want to do something over time? Wait 2 seconds, then spawn an enemy. Fade the screen out over half a second. Flash a power-up indicator three times with pauses in between. Normal methods can't do this &mdash; but <strong>coroutines</strong> can.</p>
+
+      <h3>What Is a Coroutine?</h3>
+      <p>A coroutine is a special kind of method that can <strong>pause its execution</strong> and <strong>resume later</strong>. While a normal method runs all its code in one frame, a coroutine can spread its work across multiple frames. It "yields" control back to Unity, lets the game continue running, and then picks up where it left off on a later frame (or after a specified delay).</p>
+      <p>Coroutines are perfect for:</p>
+      <ul>
+        <li><strong>Delays:</strong> Wait 3 seconds, then do something.</li>
+        <li><strong>Animations over time:</strong> Smoothly fade out an object's opacity over 1 second.</li>
+        <li><strong>Sequences:</strong> Do A, wait, do B, wait, do C.</li>
+        <li><strong>Timed events:</strong> A power-up lasts for 10 seconds, then expires.</li>
+        <li><strong>Loading sequences:</strong> Show a progress bar while loading resources.</li>
+      </ul>
+
+      <h3>Basic Syntax</h3>
+      <p>A coroutine method looks different from a normal method in two ways: it returns <code>IEnumerator</code> instead of <code>void</code>, and it uses <code>yield return</code> statements to pause execution.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">CoroutineBasics.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+
+public class CoroutineBasics : MonoBehaviour
+{
+    // A coroutine method returns IEnumerator
+    private IEnumerator WaitAndPrint()
+    {
+        Debug.Log("Starting...");
+
+        // Pause execution for 2 seconds
+        yield return new WaitForSeconds(2f);
+
+        Debug.Log("2 seconds later!");
+
+        // Pause for 1 more second
+        yield return new WaitForSeconds(1f);
+
+        Debug.Log("3 seconds total have passed!");
+    }
+
+    // Starting a coroutine (must be called from a MonoBehaviour)
+    void Start()
+    {
+        // You don't call a coroutine like a normal method.
+        // You must use StartCoroutine().
+        StartCoroutine(WaitAndPrint());
+
+        // This line runs IMMEDIATELY - it does NOT wait
+        // for the coroutine to finish!
+        Debug.Log("Start() method finished.");
+    }
+}</code></pre>
+      </div>
+
+      <p>The output of the above code would be:</p>
+      <ol>
+        <li><code>"Starting..."</code> (immediately)</li>
+        <li><code>"Start() method finished."</code> (immediately &mdash; Start doesn't wait for the coroutine)</li>
+        <li><code>"2 seconds later!"</code> (after 2 seconds)</li>
+        <li><code>"3 seconds total have passed!"</code> (after 3 seconds)</li>
+      </ol>
+
+      <h3>yield return Options</h3>
+      <p>The <code>yield return</code> statement is what makes a coroutine pause. What you yield determines <em>how long</em> or <em>until when</em> it pauses:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">YieldExamples.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">private IEnumerator YieldExamples()
+{
+    // Wait for a specific number of seconds (real time)
+    yield return new WaitForSeconds(2f);
+
+    // Wait one frame (continues on the next Update cycle)
+    yield return null;
+
+    // Wait until the end of the current frame
+    yield return new WaitForEndOfFrame();
+
+    // Wait for the next FixedUpdate (physics step)
+    yield return new WaitForFixedUpdate();
+
+    // Wait until a condition becomes true
+    yield return new WaitUntil(() => score >= 100);
+
+    // Wait while a condition is true (opposite of WaitUntil)
+    yield return new WaitWhile(() => isPaused);
+}</code></pre>
+      </div>
+
+      <h3>Practical Example: Fade Out Over Time</h3>
+      <p>Here's a real-world example &mdash; smoothly fading out a UI element over a specified duration. This pattern comes up constantly in game development.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">FadeExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+
+public class FadeExample : MonoBehaviour
+{
+    [SerializeField] private CanvasGroup canvasGroup;
+
+    private IEnumerator FadeOut(CanvasGroup group, float duration)
+    {
+        float elapsed = 0f;
+        float startAlpha = group.alpha;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            group.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / duration);
+            yield return null; // Wait one frame, then continue the loop
+        }
+
+        group.alpha = 0f; // Ensure we end at exactly 0
+    }
+
+    // Call this to start fading
+    public void StartFadeOut()
+    {
+        StartCoroutine(FadeOut(canvasGroup, 1.5f)); // Fade over 1.5 seconds
+    }
+}</code></pre>
+      </div>
+
+      <p>This coroutine runs a <code>while</code> loop that executes once per frame (<code>yield return null</code>). Each frame, it calculates how far through the fade we are and updates the alpha (transparency) value. After the specified duration, the loop ends and the alpha is set to exactly 0.</p>
+
+      <h3>Stopping Coroutines</h3>
+      <p>Sometimes you need to cancel a coroutine before it finishes. For example, if a player picks up a power-up and then picks up another one, you might want to stop the first timer and start a new one. To stop a coroutine, you need to store a reference to it.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">StopCoroutineExample.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+
+public class StopCoroutineExample : MonoBehaviour
+{
+    [SerializeField] private CanvasGroup canvasGroup;
+    private Coroutine fadeCoroutine;
+
+    public void StartFading()
+    {
+        // Stop any existing fade before starting a new one
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+        }
+
+        // Store the reference so we can stop it later
+        fadeCoroutine = StartCoroutine(FadeOut(canvasGroup, 1f));
+    }
+
+    public void CancelFading()
+    {
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+            fadeCoroutine = null;
+        }
+    }
+
+    private IEnumerator FadeOut(CanvasGroup group, float duration)
+    {
+        float elapsed = 0f;
+        float startAlpha = group.alpha;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            group.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        group.alpha = 0f;
+        fadeCoroutine = null; // Clear reference when done
+    }
+}</code></pre>
+      </div>
+
+      <h3>When to Use Coroutines vs. Update</h3>
+      <p>Coroutines and <code>Update()</code> can sometimes accomplish the same thing, but each has strengths. Here's a guide for when to use which:</p>
+
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Use Coroutines For</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Use Update For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">One-time delayed actions</td>
+            <td style="padding: 0.75rem;">Continuous every-frame logic</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">Sequences (do A, wait, do B, wait, do C)</td>
+            <td style="padding: 0.75rem;">Player input handling</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">Temporary timed effects (power-up duration)</td>
+            <td style="padding: 0.75rem;">Movement and physics</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">Loading and initialization sequences</td>
+            <td style="padding: 0.75rem;">Continuous state checks</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem;">Smooth transitions (fades, lerps over time)</td>
+            <td style="padding: 0.75rem;">Real-time game logic that never stops</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Coroutines in Later Chapters</div>
+        <p>We'll use coroutines extensively as the project grows: power-up timers in Chapter 16, UI animations and screen transitions in Chapter 19, and audio crossfading in Chapter 20. Understanding the basics now &mdash; how to start them, stop them, and what <code>yield return</code> does &mdash; will save you a lot of confusion when we reach those chapters. If this section felt abstract, don't worry. It will click once you use coroutines in a real gameplay system.</p>
+      </div>
+
+      <!-- Section: Chapter Summary -->
+      <h2>Chapter Summary</h2>
+      <p>That was a lot of information. Here's a recap of everything we covered:</p>
+      <ul>
+        <li><strong>Scripts</strong> are C# classes that inherit from <code>MonoBehaviour</code> and attach to GameObjects.</li>
+        <li><strong>Lifecycle methods</strong>: <code>Awake()</code>, <code>Start()</code>, <code>Update()</code>, <code>FixedUpdate()</code>, <code>LateUpdate()</code>, <code>OnEnable()</code>, <code>OnDisable()</code>, <code>OnDestroy()</code>.</li>
+        <li><strong>Variables</strong>: <code>int</code>, <code>float</code> (with <code>f</code>!), <code>bool</code>, <code>string</code>, <code>Vector3</code>, <code>Vector2</code>.</li>
+        <li><strong>Access modifiers</strong>: <code>public</code>, <code>private</code>, <code>[SerializeField] private</code> (preferred).</li>
+        <li><strong>Conditionals</strong>: <code>if/else</code>, <code>switch</code>, comparison and logical operators.</li>
+        <li><strong>Loops</strong>: <code>for</code>, <code>foreach</code>, <code>while</code> (careful with infinite loops!).</li>
+        <li><strong>Methods</strong>: reusable blocks of code with optional parameters and return values.</li>
+        <li><strong>Classes</strong>: blueprints for objects. MonoBehaviour classes attach to GameObjects; plain classes hold data.</li>
+        <li><strong>Collections</strong>: <code>arrays</code> (fixed size), <code>List&lt;T&gt;</code> (dynamic size).</li>
+        <li><strong>Enums</strong>: named constants for readable code (GameState, Lane, PowerUpType).</li>
+        <li><strong>Unity patterns</strong>: <code>GetComponent</code>, <code>Instantiate</code>, <code>Destroy</code>, <code>Time.deltaTime</code>.</li>
+        <li><strong>Debugging</strong>: <code>Debug.Log</code> / <code>LogWarning</code> / <code>LogError</code>, reading error messages, fixing NullReferenceException, visual debugging with <code>Debug.DrawRay</code>, and using breakpoints in your IDE.</li>
+        <li><strong>Coroutines</strong>: methods that pause and resume over time using <code>IEnumerator</code>, <code>yield return</code>, <code>StartCoroutine</code>, and <code>StopCoroutine</code>.</li>
+      </ul>
+
+      <p>You don't need to memorize all of this. As we build each system in the coming chapters, you'll see these concepts used in context and they'll become natural. This chapter is meant as a reference you can come back to whenever you encounter something unfamiliar.</p>
+
+      <p>In the next chapter, we'll design the architecture and folder structure for our project, setting up the organizational foundation that will keep our code clean as it grows.</p>
+
+      <div class="chapter-nav">
+        <a href="03-editor-tour.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Editor Tour</span></a>
+        <a href="05-project-architecture.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Architecture</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

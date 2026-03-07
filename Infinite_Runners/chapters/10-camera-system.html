@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link active"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 10</span>
+        <h1>Camera System</h1>
+        <p class="chapter-desc">Set up a smooth, professional camera that follows the player using Cinemachine &mdash; with camera shake for impacts.</p>
+      </div>
+
+      <!-- SECTION: Why Not Parent? -->
+      <section>
+        <h2>Why Not Just Parent the Camera to the Player?</h2>
+        <p>The simplest approach is to make the camera a child of the player object. The camera then automatically follows wherever the player goes. It works &mdash; but it feels terrible. Here is why:</p>
+
+        <ul>
+          <li><strong>No damping.</strong> The camera snaps to the player's position instantly. Every tiny bump, every frame of jump movement, the camera follows perfectly. This creates a jittery, nauseating experience.</li>
+          <li><strong>No smoothing.</strong> When the player switches lanes, the camera jerks sideways. When the player lands from a jump, the camera jolts downward. Professional games have a slight delay where the camera "catches up" smoothly.</li>
+          <li><strong>No flexibility.</strong> Want to do a camera shake when the player dies? A zoom effect when hitting a speed boost? A look-ahead when switching lanes? All of this is extremely difficult with a parented camera.</li>
+        </ul>
+
+        <p>Instead, we will use <strong>Cinemachine</strong> &mdash; Unity's professional camera system. It handles smooth following, damping, look-ahead, camera shake, and much more, all configurable in the Inspector with zero code for basic setups.</p>
+
+        <div class="callout info">
+          <div class="callout-title">What Is Cinemachine?</div>
+          <p>Cinemachine is a free Unity package that controls your main camera procedurally. You create "virtual cameras" that define how the camera should behave (what to follow, from what angle, with what smoothing). Cinemachine then drives the actual Main Camera to match the active virtual camera. It is used in AAA games, films, and almost every professional Unity project.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Installing Cinemachine -->
+      <section>
+        <h2>Installing Cinemachine</h2>
+
+        <ol class="steps">
+          <li>Open <strong>Window &gt; Package Manager</strong>.</li>
+          <li>In the top-left dropdown, select <strong>"Unity Registry"</strong>.</li>
+          <li>Search for <strong>"Cinemachine"</strong>.</li>
+          <li>Select the <strong>Cinemachine</strong> package (version 3.x or later) and click <strong>Install</strong>.</li>
+          <li>Wait for the installation to complete. No restart is required.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Cinemachine 3.x vs 2.x</div>
+          <p>Cinemachine 3.x (released with Unity 2023+) has a different API from Cinemachine 2.x. The component names changed: <code>CinemachineVirtualCamera</code> became <code>CinemachineCamera</code>, <code>CinemachineTransposer</code> became <code>CinemachineFollow</code>, and so on. This tutorial uses <strong>Cinemachine 3.x</strong> naming. If you are on Unity 2022 or earlier, you may have Cinemachine 2.x &mdash; the concepts are the same, but the component names differ slightly.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Creating the Virtual Camera -->
+      <section>
+        <h2>Creating a Cinemachine Virtual Camera</h2>
+        <p>A virtual camera is a lightweight object that says "the camera should be HERE, looking at THAT, with THESE settings." Cinemachine uses the active virtual camera to drive the real Main Camera.</p>
+
+        <ol class="steps">
+          <li>In the top menu, go to <strong>GameObject &gt; Cinemachine &gt; Cinemachine Camera</strong>. This creates a new virtual camera in your scene.</li>
+          <li>Name it <code>CM_FollowCamera</code>.</li>
+          <li>Notice that Unity also added a <code>CinemachineBrain</code> component to your <strong>Main Camera</strong> automatically. This component is the "driver" that reads virtual cameras and moves the Main Camera accordingly.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Naming Convention</div>
+          <p>Prefix Cinemachine cameras with <code>CM_</code> to make them easy to identify in the Hierarchy. In complex games, you might have CM_FollowCamera, CM_MenuCamera, CM_DeathCamera, etc.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Follow and LookAt -->
+      <section>
+        <h2>Setting Up Follow and Look At Targets</h2>
+        <p>Select the <code>CM_FollowCamera</code> in the Hierarchy. In the Inspector, you will see the <strong>CinemachineCamera</strong> component with several fields:</p>
+
+        <ol class="steps">
+          <li>
+            <strong>Tracking Target:</strong> Drag the <code>Player</code> GameObject into this field. This tells the virtual camera "follow this object."
+          </li>
+          <li>
+            <strong>Look At Target:</strong> Also drag the <code>Player</code> here (or leave it set to the same Tracking Target). This tells the camera "always face toward this object."
+          </li>
+        </ol>
+
+        <p>At this point, if you press Play, the camera will follow the player &mdash; but it will be sitting right on top of them. We need to configure an offset.</p>
+      </section>
+
+      <!-- SECTION: Configuring the Transposer -->
+      <section>
+        <h2>Configuring the Follow Offset (Transposer)</h2>
+        <p>We need the camera to be <strong>behind</strong> and <strong>above</strong> the player, looking down slightly. In Cinemachine 3.x, this is handled by the <strong>CinemachineFollow</strong> component (in 2.x, it was called <code>CinemachineTransposer</code>).</p>
+
+        <ol class="steps">
+          <li>Select <code>CM_FollowCamera</code>.</li>
+          <li>In the CinemachineCamera component, look for the <strong>Body</strong> section. It should show <strong>Cinemachine Follow</strong> (or you can add it via the "Add Extension" or "Body" dropdown).</li>
+          <li>Set the <strong>Follow Offset</strong> to:
+            <ul>
+              <li><strong>X:</strong> <code>0</code> (centered behind the player, not to the side)</li>
+              <li><strong>Y:</strong> <code>7</code> (7 units above the player)</li>
+              <li><strong>Z:</strong> <code>-10</code> (10 units behind the player)</li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Camera Position Diagram</span><span class="lang-badge">Diagram</span></div>
+          <pre><code>  Side View:
+                    Camera
+                   /  (Y=7, Z=-10)
+                  /
+                 /  ← Looking down at player
+                /
+  ─────────[Player]─────────────────────────────
+            (0,0,0)          → Running direction (Z+)
+
+  Top-Down View:
+              Camera
+                |
+                |  Z = -10
+                |
+  ──────────[Player]────────────────────────────
+                              → Z+
+
+  The camera is directly behind the player, offset 10 units back
+  and 7 units up. This creates the classic runner perspective.</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Finding Your Perfect Angle</div>
+          <p>These values are starting points. With Cinemachine, you can tweak the offset in the Inspector and see the result in real-time in the Game view (even during Play mode!). Try different Y and Z values until the perspective feels right. Subway Surfers uses a higher angle; Temple Run uses a lower angle. It is an artistic choice.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Damping Settings -->
+      <section>
+        <h2>Damping Settings for Smooth Camera Feel</h2>
+        <p><strong>Damping</strong> is the secret ingredient that makes cameras feel professional. It controls how quickly the camera catches up to the target. Without damping, the camera is rigidly locked to the player (jittery). With damping, the camera smoothly glides to where it should be.</p>
+
+        <p>In the CinemachineFollow (Body) section, find the <strong>Damping</strong> settings:</p>
+
+        <table>
+          <thead>
+            <tr><th>Axis</th><th>Value</th><th>What It Controls</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>X Damping</strong></td><td><code>0.5</code></td><td>How quickly the camera follows left/right lane switches. Lower = snappier. Higher = more lag.</td></tr>
+            <tr><td><strong>Y Damping</strong></td><td><code>0.3</code></td><td>How quickly the camera follows vertical movement (jumps). Lower = camera follows jumps closely. Higher = camera barely moves during jumps.</td></tr>
+            <tr><td><strong>Z Damping</strong></td><td><code>0.1</code></td><td>How quickly the camera follows forward movement. Keep this low so the camera stays close behind.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout info">
+          <div class="callout-title">Understanding Damping Values</div>
+          <p><strong>0</strong> = no damping (camera rigidly follows, no smoothing). <strong>1</strong> = heavy damping (camera takes about 1 second to catch up). <strong>0.5</strong> = moderate damping (camera takes about half a second). For an infinite runner, you want: LOW Z damping (camera must keep up with forward movement), MODERATE X damping (smooth lane switches), and MODERATE Y damping (gentle response to jumps without making the player feel disconnected).</p>
+        </div>
+
+        <h3>Aim Settings</h3>
+        <p>In the <strong>Aim</strong> section of the CinemachineCamera, you may see <strong>CinemachineRotationComposer</strong> (or Composer in 2.x). This controls how the camera rotates to keep the player in frame. For a runner, we want simple settings:</p>
+
+        <ul>
+          <li><strong>Tracked Object Offset Y:</strong> <code>1</code> &mdash; Look at the player's chest, not their feet.</li>
+          <li><strong>Lookahead Time:</strong> <code>0</code> &mdash; Do not look ahead of the player. (In some runners you might want a small value here, but start with 0.)</li>
+          <li><strong>Damping:</strong> <code>0.5</code> &mdash; Smooth rotation.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Camera Shake -->
+      <section>
+        <h2>Camera Shake on Death</h2>
+        <p>When the player hits an obstacle and dies, a quick camera shake adds satisfying impact. Cinemachine has a built-in system for this called <strong>Impulse</strong>.</p>
+
+        <h3>How Cinemachine Impulse Works</h3>
+        <ol>
+          <li>An <strong>Impulse Source</strong> generates a shake signal (attached to whatever causes the impact).</li>
+          <li>An <strong>Impulse Listener</strong> receives the signal and shakes the camera (attached to the virtual camera).</li>
+        </ol>
+
+        <h3>Step 1: Add an Impulse Listener to the Camera</h3>
+        <ol class="steps">
+          <li>Select <code>CM_FollowCamera</code>.</li>
+          <li>Click <strong>Add Component</strong> and add <strong>CinemachineImpulseListener</strong>.</li>
+          <li>Leave the default settings. The <strong>Gain</strong> controls how strongly this camera responds to impulses (1 = full strength).</li>
+        </ol>
+
+        <h3>Step 2: Add an Impulse Source to the Player</h3>
+        <ol class="steps">
+          <li>Select the <code>Player</code> GameObject.</li>
+          <li>Click <strong>Add Component</strong> and add <strong>CinemachineImpulseSource</strong>.</li>
+          <li>Configure the impulse:
+            <ul>
+              <li><strong>Raw Signal:</strong> Select a built-in noise profile (e.g., <code>6D Shake</code>). This defines the shake pattern.</li>
+              <li><strong>Amplitude Gain:</strong> <code>1</code> (how strong the shake is)</li>
+              <li><strong>Frequency Gain:</strong> <code>1</code> (how fast the shake vibrates)</li>
+              <li><strong>Time Envelope &gt; Sustain:</strong> <code>0.1</code> seconds</li>
+              <li><strong>Time Envelope &gt; Decay:</strong> <code>0.3</code> seconds</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h3>Step 3: Create the CameraShake Utility Script</h3>
+        <p>We need a simple script that triggers the impulse when called. This bridges our game code with Cinemachine.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">CameraShake.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using Unity.Cinemachine;
+
+namespace InfiniteRunner.Camera
+{
+    /// &lt;summary&gt;
+    /// Utility script for triggering camera shake effects.
+    /// Attach to the same GameObject as a CinemachineImpulseSource.
+    ///
+    /// Usage: Call Shake() from any script to trigger the camera shake.
+    /// The PlayerController calls this on death.
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(CinemachineImpulseSource))]
+    public class CameraShake : MonoBehaviour
+    {
+        [Header("Shake Profiles")]
+        [Tooltip("Force of the death shake. Higher = more violent.")]
+        [SerializeField] private float deathShakeForce = 3f;
+
+        [Tooltip("Force of a minor hit shake (e.g., stumble).")]
+        [SerializeField] private float minorShakeForce = 0.5f;
+
+        // The Cinemachine impulse source component
+        private CinemachineImpulseSource _impulseSource;
+
+        // Singleton-like static reference for easy access
+        // (We could also use the event system from Chapter 7)
+        private static CameraShake _instance;
+
+        /// &lt;summary&gt;
+        /// Static accessor so any script can trigger a shake.
+        /// Usage: CameraShake.Instance.Shake();
+        /// &lt;/summary&gt;
+        public static CameraShake Instance =&gt; _instance;
+
+        private void Awake()
+        {
+            _instance = this;
+            _impulseSource = GetComponent&lt;CinemachineImpulseSource&gt;();
+
+            if (_impulseSource == null)
+            {
+                Debug.LogError(
+                    "[CameraShake] No CinemachineImpulseSource found! " +
+                    "Add one to this GameObject.");
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Triggers a strong camera shake (used for death/big impacts).
+        /// &lt;/summary&gt;
+        public void ShakeDeath()
+        {
+            if (_impulseSource != null)
+            {
+                _impulseSource.GenerateImpulse(deathShakeForce);
+                Debug.Log($"[CameraShake] Death shake (force: {deathShakeForce})");
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Triggers a mild camera shake (used for stumbles, minor hits).
+        /// &lt;/summary&gt;
+        public void ShakeMinor()
+        {
+            if (_impulseSource != null)
+            {
+                _impulseSource.GenerateImpulse(minorShakeForce);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Triggers a camera shake with a custom force.
+        /// &lt;/summary&gt;
+        /// &lt;param name="force"&gt;Shake intensity. 0.5 = mild, 3 = strong.&lt;/param&gt;
+        public void Shake(float force)
+        {
+            if (_impulseSource != null)
+            {
+                _impulseSource.GenerateImpulse(force);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Triggers a directional camera shake.
+        /// The camera shakes in the specified direction.
+        /// &lt;/summary&gt;
+        /// &lt;param name="direction"&gt;Direction and magnitude of the shake.&lt;/param&gt;
+        public void ShakeDirectional(Vector3 direction)
+        {
+            if (_impulseSource != null)
+            {
+                _impulseSource.GenerateImpulse(direction);
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Camera/CameraShake.cs</code>.</p>
+
+        <h3>Step 4: Connect Camera Shake to Player Death</h3>
+        <p>Update the <code>Die()</code> method in <code>PlayerController.cs</code> to trigger the camera shake:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerController.cs (updated Die method)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">private void Die()
+{
+    if (_currentState == PlayerState.Dead) return;
+
+    _currentState = PlayerState.Dead;
+
+    // Stop all movement
+    _rb.linearVelocity = Vector3.zero;
+    forwardSpeed = 0f;
+
+    Debug.Log("[Player] DIED!");
+
+    // Trigger camera shake for impact feel
+    if (InfiniteRunner.Camera.CameraShake.Instance != null)
+    {
+        InfiniteRunner.Camera.CameraShake.Instance.ShakeDeath();
+    }
+
+    // Notify listeners
+    OnPlayerDied?.Invoke();
+
+    // Tell the GameManager the game is over
+    if (GameManager.Instance != null)
+    {
+        GameManager.Instance.EndGame();
+    }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Complete Setup Checklist -->
+      <section>
+        <h2>Complete Setup Checklist</h2>
+        <p>Here is everything you should have in the scene after this chapter:</p>
+
+        <ol class="steps">
+          <li>
+            <strong>Main Camera</strong> &mdash; Has a <code>CinemachineBrain</code> component (added automatically). Do NOT add any follow scripts to this &mdash; Cinemachine controls it entirely.
+          </li>
+          <li>
+            <strong>CM_FollowCamera</strong> (GameObject) &mdash; Has:
+            <ul>
+              <li><code>CinemachineCamera</code> component with Tracking Target set to Player.</li>
+              <li><code>CinemachineFollow</code> (Body) with Follow Offset (0, 7, -10) and damping values.</li>
+              <li><code>CinemachineRotationComposer</code> (Aim) for smooth look-at behavior.</li>
+              <li><code>CinemachineImpulseListener</code> for receiving camera shake signals.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Player</strong> (GameObject) &mdash; Has:
+            <ul>
+              <li><code>PlayerController</code> (from Chapter 9)</li>
+              <li><code>CinemachineImpulseSource</code> for generating shake signals.</li>
+              <li><code>CameraShake</code> script (from this chapter).</li>
+              <li><code>Rigidbody</code> and <code>CapsuleCollider</code> (from Chapter 9).</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <!-- SECTION: Testing -->
+      <section>
+        <h2>Testing and Tweaking</h2>
+
+        <ol class="steps">
+          <li>Press <strong>Play</strong>.</li>
+          <li><strong>Forward movement:</strong> The camera should smoothly follow the player as they run forward. The camera should never jitter or snap.</li>
+          <li><strong>Lane switching:</strong> Press A/D. The camera should follow with a slight delay (the X damping). The player switches lanes, and the camera gently slides over to keep them centered.</li>
+          <li><strong>Jumping:</strong> Press Space. The camera should barely move vertically (or move just a little). The player jumps, but the camera stays relatively stable. This keeps the player's view of upcoming obstacles consistent.</li>
+          <li><strong>Death shake:</strong> Place a cube in the player's path, tag it as "Obstacle" (with a trigger collider). When the player hits it, the camera should shake violently for a brief moment.</li>
+        </ol>
+
+        <h3>Recommended Tweaking Process</h3>
+
+        <div class="callout tip">
+          <div class="callout-title">Live Tweaking in Play Mode</div>
+          <p>One of Cinemachine's best features: you can change values in the Inspector <strong>while the game is running</strong> and see the effect immediately. Enter Play mode, select <code>CM_FollowCamera</code>, and adjust damping values, offset, etc. When you find values you like, write them down, then exit Play mode and enter them again (changes during Play mode are lost when you stop).</p>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th>If the camera feels...</th><th>Adjust this...</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Too jittery / rigid</td><td>Increase damping values (try 0.5 - 1.0)</td></tr>
+            <tr><td>Too laggy / floaty</td><td>Decrease damping values (try 0.1 - 0.3)</td></tr>
+            <tr><td>Too close to the player</td><td>Increase Z offset (more negative, e.g., -12)</td></tr>
+            <tr><td>Too far from the player</td><td>Decrease Z offset (less negative, e.g., -8)</td></tr>
+            <tr><td>Too high / birds-eye</td><td>Decrease Y offset (e.g., 5)</td></tr>
+            <tr><td>Too low / behind</td><td>Increase Y offset (e.g., 10)</td></tr>
+            <tr><td>Camera moves too much on jump</td><td>Increase Y damping (e.g., 1.0)</td></tr>
+            <tr><td>Camera shake too strong</td><td>Decrease deathShakeForce or Impulse Gain</td></tr>
+            <tr><td>Camera shake too weak</td><td>Increase deathShakeForce</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- SECTION: Advanced Topics -->
+      <section>
+        <h2>Advanced: Multiple Camera States</h2>
+        <p>In a polished game, you might want different camera behaviors for different game states. For example:</p>
+
+        <ul>
+          <li><strong>Menu camera:</strong> A slow orbit around a scene, or a static angle showing the character.</li>
+          <li><strong>Gameplay camera:</strong> The follow camera we just built.</li>
+          <li><strong>Death camera:</strong> Zooms in on the player, or does a slow-motion pan.</li>
+        </ul>
+
+        <p>Cinemachine makes this easy with <strong>priority-based camera blending</strong>. You can have multiple virtual cameras and switch between them by changing their priority:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">CameraManager.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using Unity.Cinemachine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Camera
+{
+    /// &lt;summary&gt;
+    /// Manages which Cinemachine virtual camera is active
+    /// based on the current game state.
+    ///
+    /// Higher priority = this camera is used.
+    /// Cinemachine automatically blends between cameras.
+    /// &lt;/summary&gt;
+    public class CameraManager : MonoBehaviour
+    {
+        [Header("Virtual Cameras")]
+        [SerializeField] private CinemachineCamera menuCamera;
+        [SerializeField] private CinemachineCamera gameplayCamera;
+        [SerializeField] private CinemachineCamera deathCamera;
+
+        [Header("Settings")]
+        [Tooltip("Priority value for the active camera.")]
+        [SerializeField] private int activePriority = 20;
+
+        [Tooltip("Priority value for inactive cameras.")]
+        [SerializeField] private int inactivePriority = 10;
+
+        private void OnEnable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged += HandleStateChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleStateChanged;
+            }
+        }
+
+        private void HandleStateChanged(GameState newState)
+        {
+            // Reset all cameras to low priority
+            SetAllInactive();
+
+            // Activate the camera for the current state
+            switch (newState)
+            {
+                case GameState.Menu:
+                    if (menuCamera != null)
+                        menuCamera.Priority = activePriority;
+                    break;
+
+                case GameState.Playing:
+                    if (gameplayCamera != null)
+                        gameplayCamera.Priority = activePriority;
+                    break;
+
+                case GameState.GameOver:
+                    if (deathCamera != null)
+                        deathCamera.Priority = activePriority;
+                    break;
+
+                case GameState.Paused:
+                    // Keep gameplay camera during pause
+                    if (gameplayCamera != null)
+                        gameplayCamera.Priority = activePriority;
+                    break;
+            }
+        }
+
+        private void SetAllInactive()
+        {
+            if (menuCamera != null) menuCamera.Priority = inactivePriority;
+            if (gameplayCamera != null) gameplayCamera.Priority = inactivePriority;
+            if (deathCamera != null) deathCamera.Priority = inactivePriority;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Camera/CameraManager.cs</code>.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Camera Blending</div>
+          <p>When you switch the active camera (by changing priorities), Cinemachine does not cut instantly. It <strong>blends</strong> between them over a configurable duration. You can set the blend time on the <code>CinemachineBrain</code> component on the Main Camera. The default is 2 seconds, which you may want to reduce to 0.5 seconds for a snappier feel. You can also configure custom blend times for specific camera transitions.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Project Files -->
+      <section>
+        <h2>Project Files After This Chapter</h2>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Scripts/
+    Camera/
+      CameraShake.cs        &lt;-- Triggers Cinemachine Impulse for screen shake
+      CameraManager.cs      &lt;-- Switches cameras based on game state (advanced)
+    Player/
+      PlayerController.cs   &lt;-- Updated Die() method calls CameraShake
+      PlayerState.cs        &lt;-- Player state enum
+    Input/
+      InputReader.cs        &lt;-- Input wrapper
+    Core/
+      GameManager.cs        &lt;-- Game state manager
+    Events/
+      GameEvent.cs          &lt;-- Event system
+
+  Scene Hierarchy:
+    Main Camera             &lt;-- CinemachineBrain (auto-added)
+    CM_FollowCamera         &lt;-- CinemachineCamera + Follow + Aim + ImpulseListener
+    Player                  &lt;-- PlayerController + ImpulseSource + CameraShake
+      PlayerModel           &lt;-- Visual capsule/model
+    [GameManager]           &lt;-- GameManager singleton
+    Ground                  &lt;-- Plane with Ground layer</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Common Issues -->
+      <section>
+        <h2>Common Issues and Solutions</h2>
+
+        <div class="callout danger">
+          <div class="callout-title">Camera Not Moving At All</div>
+          <p>Check that: (1) The Main Camera has a <code>CinemachineBrain</code> component. (2) The <code>CM_FollowCamera</code> has a <code>CinemachineCamera</code> component with a Tracking Target assigned. (3) There are no other virtual cameras with higher priority. (4) The Player object exists in the scene and is not destroyed.</p>
+        </div>
+
+        <div class="callout danger">
+          <div class="callout-title">Camera Jittering / Stuttering</div>
+          <p>This usually means the camera and the player are updating at different rates. The player moves in <code>FixedUpdate()</code> (physics), but the camera updates in <code>LateUpdate()</code> (rendering). Cinemachine handles this automatically in most cases. If you still see jitter, try setting the <code>CinemachineBrain</code> Update Method to <strong>"Fixed Update"</strong> or <strong>"Smart Update"</strong>.</p>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">Camera Shake Not Working</div>
+          <p>Make sure: (1) The virtual camera has a <code>CinemachineImpulseListener</code>. (2) The Player has a <code>CinemachineImpulseSource</code> with a noise profile assigned. (3) The <code>CameraShake</code> script is on the same object as the ImpulseSource. (4) The shake force is high enough to see (try 5 for testing).</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <ul>
+          <li>Understood why a <strong>parented camera</strong> is not good enough for a professional game.</li>
+          <li>Installed <strong>Cinemachine</strong> and created a <strong>virtual camera</strong> that follows the player.</li>
+          <li>Configured the <strong>Follow Offset</strong> to position the camera behind and above the player.</li>
+          <li>Set up <strong>damping</strong> for smooth camera movement on all three axes.</li>
+          <li>Implemented <strong>camera shake on death</strong> using Cinemachine Impulse (ImpulseSource and ImpulseListener).</li>
+          <li>Created a <strong>CameraShake utility script</strong> for triggering shake effects.</li>
+          <li>Built an advanced <strong>CameraManager</strong> for switching cameras based on game state.</li>
+        </ul>
+
+        <p>This completes <strong>Part 2: Core Systems</strong>. You now have a Game Manager, Event System, Input System, Player Controller, and Camera System &mdash; the five pillars that every game needs. In Part 3, we will build the <strong>World Generation</strong> system: chunks, object pooling, procedural generation, and origin shifting to create an infinite world.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Camera system complete with follow and shake. Commit it.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git add .
+git commit -m "Add Cinemachine camera with follow and screen shake"</code></pre>
+        </div>
+        <p>You've now completed Part 2. Run <code>git log --oneline</code> — you should have about 7 commits. That's 7 safe points you can return to if anything breaks.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="09-player-controller.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Player Controller</span></a>
+        <a href="11-chunk-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Chunk System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

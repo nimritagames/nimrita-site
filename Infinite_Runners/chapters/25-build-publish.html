@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building &amp; Publishing - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link active"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 25</span>
+        <h1>Building &amp; Publishing</h1>
+        <p class="chapter-desc">Take your finished game from the Unity Editor to the real world &mdash; build for PC, Android, WebGL, and iOS, then publish for players to enjoy.</p>
+      </div>
+
+      <!-- SECTION: Build Settings Window -->
+      <section>
+        <h2>Build Settings Window</h2>
+        <p>The Build Settings window is your launch pad. It is where you choose which platform to build for and which scenes to include.</p>
+
+        <ol class="steps">
+          <li>Open <strong>File &gt; Build Settings</strong> (or press <strong>Ctrl+Shift+B</strong> / <strong>Cmd+Shift+B</strong>).</li>
+          <li>At the top, you will see <strong>Scenes In Build</strong>. Click <strong>Add Open Scenes</strong> to add your current scene. If you have multiple scenes (e.g., a Loading scene and a Game scene), add them all. The first scene in the list (index 0) is the one that loads on startup.</li>
+          <li>On the left, you will see a list of platforms: PC/Mac/Linux, Android, iOS, WebGL, and more. The active platform has the Unity logo next to it.</li>
+          <li>To switch platforms, select the target platform and click <strong>Switch Platform</strong>. Unity will reimport assets for the new platform &mdash; this can take several minutes the first time.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Platform Modules</div>
+          <p>You can only build for platforms whose modules are installed. If you do not see Android or WebGL in the list, go back to <strong>Unity Hub &gt; Installs</strong>, click the gear icon on your Unity version, select <strong>Add Modules</strong>, and install the platform you need (e.g., "Android Build Support," "WebGL Build Support"). You will need to restart Unity after installing.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Player Settings -->
+      <section>
+        <h2>Player Settings</h2>
+        <p>Player Settings control how your built game presents itself to the player &mdash; the app name, icon, resolution, and more. Open them via <strong>Edit &gt; Project Settings &gt; Player</strong> (or click <strong>Player Settings...</strong> in the Build Settings window).</p>
+
+        <h3>General Settings (All Platforms)</h3>
+        <table>
+          <thead>
+            <tr><th>Setting</th><th>What to Set</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Company Name</strong></td><td>Your name or studio name. Used in the file path for save data.</td><td>NimritaGames</td></tr>
+            <tr><td><strong>Product Name</strong></td><td>The game's display name. This is what appears on the home screen or desktop.</td><td>Infinite Runner</td></tr>
+            <tr><td><strong>Version</strong></td><td>Semantic versioning (major.minor.patch).</td><td>1.0.0</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Icon Setup</h3>
+        <ol class="steps">
+          <li>In Player Settings, scroll to the <strong>Icon</strong> section (platform-specific tabs at the top).</li>
+          <li>For Android, you need multiple icon sizes (from 48x48 to 432x432). Drag your icon image into the <strong>Default Icon</strong> slot and Unity will scale it for each size. For best results, provide the largest size (512x512 or 1024x1024).</li>
+          <li>For iOS, you need even more sizes. Unity shows each required size &mdash; fill them all.</li>
+          <li>For PC, a single 256x256 icon works. Drag it into the Default Icon.</li>
+        </ol>
+
+        <h3>Resolution and Presentation</h3>
+        <ul>
+          <li><strong>Default Orientation</strong> (mobile): Set to <strong>Portrait</strong> for an infinite runner (phone held upright). Some runners use Landscape &mdash; choose what fits your game.</li>
+          <li><strong>Fullscreen Mode</strong> (PC): "Fullscreen Window" is the safest option for modern PCs.</li>
+          <li><strong>Default Screen Width/Height</strong> (PC): 1920x1080 is standard.</li>
+          <li><strong>Run In Background</strong>: Uncheck for mobile (saves battery). Check for PC if the player might alt-tab.</li>
+        </ul>
+
+        <h3>Splash Screen</h3>
+        <p>If you use Unity Personal (free), Unity requires a splash screen with the "Made with Unity" logo. You can customize the background color and add your own logo alongside Unity's. With Unity Pro or Plus, you can disable the Unity splash entirely.</p>
+        <ul>
+          <li>In Player Settings &gt; Splash Image, set the <strong>Background Color</strong> to match your game's theme.</li>
+          <li>Add your game's logo under <strong>Logos</strong> &gt; click <strong>+</strong> and drag your logo sprite.</li>
+          <li>Set <strong>Draw Mode</strong> to "Unity Logo Below" or "All Sequential."</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Building for PC/Mac -->
+      <section>
+        <h2>Building for PC / Mac</h2>
+        <p>PC is the simplest platform to build for. No special SDKs, no signing, no store requirements.</p>
+
+        <ol class="steps">
+          <li>Open <strong>File &gt; Build Settings</strong>.</li>
+          <li>Select <strong>Windows, Mac, Linux</strong> as the platform. Click <strong>Switch Platform</strong> if it is not already active.</li>
+          <li>Choose your <strong>Target Platform</strong>: Windows, macOS, or Linux.</li>
+          <li>Choose <strong>Architecture</strong>: x86_64 (64-bit) is standard for modern systems.</li>
+          <li>Click <strong>Build</strong> (or <strong>Build and Run</strong> to launch immediately after building).</li>
+          <li>Choose a folder for the build output (e.g., <code>Builds/Windows/</code>). Unity creates an executable and a Data folder.</li>
+        </ol>
+
+        <h3>Distributing Your PC Build</h3>
+        <p>The simplest way to share a PC build is to zip the entire build folder and upload it somewhere players can download it.</p>
+
+        <h4>itch.io (Recommended for Indie Games)</h4>
+        <ol class="steps">
+          <li>Create a free account at <a href="https://itch.io" target="_blank" rel="noopener">itch.io</a>.</li>
+          <li>Click <strong>Dashboard &gt; Create new project</strong>.</li>
+          <li>Fill in the game details: title, description, tags, cover image.</li>
+          <li>Set <strong>Kind of project</strong> to "Downloadable."</li>
+          <li>Under <strong>Uploads</strong>, upload your zipped build folder. Tag it with the platform (Windows, Mac, Linux).</li>
+          <li>Set the project to <strong>Public</strong> and click <strong>Save</strong>.</li>
+          <li>Share your itch.io page link with the world!</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Butler (Advanced)</div>
+          <p>itch.io provides a command-line tool called <strong>butler</strong> that lets you push builds from a terminal. It is faster than the web upload, supports incremental uploads (only pushes changed files), and can be integrated into automated build pipelines. For now, the web upload is perfectly fine.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Building for Android -->
+      <section>
+        <h2>Building for Android</h2>
+        <p>Android is the most popular platform for infinite runners. The setup takes a few extra steps, but Unity handles most of the complexity for you.</p>
+
+        <h3>Installing Android Build Support</h3>
+        <ol class="steps">
+          <li>Open <strong>Unity Hub &gt; Installs</strong>.</li>
+          <li>Click the gear icon on your Unity version and select <strong>Add Modules</strong>.</li>
+          <li>Check <strong>Android Build Support</strong>. Also check <strong>Android SDK &amp; NDK Tools</strong> and <strong>OpenJDK</strong> (Unity installs these automatically so you do not need to manage them yourself).</li>
+          <li>Click Install and wait for the download to complete. Restart Unity.</li>
+        </ol>
+
+        <h3>Android Player Settings</h3>
+        <ol class="steps">
+          <li>In Build Settings, select <strong>Android</strong> and click <strong>Switch Platform</strong>.</li>
+          <li>Click <strong>Player Settings</strong> and navigate to the Android tab (the green robot icon).</li>
+          <li>
+            <strong>Other Settings:</strong>
+            <ul>
+              <li><strong>Package Name:</strong> A unique identifier in reverse-domain format, e.g., <code>com.yourname.infiniterunner</code>. This MUST be unique on the Google Play Store.</li>
+              <li><strong>Minimum API Level:</strong> Set to <strong>API Level 24</strong> (Android 7.0) or higher. This is the minimum Android version your game supports. Lower values support more devices but limit available features.</li>
+              <li><strong>Target API Level:</strong> Set to the highest available (Google Play requires targeting recent API levels).</li>
+              <li><strong>Scripting Backend:</strong> Set to <strong>IL2CPP</strong> (required by Google Play for 64-bit support and better performance than Mono).</li>
+              <li><strong>Target Architectures:</strong> Check both <strong>ARM64</strong> and <strong>ARMv7</strong>. ARM64 is required by Google Play. ARMv7 supports older devices.</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h3>Keystore for Signing</h3>
+        <p>Android apps must be digitally signed. For development, Unity uses a debug keystore automatically. For publishing to the Google Play Store, you need a release keystore.</p>
+
+        <ol class="steps">
+          <li>In Player Settings &gt; Publishing Settings, check <strong>Custom Keystore</strong>.</li>
+          <li>Click <strong>Keystore Manager</strong> (or create a new keystore).</li>
+          <li>Choose <strong>Create New</strong>, pick a file location, and set:
+            <ul>
+              <li><strong>Password:</strong> A strong password (write it down and store it safely!).</li>
+              <li><strong>Alias:</strong> A name for the key (e.g., "release").</li>
+              <li><strong>Alias Password:</strong> Can be the same as the keystore password.</li>
+              <li><strong>Validity (years):</strong> 25 (Google requires at least 25 years).</li>
+            </ul>
+          </li>
+          <li>Click <strong>Create</strong>. Unity generates the keystore file.</li>
+        </ol>
+
+        <div class="callout danger">
+          <div class="callout-title">Never Lose Your Keystore!</div>
+          <p>If you lose your keystore file or forget the password, you can <strong>never</strong> update your app on the Google Play Store. Google identifies your app by its signing key. Losing it means starting over with a new listing. Back up the keystore file and passwords in a secure location (e.g., a password manager or encrypted cloud storage).</p>
+        </div>
+
+        <h3>Building APK vs. AAB</h3>
+        <ul>
+          <li><strong>APK (Android Package):</strong> A standalone file you can install directly on a device. Good for testing.</li>
+          <li><strong>AAB (Android App Bundle):</strong> The format required by Google Play. It lets Google optimize the download size for each device. Select <strong>Build App Bundle (Google Play)</strong> in Build Settings.</li>
+        </ul>
+
+        <ol class="steps">
+          <li>In Build Settings, click <strong>Build</strong>.</li>
+          <li>Choose an output location. Unity will generate an .apk or .aab file.</li>
+          <li>
+            <strong>To test on a real device (APK):</strong>
+            <ul>
+              <li>Enable <strong>Developer Options</strong> on your Android phone (Settings &gt; About Phone &gt; tap "Build Number" 7 times).</li>
+              <li>Enable <strong>USB Debugging</strong> in Developer Options.</li>
+              <li>Connect your phone via USB. Your computer should detect it.</li>
+              <li>In Build Settings, click <strong>Build and Run</strong>. Unity installs the APK directly to the connected device and launches it.</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <!-- SECTION: Building for WebGL -->
+      <section>
+        <h2>Building for WebGL</h2>
+        <p>WebGL builds let people play your game in a web browser &mdash; no download required. This is fantastic for sharing your game quickly and for embedding on game portals.</p>
+
+        <ol class="steps">
+          <li>In Build Settings, select <strong>WebGL</strong> and click <strong>Switch Platform</strong>.</li>
+          <li>In Player Settings for WebGL:
+            <ul>
+              <li><strong>Resolution:</strong> Set a default canvas size (e.g., 960x600 for a landscape browser window, or 540x960 for portrait).</li>
+              <li><strong>WebGL Template:</strong> Use "Minimal" or "Default." The Minimal template is a clean page with just the game canvas.</li>
+              <li><strong>Compression Format:</strong> Set to <strong>Gzip</strong> for hosting on servers that support it, or <strong>Disabled</strong> if your host does not support compression headers (GitHub Pages needs Disabled or Brotli).</li>
+              <li><strong>Data Caching:</strong> Enable this so returning players do not re-download the entire game.</li>
+            </ul>
+          </li>
+          <li>Click <strong>Build</strong>. Choose an output folder (e.g., <code>Builds/WebGL/</code>).</li>
+          <li>Unity generates an <code>index.html</code> file and a <code>Build/</code> folder containing the game data.</li>
+        </ol>
+
+        <h3>Hosting on itch.io</h3>
+        <ol class="steps">
+          <li>Zip the entire WebGL build folder (the one containing <code>index.html</code>).</li>
+          <li>On your itch.io project page, upload the zip.</li>
+          <li>Check <strong>This file will be played in the browser</strong>.</li>
+          <li>Set the viewport dimensions to match your game's resolution.</li>
+          <li>Save and test &mdash; your game is now playable in the browser!</li>
+        </ol>
+
+        <h3>Hosting on GitHub Pages</h3>
+        <ol class="steps">
+          <li>Create a GitHub repository for your game (or use an existing one).</li>
+          <li>Push the WebGL build output to the repository (the <code>index.html</code> and <code>Build/</code> folder should be in the root, or in a <code>docs/</code> folder).</li>
+          <li>Go to your repository's <strong>Settings &gt; Pages</strong>.</li>
+          <li>Set the source to the branch and folder where your build files are.</li>
+          <li>GitHub provides a URL like <code>https://yourusername.github.io/your-repo/</code>.</li>
+          <li>If the game does not load, check the browser console for errors. A common issue is compression &mdash; set <strong>Compression Format</strong> to <strong>Disabled</strong> in Player Settings and rebuild.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">WebGL Limitations</div>
+          <p>WebGL builds have some restrictions compared to native builds: no multithreading (by default), no direct file system access (your save system will need to use <code>PlayerPrefs</code> or the IndexedDB via JavaScript interop instead of <code>File.WriteAllText</code>), and no access to native plugins. Also, build sizes can be large &mdash; strip unused code via <strong>Player Settings &gt; Other Settings &gt; Managed Stripping Level = Medium</strong> to reduce the download size.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Building for iOS -->
+      <section>
+        <h2>Building for iOS (Overview)</h2>
+        <p>Building for iOS requires specific hardware and accounts. Here is an overview of the process:</p>
+
+        <h3>Requirements</h3>
+        <ul>
+          <li>A <strong>Mac</strong> computer running macOS (iOS builds cannot be made on Windows).</li>
+          <li><strong>Xcode</strong> installed from the Mac App Store (free).</li>
+          <li>An <strong>Apple Developer Account</strong> ($99/year) for distributing on the App Store. A free account works for testing on your own device.</li>
+        </ul>
+
+        <h3>Basic Steps</h3>
+        <ol class="steps">
+          <li>On your Mac, open your Unity project and switch to the <strong>iOS</strong> platform in Build Settings.</li>
+          <li>Configure Player Settings:
+            <ul>
+              <li><strong>Bundle Identifier:</strong> <code>com.yourname.infiniterunner</code> (must match your Apple Developer portal).</li>
+              <li><strong>Target minimum iOS Version:</strong> 14.0 or higher.</li>
+              <li><strong>Signing Team ID:</strong> Your Apple Developer team ID.</li>
+            </ul>
+          </li>
+          <li>Click <strong>Build</strong>. Unity generates an <strong>Xcode project</strong> (not a final app).</li>
+          <li>Open the generated Xcode project (<code>.xcodeproj</code> file) in Xcode.</li>
+          <li>In Xcode, select your signing team, connect your iPhone, and click <strong>Run</strong> to install on the device.</li>
+          <li>For App Store distribution, create an archive in Xcode and upload via App Store Connect.</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">No Mac? No Problem (For Now)</div>
+          <p>If you do not have a Mac, focus on Android and WebGL. Both platforms reach a massive audience. You can always add iOS later when you have access to the required hardware. Some developers use cloud Mac services (like MacinCloud or GitHub Actions with macOS runners) to build iOS projects remotely.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Pre-Build Checklist -->
+      <section>
+        <h2>Pre-Build Checklist</h2>
+        <p>Before creating your final build, run through this checklist to catch common issues:</p>
+
+        <h3>Code Cleanup</h3>
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Removing Debug.Log Statements</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// OPTION 1: Use conditional compilation to strip Debug.Log from release builds.
+// Debug.Log calls are surprisingly expensive — each one allocates strings
+// and can cause frame drops on mobile.
+
+// Wrap debug logs in #if UNITY_EDITOR or #if DEVELOPMENT_BUILD
+#if UNITY_EDITOR
+    Debug.Log("This only runs in the Editor");
+#endif
+
+// OPTION 2: Create a custom logger that compiles away in release builds
+public static class GameLogger
+{
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    [System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    public static void Log(string message)
+    {
+        Debug.Log(message);
+    }
+
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    [System.Diagnostics.Conditional("DEVELOPMENT_BUILD")]
+    public static void LogWarning(string message)
+    {
+        Debug.LogWarning(message);
+    }
+
+    // Debug.LogError should ALWAYS work — you want to know about errors
+    // even in release builds.
+    public static void LogError(string message)
+    {
+        Debug.LogError(message);
+    }
+}
+
+// Usage: Replace Debug.Log with GameLogger.Log throughout your project.
+// In release builds, GameLogger.Log calls are completely stripped by the compiler.
+// GameLogger.LogError still works everywhere.</code></pre>
+        </div>
+
+        <h3>Full Checklist</h3>
+        <table>
+          <thead>
+            <tr><th>Category</th><th>Item</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Code</td><td>Remove or wrap all Debug.Log statements</td></tr>
+            <tr><td>Code</td><td>Delete any test/debug scripts (GameManagerTester, etc.)</td></tr>
+            <tr><td>Code</td><td>Verify no compiler warnings in the Console</td></tr>
+            <tr><td>Functionality</td><td>Test all features end-to-end: menu, gameplay, pause, game over, restart</td></tr>
+            <tr><td>Functionality</td><td>Verify the save system works (play a game, close the app, reopen &mdash; high score should persist)</td></tr>
+            <tr><td>Functionality</td><td>Test on minimum-spec target device</td></tr>
+            <tr><td>Performance</td><td>Run the Profiler and verify no major spikes (see Chapter 24)</td></tr>
+            <tr><td>Performance</td><td>Check draw call count on target device</td></tr>
+            <tr><td>Audio</td><td>Verify music and SFX play correctly and respect volume settings</td></tr>
+            <tr><td>UI</td><td>Test on different aspect ratios (16:9, 18:9, 20:9 for modern phones)</td></tr>
+            <tr><td>UI</td><td>Verify UI scales correctly on small and large screens</td></tr>
+            <tr><td>Build</td><td>Scenes In Build list is correct (right scenes, right order)</td></tr>
+            <tr><td>Build</td><td>Player Settings are configured (name, icon, version, orientation)</td></tr>
+            <tr><td>Build</td><td>Keystore is configured (Android only)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- SECTION: Build Size Optimization -->
+      <section>
+        <h2>Reducing Build Size</h2>
+        <p>A smaller build downloads faster and is more likely to be installed. Here are key strategies:</p>
+
+        <ul>
+          <li><strong>Texture Compression:</strong> Use ASTC (Android/iOS) and DXT (PC). Set Max Size to the minimum that still looks good (often 512x512 or 256x256 for mobile).</li>
+          <li><strong>Audio Compression:</strong> In the Audio Clip import settings, set music to <strong>Vorbis</strong> (compressed) with quality 50&ndash;70%. Set short SFX to <strong>ADPCM</strong> (fast decompression, smaller than PCM).</li>
+          <li><strong>Managed Stripping Level:</strong> In Player Settings &gt; Other Settings, set to <strong>Medium</strong> or <strong>High</strong>. This strips unused C# code from the build. If you get runtime errors, lower the stripping level.</li>
+          <li><strong>Remove Unused Assets:</strong> Delete any assets you are not using (unused textures, models, audio clips). They may still be included in the build if referenced anywhere.</li>
+          <li><strong>Analyze Build Report:</strong> After building, check the <strong>Editor.log</strong> file. Search for "Build Report" to see a breakdown of which assets consume the most space. The largest culprits are usually textures and audio.</li>
+        </ul>
+
+        <div class="callout tip">
+          <div class="callout-title">Finding the Editor Log</div>
+          <p>On Windows: <code>%LOCALAPPDATA%\Unity\Editor\Editor.log</code>. On macOS: <code>~/Library/Logs/Unity/Editor.log</code>. Open it in a text editor and search for "Build Report" to see a per-asset size breakdown.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: What's Next -->
+      <section>
+        <h2>What's Next?</h2>
+        <p>Congratulations! You have built a complete, production-quality infinite runner from scratch. But the journey does not have to end here. There are many features you could add to take your game to the next level:</p>
+
+        <h3>Features to Add</h3>
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>Description</th><th>Difficulty</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Multiple Characters</strong></td><td>Let players unlock and play as different characters with unique models and abilities.</td><td>Medium</td></tr>
+            <tr><td><strong>Themes / Environments</strong></td><td>Different visual themes (city, forest, space) that change the world generation.</td><td>Medium</td></tr>
+            <tr><td><strong>Daily Challenges</strong></td><td>Timed events with special rules and rewards.</td><td>Medium</td></tr>
+            <tr><td><strong>Leaderboards</strong></td><td>Online high scores using Unity Gaming Services or Firebase.</td><td>Hard</td></tr>
+            <tr><td><strong>Achievements</strong></td><td>"Run 10,000 meters total," "Collect 500 coins in one run," etc.</td><td>Medium</td></tr>
+            <tr><td><strong>Ads (Monetization)</strong></td><td>Rewarded video ads ("Watch an ad to continue") using Unity Ads or AdMob.</td><td>Medium</td></tr>
+            <tr><td><strong>In-App Purchases</strong></td><td>Coin packs, ad removal, exclusive characters using Unity IAP.</td><td>Hard</td></tr>
+            <tr><td><strong>Power-Ups</strong></td><td>Magnet (auto-collect coins), shield (survive one hit), 2x score multiplier.</td><td>Medium</td></tr>
+            <tr><td><strong>Missions / Quests</strong></td><td>"Collect 30 coins in one run" for bonus rewards.</td><td>Medium</td></tr>
+            <tr><td><strong>Haptic Feedback</strong></td><td>Phone vibration on coin collect, crash, etc. (mobile only).</td><td>Easy</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Where to Learn More</h3>
+        <ul>
+          <li><strong>Unity Learn</strong> (<a href="https://learn.unity.com" target="_blank" rel="noopener">learn.unity.com</a>) &mdash; Free official tutorials and courses on every Unity topic.</li>
+          <li><strong>Unity Documentation</strong> (<a href="https://docs.unity3d.com" target="_blank" rel="noopener">docs.unity3d.com</a>) &mdash; The official API reference. Bookmark this &mdash; you will use it constantly.</li>
+          <li><strong>Catlike Coding</strong> (<a href="https://catlikecoding.com/unity/tutorials/" target="_blank" rel="noopener">catlikecoding.com</a>) &mdash; Excellent in-depth tutorials on advanced Unity topics.</li>
+          <li><strong>Game Programming Patterns</strong> by Robert Nystrom (free online at <a href="https://gameprogrammingpatterns.com" target="_blank" rel="noopener">gameprogrammingpatterns.com</a>) &mdash; The definitive book on patterns like the ones we used (Singleton, State, Observer, Object Pool).</li>
+          <li><strong>Unity Forums and Reddit</strong> (r/Unity3D, r/gamedev) &mdash; Communities where you can ask questions and share your work.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Congratulations -->
+      <section>
+        <h2>Congratulations!</h2>
+        <p>You did it. Over 25 chapters, you went from zero to a fully-featured infinite runner game. Let us recap everything you built:</p>
+
+        <ul>
+          <li><strong>Part 1 (Foundations)</strong> &mdash; Set up Unity, learned the Editor, wrote your first C# code, and planned your project architecture.</li>
+          <li><strong>Part 2 (Core Systems)</strong> &mdash; Built a Game Manager with a state machine, an event system for decoupled communication, input handling for swipe and keyboard, a responsive player controller, and a smooth camera system.</li>
+          <li><strong>Part 3 (World Generation)</strong> &mdash; Created an infinite world with chunk-based generation, object pooling for zero-allocation runtime performance, procedural world layout, and origin shifting for floating-point precision.</li>
+          <li><strong>Part 4 (Gameplay)</strong> &mdash; Designed obstacles with different dodge patterns, collectible coins, a scoring system, and a difficulty curve that ramps up over time.</li>
+          <li><strong>Part 5 (Polish)</strong> &mdash; Added a complete UI system, audio with music and sound effects, particle effects for visual juice, and a full animation system with blend trees.</li>
+          <li><strong>Part 6 (Ship It)</strong> &mdash; Built a save system for persistent data, optimized performance for mobile, and learned how to build and publish for PC, Android, WebGL, and iOS.</li>
+        </ul>
+
+        <p>You did not just follow tutorials &mdash; you learned <strong>production-grade patterns</strong> that professional game developers use every day. The Singleton pattern, the State pattern, event-driven architecture, object pooling, and separation of concerns are skills that transfer to every game you will ever build.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Ship It!</div>
+          <p>The most important step in game development is <strong>finishing and releasing</strong>. Most game projects are abandoned before they are done. You now have the knowledge and the code to ship a real game. Do not wait until it is "perfect" &mdash; publish it, get feedback, and iterate. The first version is never the last. Ship it, learn from players, and build version 2. The world needs your game.</p>
+        </div>
+
+        <p>Thank you for following this entire guide. Now go build something amazing.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>This is it. The final commit. Your game is complete.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Complete infinite runner - ready for release"
+git push</code></pre>
+        </div>
+        <p>Run <code>git log --oneline</code> one last time. Look at that history — from "Initial project setup" to "Complete infinite runner." Every commit represents a system you built, a concept you learned, and a problem you solved. You didn't just build a game. You learned production-grade version control along the way. You created branches, merged features, pushed to GitHub, and built a clean commit history that any professional team would be proud of. <strong>That's not just a game — that's a portfolio piece.</strong></p>
+        <p>One final git concept — <strong>tags</strong>. Tags mark specific commits as release versions:</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git tag v1.0.0
+git push --tags</code></pre>
+        </div>
+        <p><code>v1.0.0</code> marks this as your first release. If you ever need to find the exact state of your game at launch, <code>git checkout v1.0.0</code> will take you right there.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="24-optimization.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Optimization</span></a>
+        <a href="../index.html" class="nav-next"><span class="nav-label">Finished!</span><span class="nav-title">Back to Home</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Controller - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link active"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 9</span>
+        <h1>Player Controller</h1>
+        <p class="chapter-desc">Build the character that runs, switches lanes, jumps, and slides &mdash; the heart of your infinite runner.</p>
+      </div>
+
+      <!-- SECTION: Player Setup -->
+      <section>
+        <h2>Setting Up the Player in the Scene</h2>
+        <p>Before we write any code, we need a player object in the scene. For now, we will use a simple capsule as a placeholder. You can replace it with a character model later.</p>
+
+        <ol class="steps">
+          <li>
+            <strong>Create the player root.</strong> In the Hierarchy, right-click and select <strong>Create Empty</strong>. Name it <code>Player</code>. Set its position to <code>(0, 0, 0)</code>.
+          </li>
+          <li>
+            <strong>Add the visual.</strong> Right-click the <code>Player</code> object and select <strong>3D Object &gt; Capsule</strong>. This creates a capsule as a child. Name it <code>PlayerModel</code>. Set its local position to <code>(0, 1, 0)</code> so it sits on the ground (the capsule is 2 units tall, centered at its origin).
+          </li>
+          <li>
+            <strong>Add a Rigidbody.</strong> Select the <code>Player</code> root object. Click <strong>Add Component &gt; Rigidbody</strong>. Configure it:
+            <ul>
+              <li><strong>Mass:</strong> 1</li>
+              <li><strong>Drag:</strong> 0</li>
+              <li><strong>Angular Drag:</strong> 0</li>
+              <li><strong>Use Gravity:</strong> Checked</li>
+              <li><strong>Is Kinematic:</strong> Unchecked</li>
+              <li><strong>Constraints &gt; Freeze Rotation:</strong> Check all three (X, Y, Z) &mdash; we do not want the player toppling over.</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Add a Collider.</strong> The Capsule child already has a CapsuleCollider (Unity adds one automatically). Select the <code>Player</code> root and add a <strong>CapsuleCollider</strong> there instead. Set <strong>Center</strong> to <code>(0, 1, 0)</code>, <strong>Radius</strong> to <code>0.5</code>, <strong>Height</strong> to <code>2</code>. Then remove the collider from the child <code>PlayerModel</code> to avoid double collisions.
+          </li>
+          <li>
+            <strong>Add a ground plane.</strong> Create a <strong>3D Object &gt; Plane</strong> at position <code>(0, 0, 0)</code>. Scale it to <code>(10, 1, 100)</code> so you have a long flat surface to test on.
+          </li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">Why Separate Root and Model?</div>
+          <p>The root object has the Rigidbody, Collider, and scripts. The child has only the visual mesh. This lets you swap the visual model (from a capsule to a character) without touching any of the gameplay components. It also lets you animate the model independently from the physics.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Lane System -->
+      <section>
+        <h2>The Lane System</h2>
+        <p>In a 3-lane runner like Subway Surfers, the player can be in one of three lanes:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Lane Positions</span><span class="lang-badge">Diagram</span></div>
+          <pre><code>  Left Lane    Center Lane    Right Lane
+   x = -3        x = 0         x = +3
+
+    [ ]           [P]            [ ]
+  ─────────────────────────────────────
+         ← 3 units →  ← 3 units →
+
+  The player starts in the center lane (x = 0).
+  Pressing LEFT moves to x = -3.
+  Pressing RIGHT moves to x = +3.
+  You cannot go further left than -3 or further right than +3.</code></pre>
+        </div>
+
+        <p>We track the player's lane as an integer: -1 (left), 0 (center), or 1 (right). Then we multiply by a <code>laneWidth</code> constant to get the actual X position.</p>
+      </section>
+
+      <!-- SECTION: Player State Machine -->
+      <section>
+        <h2>Player State Machine</h2>
+        <p>Just like the Game Manager has states, our player has states too. The player is always in one of these states:</p>
+
+        <table>
+          <thead>
+            <tr><th>State</th><th>Description</th><th>Can Transition To</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Running</strong></td><td>Normal running on the ground</td><td>Jumping, Sliding, Dead</td></tr>
+            <tr><td><strong>Jumping</strong></td><td>In the air after a jump</td><td>Running (on landing), Dead</td></tr>
+            <tr><td><strong>Sliding</strong></td><td>Ducking under obstacles</td><td>Running (after slide ends), Dead</td></tr>
+            <tr><td><strong>Dead</strong></td><td>Hit an obstacle, game over</td><td>None (game restarts)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Player
+{
+    /// &lt;summary&gt;
+    /// All possible states the player character can be in.
+    /// &lt;/summary&gt;
+    public enum PlayerState
+    {
+        Running,
+        Jumping,
+        Sliding,
+        Dead
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Player/PlayerState.cs</code>.</p>
+      </section>
+
+      <!-- SECTION: Full PlayerController -->
+      <section>
+        <h2>The Full PlayerController Script</h2>
+        <p>This is the main player script. It handles lane switching, jumping, sliding, ground detection, and collision. Every line is commented for beginners.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerController.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using UnityEngine;
+using InfiniteRunner.Input;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Player
+{
+    /// &lt;summary&gt;
+    /// Controls the player character: lane switching, jumping,
+    /// sliding, forward movement, and collision detection.
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Rigidbody))]
+    [RequireComponent(typeof(CapsuleCollider))]
+    public class PlayerController : MonoBehaviour
+    {
+        // ─── Inspector Fields ───────────────────────────────────
+
+        [Header("References")]
+        [Tooltip("The InputReader ScriptableObject asset.")]
+        [SerializeField] private InputReader inputReader;
+
+        [Tooltip("The child object with the visual model (capsule or character).")]
+        [SerializeField] private Transform playerModel;
+
+        [Header("Lane Settings")]
+        [Tooltip("Distance between lane centers in world units.")]
+        [SerializeField] private float laneWidth = 3f;
+
+        [Tooltip("How fast the player moves between lanes (units/sec).")]
+        [SerializeField] private float laneSwitchSpeed = 10f;
+
+        [Header("Forward Movement")]
+        [Tooltip("Starting forward speed (units/sec).")]
+        [SerializeField] private float baseForwardSpeed = 10f;
+
+        [Tooltip("Current forward speed. Increases with difficulty.")]
+        [SerializeField] private float forwardSpeed = 10f;
+
+        [Header("Jump Settings")]
+        [Tooltip("Upward force applied when jumping.")]
+        [SerializeField] private float jumpForce = 10f;
+
+        [Tooltip("Extra gravity multiplier for falling (makes jump feel snappy).")]
+        [SerializeField] private float fallMultiplier = 2.5f;
+
+        [Tooltip("Reduced gravity multiplier when holding jump (for variable height).")]
+        [SerializeField] private float lowJumpMultiplier = 2f;
+
+        [Header("Slide Settings")]
+        [Tooltip("How long the slide lasts in seconds.")]
+        [SerializeField] private float slideDuration = 0.8f;
+
+        [Tooltip("Collider height during slide.")]
+        [SerializeField] private float slideColliderHeight = 0.5f;
+
+        [Tooltip("Collider center Y during slide.")]
+        [SerializeField] private float slideColliderCenterY = 0.25f;
+
+        [Header("Ground Detection")]
+        [Tooltip("Length of the ground-check raycast.")]
+        [SerializeField] private float groundCheckDistance = 0.3f;
+
+        [Tooltip("Layers considered as ground.")]
+        [SerializeField] private LayerMask groundLayer;
+
+        // ─── Events ────────────────────────────────────────────
+
+        /// &lt;summary&gt;Fired when the player dies (hits an obstacle).&lt;/summary&gt;
+        public event Action OnPlayerDied;
+
+        /// &lt;summary&gt;Fired when the player collects a coin.&lt;/summary&gt;
+        public event Action OnCoinCollected;
+
+        // ─── Private Fields ────────────────────────────────────
+
+        private Rigidbody _rb;
+        private CapsuleCollider _collider;
+
+        // Lane tracking: -1 = left, 0 = center, 1 = right
+        private int _currentLane = 0;
+        private float _targetXPosition = 0f;
+
+        // State
+        private PlayerState _currentState = PlayerState.Running;
+
+        // Slide timer
+        private float _slideTimer = 0f;
+
+        // Original collider values (saved before slide, restored after)
+        private float _originalColliderHeight;
+        private Vector3 _originalColliderCenter;
+
+        // Ground check
+        private bool _isGrounded;
+
+        // ─── Properties ────────────────────────────────────────
+
+        /// &lt;summary&gt;The current player state.&lt;/summary&gt;
+        public PlayerState CurrentState =&gt; _currentState;
+
+        /// &lt;summary&gt;Is the player on the ground?&lt;/summary&gt;
+        public bool IsGrounded =&gt; _isGrounded;
+
+        /// &lt;summary&gt;Current forward speed (read by camera, scoring, etc.).&lt;/summary&gt;
+        public float ForwardSpeed =&gt; forwardSpeed;
+
+        // ─── Unity Lifecycle ───────────────────────────────────
+
+        private void Awake()
+        {
+            _rb = GetComponent&lt;Rigidbody&gt;();
+            _collider = GetComponent&lt;CapsuleCollider&gt;();
+
+            // Save original collider dimensions for restoring after slide
+            _originalColliderHeight = _collider.height;
+            _originalColliderCenter = _collider.center;
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to input events
+            if (inputReader != null)
+            {
+                inputReader.OnMoveInput += HandleMoveInput;
+                inputReader.OnJumpInput += HandleJumpInput;
+                inputReader.OnSlideInput += HandleSlideInput;
+            }
+        }
+
+        private void OnDisable()
+        {
+            // Unsubscribe from input events
+            if (inputReader != null)
+            {
+                inputReader.OnMoveInput -= HandleMoveInput;
+                inputReader.OnJumpInput -= HandleJumpInput;
+                inputReader.OnSlideInput -= HandleSlideInput;
+            }
+        }
+
+        private void Update()
+        {
+            // Do nothing if dead
+            if (_currentState == PlayerState.Dead) return;
+
+            // Check if the game is actually playing
+            if (GameManager.Instance != null &amp;&amp;
+                GameManager.Instance.CurrentState != GameState.Playing) return;
+
+            // Update subsystems
+            CheckGrounded();
+            UpdateLanePosition();
+            UpdateSlide();
+        }
+
+        private void FixedUpdate()
+        {
+            // Do nothing if dead
+            if (_currentState == PlayerState.Dead) return;
+
+            if (GameManager.Instance != null &amp;&amp;
+                GameManager.Instance.CurrentState != GameState.Playing) return;
+
+            // Move forward
+            MoveForward();
+
+            // Apply enhanced gravity for snappy jumps
+            ApplyGravityMultiplier();
+        }
+
+        // ─── Input Handlers ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Called when the player presses left or right.
+        /// direction: -1 for left, +1 for right.
+        /// &lt;/summary&gt;
+        private void HandleMoveInput(int direction)
+        {
+            if (_currentState == PlayerState.Dead) return;
+
+            // Calculate the new lane
+            int newLane = _currentLane + direction;
+
+            // Clamp to valid lane range: -1, 0, or 1
+            newLane = Mathf.Clamp(newLane, -1, 1);
+
+            // If we are already at the edge, do nothing
+            if (newLane == _currentLane) return;
+
+            // Update the current lane and target position
+            _currentLane = newLane;
+            _targetXPosition = _currentLane * laneWidth;
+
+            Debug.Log($"[Player] Switching to lane {_currentLane} " +
+                      $"(x = {_targetXPosition})");
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player presses jump.
+        /// &lt;/summary&gt;
+        private void HandleJumpInput()
+        {
+            // Can only jump if running on the ground
+            if (_currentState != PlayerState.Running || !_isGrounded) return;
+
+            _currentState = PlayerState.Jumping;
+
+            // Apply upward force
+            // ForceMode.Impulse = instant burst of force (good for jumps)
+            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+            Debug.Log("[Player] JUMP!");
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player presses slide.
+        /// &lt;/summary&gt;
+        private void HandleSlideInput()
+        {
+            // Can only slide if running on the ground
+            if (_currentState != PlayerState.Running || !_isGrounded) return;
+
+            StartSlide();
+        }
+
+        // ─── Forward Movement ──────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Moves the player forward along the Z axis every physics frame.
+        /// Called in FixedUpdate for consistent physics.
+        /// &lt;/summary&gt;
+        private void MoveForward()
+        {
+            Vector3 forwardMovement = Vector3.forward * forwardSpeed * Time.fixedDeltaTime;
+            _rb.MovePosition(_rb.position + forwardMovement);
+        }
+
+        // ─── Lane Switching ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Smoothly moves the player toward the target lane position.
+        /// Called in Update for smooth visual movement.
+        /// &lt;/summary&gt;
+        private void UpdateLanePosition()
+        {
+            // Get current position
+            Vector3 position = transform.position;
+
+            // Are we already at the target?
+            if (Mathf.Approximately(position.x, _targetXPosition)) return;
+
+            // Move toward target X using MoveTowards (constant speed)
+            float newX = Mathf.MoveTowards(
+                position.x,
+                _targetXPosition,
+                laneSwitchSpeed * Time.deltaTime
+            );
+
+            // Apply the new position (only changing X)
+            transform.position = new Vector3(newX, position.y, position.z);
+        }
+
+        // ─── Jump Mechanics ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Applies extra gravity when falling for a snappier jump feel.
+        /// Without this, jumps feel floaty and slow.
+        ///
+        /// The idea: when falling (velocity.y is negative), multiply gravity.
+        /// When rising but not holding jump, also multiply gravity slightly
+        /// so the jump arc is shorter (variable jump height).
+        /// &lt;/summary&gt;
+        private void ApplyGravityMultiplier()
+        {
+            if (_rb.linearVelocity.y &lt; 0)
+            {
+                // Falling: apply extra downward force
+                // (fallMultiplier - 1) because default gravity is already applied
+                _rb.linearVelocity += Vector3.up *
+                    Physics.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
+            }
+            else if (_rb.linearVelocity.y &gt; 0)
+            {
+                // Rising: apply slightly less gravity for a higher peak
+                _rb.linearVelocity += Vector3.up *
+                    Physics.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
+            }
+        }
+
+        // ─── Ground Detection ──────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Checks if the player is standing on the ground using a SphereCast.
+        /// SphereCast is like a fat raycast — more reliable on uneven surfaces.
+        /// &lt;/summary&gt;
+        private void CheckGrounded()
+        {
+            // Cast a small sphere downward from the player's feet
+            Vector3 origin = transform.position + Vector3.up * 0.1f;
+            float radius = 0.2f;
+
+            _isGrounded = Physics.SphereCast(
+                origin,
+                radius,
+                Vector3.down,
+                out RaycastHit hit,
+                groundCheckDistance,
+                groundLayer
+            );
+
+            // If we just landed and were jumping, go back to Running
+            if (_isGrounded &amp;&amp; _currentState == PlayerState.Jumping)
+            {
+                _currentState = PlayerState.Running;
+                Debug.Log("[Player] Landed — back to Running");
+            }
+
+            // Debug visualization (visible in Scene view)
+            UnityEngine.Debug.DrawRay(
+                origin,
+                Vector3.down * groundCheckDistance,
+                _isGrounded ? Color.green : Color.red
+            );
+        }
+
+        // ─── Slide Mechanics ───────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Starts the slide: shrinks the collider and starts the timer.
+        /// &lt;/summary&gt;
+        private void StartSlide()
+        {
+            _currentState = PlayerState.Sliding;
+            _slideTimer = slideDuration;
+
+            // Shrink the collider so the player fits under obstacles
+            _collider.height = slideColliderHeight;
+            _collider.center = new Vector3(0f, slideColliderCenterY, 0f);
+
+            // Scale down the model visually (temporary — replace with animation later)
+            if (playerModel != null)
+            {
+                playerModel.localScale = new Vector3(1f, 0.5f, 1f);
+                playerModel.localPosition = new Vector3(0f, 0.5f, 0f);
+            }
+
+            Debug.Log("[Player] SLIDE started!");
+        }
+
+        /// &lt;summary&gt;
+        /// Updates the slide timer. Ends the slide when time runs out.
+        /// Called every frame from Update().
+        /// &lt;/summary&gt;
+        private void UpdateSlide()
+        {
+            if (_currentState != PlayerState.Sliding) return;
+
+            _slideTimer -= Time.deltaTime;
+
+            if (_slideTimer &lt;= 0f)
+            {
+                EndSlide();
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Ends the slide: restores the collider and model.
+        /// &lt;/summary&gt;
+        private void EndSlide()
+        {
+            _currentState = PlayerState.Running;
+
+            // Restore the original collider dimensions
+            _collider.height = _originalColliderHeight;
+            _collider.center = _originalColliderCenter;
+
+            // Restore the model scale (temporary — replace with animation later)
+            if (playerModel != null)
+            {
+                playerModel.localScale = Vector3.one;
+                playerModel.localPosition = new Vector3(0f, 1f, 0f);
+            }
+
+            Debug.Log("[Player] SLIDE ended, back to Running");
+        }
+
+        // ─── Collision Detection ───────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Called by Unity when the player's collider touches a trigger collider.
+        /// Obstacles and coins should have "Is Trigger" checked on their colliders.
+        /// &lt;/summary&gt;
+        private void OnTriggerEnter(Collider other)
+        {
+            // Check the tag of whatever we collided with
+            if (other.CompareTag("Obstacle"))
+            {
+                Die();
+            }
+            else if (other.CompareTag("Coin"))
+            {
+                CollectCoin(other.gameObject);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Handles the player's death: stops movement and notifies the game.
+        /// &lt;/summary&gt;
+        private void Die()
+        {
+            if (_currentState == PlayerState.Dead) return;
+
+            _currentState = PlayerState.Dead;
+
+            // Stop all movement
+            _rb.linearVelocity = Vector3.zero;
+            forwardSpeed = 0f;
+
+            Debug.Log("[Player] DIED!");
+
+            // Notify listeners (GameManager, UI, etc.)
+            OnPlayerDied?.Invoke();
+
+            // Tell the GameManager the game is over
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.EndGame();
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Handles coin collection: destroys the coin and notifies listeners.
+        /// &lt;/summary&gt;
+        private void CollectCoin(GameObject coin)
+        {
+            Debug.Log("[Player] Collected a coin!");
+
+            // Disable the coin (we will use object pooling later instead of Destroy)
+            coin.SetActive(false);
+
+            // Notify listeners (ScoreManager, AudioManager, etc.)
+            OnCoinCollected?.Invoke();
+        }
+
+        // ─── Public Methods ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Resets the player to their starting state.
+        /// Called when restarting the game.
+        /// &lt;/summary&gt;
+        public void ResetPlayer()
+        {
+            _currentState = PlayerState.Running;
+            _currentLane = 0;
+            _targetXPosition = 0f;
+            forwardSpeed = baseForwardSpeed;
+
+            transform.position = Vector3.zero;
+            _rb.linearVelocity = Vector3.zero;
+
+            // Restore collider in case we died during a slide
+            _collider.height = _originalColliderHeight;
+            _collider.center = _originalColliderCenter;
+
+            if (playerModel != null)
+            {
+                playerModel.localScale = Vector3.one;
+                playerModel.localPosition = new Vector3(0f, 1f, 0f);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Increases the forward speed. Called by the difficulty system.
+        /// &lt;/summary&gt;
+        public void SetForwardSpeed(float newSpeed)
+        {
+            forwardSpeed = newSpeed;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Player/PlayerController.cs</code>.</p>
+      </section>
+
+      <!-- SECTION: Detailed Explanations -->
+      <section>
+        <h2>Key Concepts Explained</h2>
+
+        <h3>Smooth Lane Switching with MoveTowards</h3>
+        <p>When the player presses left or right, we do not teleport them instantly. Instead, we use <code>Mathf.MoveTowards()</code> which moves a value toward a target at a constant speed:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">MoveTowards Explanation</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Mathf.MoveTowards(current, target, maxStep)
+// current = where we are now (e.g., x = 0)
+// target  = where we want to be (e.g., x = 3)
+// maxStep = maximum distance to move this frame
+
+float newX = Mathf.MoveTowards(
+    position.x,          // current X: 0
+    _targetXPosition,    // target X: 3
+    laneSwitchSpeed * Time.deltaTime  // max step: 10 * 0.016 = 0.16
+);
+// Result: newX = 0.16 (moved a tiny bit toward 3)
+// Next frame: newX = 0.32
+// ...continues until newX reaches 3.0</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">MoveTowards vs Lerp</div>
+          <p><code>MoveTowards</code> moves at a <strong>constant speed</strong> &mdash; same distance every frame, like a car at cruise control. <code>Lerp</code> moves at a <strong>decreasing speed</strong> &mdash; fast at first, then slower as it approaches the target, like a car braking. MoveTowards feels more responsive for lane switching. Lerp feels smoother but can feel sluggish near the end. We use MoveTowards here for crisp, predictable movement.</p>
+        </div>
+
+        <h3>Gravity Multiplier for Snappy Jumps</h3>
+        <p>In real life, you go up and come down at the same speed. In games, this feels terrible &mdash; floaty and unresponsive. Professional platformers (like Mario) make the player fall faster than they rise. Here is the trick:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Jump Feel Comparison</span><span class="lang-badge">Diagram</span></div>
+          <pre><code>  Default Physics (floaty):        With Gravity Multiplier (snappy):
+
+       *  *                              *  *
+     *      *                          *      *
+    *        *                        *          *
+   *          *                      *            *
+  *            *                    *               *
+  ──────────────                   ───────────────────
+  Symmetric arc                    Falls faster than rising
+  Feels "moon-like"                Feels responsive and tight</code></pre>
+        </div>
+
+        <p>The code adds extra downward force when the player is falling (<code>velocity.y &lt; 0</code>). The <code>fallMultiplier</code> of 2.5 means gravity is 2.5x stronger when falling. Tweak this value until the jump "feels right."</p>
+
+        <h3>Ground Detection with SphereCast</h3>
+        <p>We need to know if the player is on the ground (to prevent double-jumping). A simple raycast shoots a thin line downward &mdash; but if the player is near the edge of a platform, the ray might miss. A <strong>SphereCast</strong> is like a fat raycast that sweeps a sphere through space, making it much more reliable.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">SphereCast vs Raycast</span><span class="lang-badge">Diagram</span></div>
+          <pre><code>  Raycast (thin line):          SphereCast (fat sweep):
+
+     |                              (   )
+     |                             (     )
+     |                            (       )
+     v                             (     )
+  ───┼───                          ──(─)──
+  Misses edge!                    Catches edge!</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Setting Up Tags and Layers -->
+      <section>
+        <h2>Setting Up Tags and Layers</h2>
+        <p>Our collision detection uses tags. Let us set them up:</p>
+
+        <ol class="steps">
+          <li>Go to <strong>Edit &gt; Project Settings &gt; Tags and Layers</strong>.</li>
+          <li>Under <strong>Tags</strong>, add: <code>Obstacle</code> and <code>Coin</code>.</li>
+          <li>Under <strong>Layers</strong>, add: <code>Ground</code> (use an empty user layer, e.g., Layer 6).</li>
+          <li>Select your ground plane and set its <strong>Layer</strong> to <code>Ground</code>.</li>
+          <li>On the <code>Player</code> object's <code>PlayerController</code> component, set the <strong>Ground Layer</strong> mask to include only the <code>Ground</code> layer.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Do Not Forget the Ground Layer!</div>
+          <p>If you leave the Ground Layer mask empty, the SphereCast will never detect ground, <code>_isGrounded</code> will always be <code>false</code>, and the player will never be able to jump. This is the number one bug beginners encounter with this system.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Wiring Up in the Inspector -->
+      <section>
+        <h2>Wiring Everything Up</h2>
+
+        <ol class="steps">
+          <li>Select the <code>Player</code> GameObject.</li>
+          <li>Add the <code>PlayerController</code> component (<strong>Add Component &gt; PlayerController</strong>).</li>
+          <li>Drag the <code>InputReader</code> ScriptableObject asset into the <strong>Input Reader</strong> field.</li>
+          <li>Drag the <code>PlayerModel</code> child object into the <strong>Player Model</strong> field.</li>
+          <li>Set <strong>Ground Layer</strong> to the <code>Ground</code> layer.</li>
+          <li>Leave the other values at their defaults for now. You can tweak them later.</li>
+        </ol>
+      </section>
+
+      <!-- SECTION: Testing -->
+      <section>
+        <h2>Testing the Player</h2>
+
+        <ol class="steps">
+          <li>Press <strong>Play</strong>.</li>
+          <li>Press <strong>A</strong> or <strong>Left Arrow</strong> &mdash; the player should slide smoothly to the left lane (x = -3).</li>
+          <li>Press <strong>D</strong> or <strong>Right Arrow</strong> &mdash; the player should slide back to center, then to the right lane.</li>
+          <li>Press <strong>Space</strong> &mdash; the player should jump and come back down quickly (snappy gravity).</li>
+          <li>Press <strong>S</strong> or <strong>Down Arrow</strong> &mdash; the player should shrink down (slide) for 0.8 seconds, then pop back up.</li>
+          <li>The player should be moving forward continuously along the Z axis.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Tweaking the Feel</div>
+          <p>Game feel is everything in a runner. Here are some starting values, but tweak them until it feels right to YOU:</p>
+          <ul>
+            <li><strong>Jump Force:</strong> 10 (higher = jump higher)</li>
+            <li><strong>Fall Multiplier:</strong> 2.5 (higher = fall faster)</li>
+            <li><strong>Lane Switch Speed:</strong> 10 (higher = snap to lane faster)</li>
+            <li><strong>Forward Speed:</strong> 10 (higher = run faster)</li>
+            <li><strong>Slide Duration:</strong> 0.8 (longer = more forgiving)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- SECTION: Project Files -->
+      <section>
+        <h2>Project Files After This Chapter</h2>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Scripts/
+    Player/
+      PlayerState.cs          &lt;-- Enum: Running, Jumping, Sliding, Dead
+      PlayerController.cs     &lt;-- Main player logic (this chapter)
+    Input/
+      InputReader.cs          &lt;-- Input wrapper (Chapter 8)
+      SwipeDetector.cs        &lt;-- Touch input (Chapter 8)
+    Core/
+      GameManager.cs          &lt;-- Game state manager (Chapter 6)
+      Singleton.cs            &lt;-- Singleton base class (Chapter 6)
+    Events/
+      GameEvent.cs            &lt;-- Event system (Chapter 7)</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Physics Layers & Collision Matrix -->
+      <section>
+        <h2>Physics Layers &amp; Collision Matrix</h2>
+
+        <h3>Why Layers Matter</h3>
+        <p>Right now, Unity checks <strong>every</strong> collider against <strong>every other</strong> collider in the scene. Coins check collision with obstacles. Obstacles check collision with other obstacles. The ground checks collision with coins. All of it is wasteful, and worse, it causes phantom triggers &mdash; a coin might accidentally trigger a collision callback on an obstacle, or two obstacles might push each other around in ways you never intended.</p>
+        <p><strong>Physics layers</strong> let you control exactly what collides with what. You assign each GameObject a layer, then use the <strong>Collision Matrix</strong> to specify which layer pairs should interact. Objects on layers that are unchecked against each other are completely invisible to each other in the physics system &mdash; no collision, no triggers, no raycasts (unless you specifically ask for that layer).</p>
+
+        <h3>Creating Custom Layers</h3>
+        <p>Follow these steps to set up the layers your infinite runner needs:</p>
+
+        <ol class="steps">
+          <li>Go to <strong>Edit &gt; Project Settings &gt; Tags and Layers</strong>.</li>
+          <li>Open the <strong>Layers</strong> section. Be careful: there are three sections on this page &mdash; Tags, Sorting Layers, and Layers. You want the third one, simply called <strong>Layers</strong>.</li>
+          <li>
+            Unity reserves Layers 0 through 7 for built-in use (<code>Default</code>, <code>TransparentFX</code>, <code>Ignore Raycast</code>, <code>Water</code>, <code>UI</code>, etc.). You cannot edit these. Use <strong>Layer 8 and above</strong> for your custom layers.
+          </li>
+          <li>
+            Create the following custom layers:
+            <table>
+              <thead>
+                <tr><th>Layer Number</th><th>Layer Name</th><th>Purpose</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>8</td><td><code>Player</code></td><td>The player character</td></tr>
+                <tr><td>9</td><td><code>Ground</code></td><td>Ground tiles and platforms</td></tr>
+                <tr><td>10</td><td><code>Obstacle</code></td><td>Barriers, trains, cars &mdash; things that kill the player</td></tr>
+                <tr><td>11</td><td><code>Collectible</code></td><td>Coins, gems, and other pickups</td></tr>
+                <tr><td>12</td><td><code>PowerUp</code></td><td>Magnets, shields, score multipliers</td></tr>
+              </tbody>
+            </table>
+          </li>
+        </ol>
+
+        <h3>Assigning Layers to GameObjects</h3>
+        <p>Once the layers exist, you need to assign them to your objects:</p>
+
+        <ol class="steps">
+          <li>Select a GameObject in the Hierarchy or Project window.</li>
+          <li>At the very top of the Inspector, you will see a <strong>Layer</strong> dropdown (next to the Tag dropdown). Click it and choose the correct layer.</li>
+          <li>When you set a layer on a <strong>parent</strong> object, Unity asks: <em>"Do you want to set layer for all child objects?"</em> In most cases, click <strong>Yes, change children</strong>. This ensures the colliders on child objects are also on the correct layer.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Set Layers on Prefabs, Not Just Scene Objects</div>
+          <p>If you set the layer on a scene object but not the prefab, every newly spawned or pooled instance will use the prefab's layer (probably <code>Default</code>) instead of the one you set. Always open the prefab and set the layer there. This is especially important once you start using object pooling in Chapter 12 &mdash; pooled objects are instantiated from prefabs, so the prefab must have the right layer.</p>
+        </div>
+
+        <h3>The Collision Matrix</h3>
+        <p>The collision matrix is where the real power of layers comes in. It is a grid that shows every possible layer-to-layer combination, and you can check or uncheck each one.</p>
+
+        <ol class="steps">
+          <li>Go to <strong>Edit &gt; Project Settings &gt; Physics</strong> (for 3D projects).</li>
+          <li>Scroll all the way to the bottom. You will see the <strong>Layer Collision Matrix</strong> &mdash; a triangular grid of checkboxes.</li>
+          <li>Each checkbox represents a pair of layers. If the box is checked, those two layers <strong>can</strong> collide. If unchecked, objects on those layers are completely invisible to each other in the physics system.</li>
+        </ol>
+
+        <p>Here is the recommended collision matrix for our infinite runner. A check mark means the pair should collide; a dash means it should not:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Player</th>
+              <th>Ground</th>
+              <th>Obstacle</th>
+              <th>Collectible</th>
+              <th>PowerUp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Player</strong></td>
+              <td>&mdash;</td>
+              <td>ON</td>
+              <td>ON</td>
+              <td>ON</td>
+              <td>ON</td>
+            </tr>
+            <tr>
+              <td><strong>Ground</strong></td>
+              <td>ON</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>Obstacle</strong></td>
+              <td>ON</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>Collectible</strong></td>
+              <td>ON</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>PowerUp</strong></td>
+              <td>ON</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+              <td>&mdash;</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Notice the pattern: the <strong>Player</strong> interacts with everything it needs to (Ground for landing, Obstacle for death, Collectible for pickup, PowerUp for activation). But obstacles do not need to detect each other. Coins do not need to detect obstacles. The ground does not care about coins. By turning off these unnecessary pairs, you reduce the physics workload and eliminate phantom collisions.</p>
+
+        <h3>Layer Masks in Code</h3>
+        <p>Layers are not just for the collision matrix. You can use them in your code to make raycasts and overlap checks more efficient and more accurate. Remember the <code>groundLayer</code> field in our PlayerController?</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">LayerMask in Ground Detection</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Ground check raycast — only check the Ground layer
+[SerializeField] private LayerMask groundLayer;
+
+private bool IsGrounded()
+{
+    return Physics.Raycast(
+        transform.position,
+        Vector3.down,
+        1.1f,
+        groundLayer  // Only checks this layer!
+    );
+}</code></pre>
+        </div>
+
+        <p>The <code>LayerMask</code> type is a <code>SerializeField</code>, so it appears as a dropdown in the Inspector where you can pick one or more layers. When you pass it to <code>Physics.Raycast</code>, <code>Physics.SphereCast</code>, or any physics query, Unity only checks colliders on the selected layers. Everything else is ignored.</p>
+
+        <p>This has two major benefits:</p>
+        <ul>
+          <li><strong>Performance:</strong> The raycast does not waste time checking colliders on irrelevant layers. In a scene with hundreds of coins and obstacles, this matters.</li>
+          <li><strong>Correctness:</strong> Without a layer mask, a downward raycast might hit a coin floating near the ground and falsely report the player as "grounded." With the mask set to <code>Ground</code> only, this cannot happen.</li>
+        </ul>
+
+        <div class="callout tip">
+          <div class="callout-title">Set Up Layers Early</div>
+          <p>Set up your layers and collision matrix <strong>now</strong>, before you have dozens of objects in your scene. Retrofitting layers later means going through every prefab and every script that does raycasting. Do it once, do it right. Your future self will thank you.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Game Feel & Juice -->
+      <section>
+        <h2>Game Feel &amp; Juice</h2>
+
+        <h3>What Is "Game Feel"?</h3>
+        <p>Your player controller works. The player runs, switches lanes, jumps, and slides. But does it <em>feel good</em>? Game feel is the difference between a prototype and a game people actually enjoy playing. It is the responsiveness, the weight, the satisfaction of every movement.</p>
+        <p>Games like Celeste, Hollow Knight, and yes &mdash; Subway Surfers &mdash; feel incredible not because they have complex mechanics, but because their developers spent an enormous amount of effort tuning the <strong>feel</strong> of those mechanics. You can have two games with identical features that feel completely different: one sluggish and frustrating, the other tight and addictive. The difference is game feel.</p>
+
+        <h3>Making Jumps Feel Good</h3>
+        <p>The biggest game-feel problem beginners encounter is that realistic physics makes jumps feel floaty and unresponsive. In reality, gravity pulls you down at the same rate whether you are rising or falling. In games, this symmetric arc feels terrible. Here are three techniques the professionals use:</p>
+
+        <h4>Technique 1: Gravity Multiplier</h4>
+        <p>We already have this in our PlayerController, but let us understand why it matters. The idea is simple: make the player fall faster than they rise. This creates an asymmetric jump arc that feels snappy and responsive.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Gravity Multiplier (already in PlayerController)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// In FixedUpdate, after jump:
+if (rb.linearVelocity.y &lt; 0)
+{
+    // Falling — increase gravity for snappy descent
+    rb.linearVelocity += Vector3.up *
+        Physics.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
+}</code></pre>
+        </div>
+
+        <p>A <code>fallMultiplier</code> of <strong>2.5 to 3.5</strong> feels great for most runners. Higher values make the descent snappier. Lower values feel floatier. Start at 2.5 and adjust from there. This single tweak transforms a floaty prototype jump into something that feels professional.</p>
+
+        <h4>Technique 2: Coyote Time</h4>
+        <p>Named after the cartoon coyote who runs off a cliff and hangs in the air for a moment before falling, coyote time lets players jump for a brief window <strong>after</strong> they have left a platform. Without it, players who press jump one frame too late get no jump, even though they felt like they were still on the ground. The result: they blame the game for being unresponsive.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Coyote Time Implementation</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">private float coyoteTimeCounter;
+[SerializeField] private float coyoteTimeDuration = 0.15f;
+
+void Update()
+{
+    if (isGrounded)
+    {
+        coyoteTimeCounter = coyoteTimeDuration;
+    }
+    else
+    {
+        coyoteTimeCounter -= Time.deltaTime;
+    }
+
+    // Allow jump if grounded OR within coyote time window
+    if (jumpPressed &amp;&amp; coyoteTimeCounter &gt; 0f)
+    {
+        Jump();
+        coyoteTimeCounter = 0f;  // Consume the coyote time
+    }
+}</code></pre>
+        </div>
+
+        <p>The sweet spot is <strong>0.1 to 0.2 seconds</strong>. Players will not notice it consciously &mdash; nobody will say "thanks for the coyote time!" But they <em>will</em> notice its absence. Without it, a game feels punishing. With it, it feels forgiving and fair.</p>
+
+        <h4>Technique 3: Jump Buffering</h4>
+        <p>Jump buffering solves the opposite problem: what if the player presses jump slightly <strong>before</strong> they land? Without buffering, the input is "eaten" &mdash; the player was in the air, so the jump input was ignored, and by the time they land the button press is gone. The player feels like the game dropped their input.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Jump Buffer Implementation</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">private float jumpBufferCounter;
+[SerializeField] private float jumpBufferDuration = 0.1f;
+
+void Update()
+{
+    if (jumpPressed)
+    {
+        jumpBufferCounter = jumpBufferDuration;
+    }
+    else
+    {
+        jumpBufferCounter -= Time.deltaTime;
+    }
+
+    if (isGrounded &amp;&amp; jumpBufferCounter &gt; 0f)
+    {
+        Jump();
+        jumpBufferCounter = 0f;  // Consume the buffer
+    }
+}</code></pre>
+        </div>
+
+        <p>If the player presses jump 0.1 seconds before landing, the jump input is remembered and fires the moment they touch down. Without this, the input vanishes and the player feels the game is unresponsive. A buffer duration of <strong>0.1 seconds</strong> is enough &mdash; longer and you risk accidental double-jumps.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Coyote Time + Jump Buffer = Magic</div>
+          <p>Coyote time handles "pressed jump slightly after leaving the ground." Jump buffering handles "pressed jump slightly before reaching the ground." Together, they cover both sides of the timing window and make your jumps feel incredibly forgiving without the player ever noticing the assist. Every great platformer uses both.</p>
+        </div>
+
+        <h3>Lane Switching Feel</h3>
+        <p>Our current lane switching uses <code>Mathf.MoveTowards</code>, which moves at a constant speed. This works, but there are ways to make it feel even better.</p>
+
+        <p><strong>Do not teleport between lanes.</strong> Instant teleportation looks jarring and makes it hard for the player to track their character. But do not make the transition too slow either &mdash; players need to dodge obstacles quickly. The sweet spot for <code>laneSwitchSpeed</code> is <strong>8 to 12 units per second</strong>. Test it and adjust based on how fast your game runs.</p>
+
+        <p>For extra polish, consider using <code>Mathf.SmoothDamp</code> instead of <code>MoveTowards</code>. SmoothDamp creates a natural ease-in, ease-out motion that feels more organic:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">SmoothDamp Lane Switching</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Instead of linear MoveTowards, use SmoothDamp for natural feel:
+private float xVelocity;
+float smoothX = Mathf.SmoothDamp(
+    transform.position.x,
+    targetLaneX,
+    ref xVelocity,
+    0.08f  // smooth time — lower = snappier
+);</code></pre>
+        </div>
+
+        <p>The <code>smoothTime</code> parameter controls how long the transition takes. A value of <strong>0.08</strong> is very snappy. A value of <strong>0.15</strong> is smoother but might feel sluggish in a fast-paced runner. <code>SmoothDamp</code> also produces a slight overshoot-and-settle effect that adds a sense of weight to the movement. Try both <code>MoveTowards</code> and <code>SmoothDamp</code> and pick the one that feels right for your game.</p>
+
+        <h3>Screen Shake</h3>
+        <p>A brief camera shake adds a sense of weight and impact to events. Keep it <strong>short</strong> (0.1 to 0.2 seconds) and <strong>subtle</strong> (small displacement). Overused screen shake is nauseating; well-used screen shake is satisfying. Good candidates for screen shake in an infinite runner:</p>
+        <ul>
+          <li><strong>Landing from a high jump:</strong> Reinforces the feeling of weight and impact.</li>
+          <li><strong>Collecting a power-up:</strong> Makes the pickup feel rewarding.</li>
+          <li><strong>Near-miss with an obstacle:</strong> Really advanced, but creates an incredible sense of tension and excitement.</li>
+        </ul>
+        <p>We will implement camera shake properly in Chapter 10 (Camera System). For now, just know that it is one of the most impactful "juice" techniques you can add.</p>
+
+        <h3>The "Juice" Checklist</h3>
+        <p>Here is a prioritized list of game feel elements for your infinite runner. Implement the "Must have" items now. Save the rest for Part 5 (Polish).</p>
+
+        <table>
+          <thead>
+            <tr><th>Element</th><th>What It Adds</th><th>Priority</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Gravity multiplier</td><td>Snappy, responsive jumps</td><td><strong>Must have</strong></td></tr>
+            <tr><td>Coyote time</td><td>Forgiving jump timing</td><td><strong>Must have</strong></td></tr>
+            <tr><td>Jump buffer</td><td>Responsive input handling</td><td><strong>Must have</strong></td></tr>
+            <tr><td>Smooth lane switch</td><td>Polished lateral movement</td><td><strong>Must have</strong></td></tr>
+            <tr><td>Landing particles</td><td>Visual feedback on landing</td><td>Nice to have</td></tr>
+            <tr><td>Screen shake on land</td><td>Weight and impact</td><td>Nice to have</td></tr>
+            <tr><td>Speed lines</td><td>Sense of speed</td><td>Nice to have</td></tr>
+            <tr><td>Near-miss feedback</td><td>Excitement and tension</td><td>Advanced</td></tr>
+            <tr><td>Camera FOV shift at speed</td><td>Intensity at high speed</td><td>Advanced</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warning">
+          <div class="callout-title">Game Feel Is Not Optional</div>
+          <p>Game feel is not a "nice-to-have." It is the difference between a game people play once and close, and a game they cannot put down. The gravity multiplier, coyote time, jump buffer, and smooth lane switching are <strong>must-have</strong> features &mdash; implement them now. The particles, screen shake, and speed lines can wait until Part 5 (Polish), but do not skip the fundamentals.</p>
+        </div>
+
+        <h3>Playtesting Your Controller</h3>
+        <p>Building a player controller is iterative. You will not get the feel right on the first try. Here is how to playtest effectively:</p>
+
+        <ul>
+          <li><strong>Test with keyboard AND touch/mouse.</strong> Your runner will probably ship on mobile. The controller needs to feel good with both input methods. Keyboard input is instantaneous; touch input has inherent latency from swipe detection. Account for both.</li>
+          <li><strong>Watch someone else play for the first time.</strong> Their struggles reveal feel problems you are blind to because you know how the game works. If they say <em>"I pressed jump!"</em> but did not jump, you need coyote time and jump buffering. If they say <em>"it feels floaty,"</em> increase your fall multiplier.</li>
+          <li><strong>If lane switching feels slow,</strong> increase the <code>laneSwitchSpeed</code>. If it feels jarring, add smoothing with <code>SmoothDamp</code>.</li>
+          <li><strong>Record gameplay and watch it back.</strong> You will notice things you miss while actively playing &mdash; hitches, awkward transitions, moments where the character does not do what you expected.</li>
+          <li><strong>Adjust values in the Inspector while in Play mode.</strong> Unity lets you tweak serialized fields during gameplay and see the results immediately. This is the fastest way to dial in the feel. Important caveat: changes made in Play mode are <strong>lost</strong> when you stop playing. Note down the values that feel good, then apply them after exiting Play mode.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <ul>
+          <li>Set up the <strong>player GameObject</strong> with Rigidbody, CapsuleCollider, and a placeholder model.</li>
+          <li>Implemented the <strong>3-lane system</strong> with smooth lane switching using <code>MoveTowards</code>.</li>
+          <li><strong>Jump mechanics</strong> with <code>Rigidbody.AddForce</code> and a gravity multiplier for snappy feel.</li>
+          <li><strong>Ground detection</strong> with <code>Physics.SphereCast</code>.</li>
+          <li><strong>Slide mechanics</strong> with collider shrinking and a timed duration.</li>
+          <li>A <strong>player state machine</strong> (Running, Jumping, Sliding, Dead) to prevent impossible actions.</li>
+          <li><strong>Collision detection</strong> for obstacles (death) and coins (collection).</li>
+          <li><strong>Constant forward movement</strong> along the Z axis.</li>
+          <li>Connected everything to the <strong>InputReader</strong> from Chapter 8 and the <strong>GameManager</strong> from Chapter 6.</li>
+        </ul>
+        <p>In the next chapter, we will set up the <strong>Camera System</strong> using Cinemachine to create smooth, professional camera follow behavior.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The player can move, jump, and slide. This is a major feature — definitely save it.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git diff
+git add .
+git commit -m "Implement player controller with lane switching, jump, and slide"</code></pre>
+        </div>
+        <p>Notice we're running <code>git diff</code> before <code>git add</code> now. This is a good habit — review what you're about to commit. In professional development, every commit is reviewed.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="08-input-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Input System</span></a>
+        <a href="10-camera-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Camera System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scoring System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link active"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 17</span>
+        <h1>Scoring System</h1>
+        <p class="chapter-desc">Track distance and coin scores, format them for display, persist high scores, and connect everything through events for a responsive, satisfying scoring experience.</p>
+      </div>
+
+      <!-- SECTION: Introduction -->
+      <section>
+        <h2>Why Scoring Matters</h2>
+        <p>Score is the heartbeat of an infinite runner. It is the single number that answers the question every player asks: "How well did I do?" Without a visible, responsive score, the game feels aimless. With one, every meter traveled and every coin collected becomes meaningful.</p>
+        <p>Our scoring system tracks two distinct types of points:</p>
+        <ul>
+          <li><strong>Distance Score:</strong> Points earned simply by staying alive and running forward. This accumulates automatically based on how far the player has traveled.</li>
+          <li><strong>Coin Score:</strong> Points earned by collecting coins. Each coin has a base value, which can be modified by the Score Multiplier power-up.</li>
+        </ul>
+        <p>The total score is the sum of both. We also track coins as a separate currency (for potential shop purchases later) and persist the all-time high score using <code>PlayerPrefs</code>.</p>
+      </section>
+
+      <!-- SECTION: ScoreData Struct -->
+      <section>
+        <h2>The ScoreData Structure</h2>
+        <p>Before building the manager, let us define a data structure that holds all scoring information. Using a <code>struct</code> keeps this lightweight and value-typed, which is perfect for passing score snapshots around via events.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ScoreData.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// A snapshot of all current scoring data. Passed through events
+    /// so UI and other systems can display the latest information.
+    ///
+    /// We use a struct (not a class) because:
+    /// 1. It is small and contains only value types.
+    /// 2. It is passed by value, so receivers get their own copy.
+    /// 3. No heap allocation - no garbage collection pressure.
+    /// &lt;/summary&gt;
+    public struct ScoreData
+    {
+        /// &lt;summary&gt;
+        /// Points earned from distance traveled.
+        /// &lt;/summary&gt;
+        public int DistanceScore;
+
+        /// &lt;summary&gt;
+        /// Points earned from collecting coins (after multiplier).
+        /// &lt;/summary&gt;
+        public int CoinScore;
+
+        /// &lt;summary&gt;
+        /// Total score (DistanceScore + CoinScore).
+        /// &lt;/summary&gt;
+        public int TotalScore;
+
+        /// &lt;summary&gt;
+        /// Total number of individual coins collected this run.
+        /// Separate from CoinScore because multipliers affect points
+        /// but not the coin count.
+        /// &lt;/summary&gt;
+        public int CoinsCollected;
+
+        /// &lt;summary&gt;
+        /// Distance traveled in meters this run.
+        /// This is the raw distance, not the score derived from it.
+        /// &lt;/summary&gt;
+        public float DistanceTraveled;
+
+        /// &lt;summary&gt;
+        /// The all-time high score (loaded from persistent storage).
+        /// &lt;/summary&gt;
+        public int HighScore;
+
+        /// &lt;summary&gt;
+        /// Whether the current TotalScore has beaten the HighScore.
+        /// Used to show "NEW!" in the game over screen.
+        /// &lt;/summary&gt;
+        public bool IsNewHighScore;
+
+        /// &lt;summary&gt;
+        /// The currently active score multiplier (1 = normal).
+        /// &lt;/summary&gt;
+        public int CurrentMultiplier;
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Struct vs. Class</div>
+          <p>A <code>struct</code> in C# is a <strong>value type</strong> stored on the stack, while a <code>class</code> is a <strong>reference type</strong> stored on the heap. For small data containers that are frequently created and passed around (like score snapshots fired every frame), structs avoid garbage collection overhead. However, structs should be small (under ~16 bytes ideally, though our ScoreData is larger for readability). For game jams this is perfectly fine; for extreme optimization you might split it into separate events.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Distance Scoring -->
+      <section>
+        <h2>Distance Scoring</h2>
+        <p>Distance score accumulates automatically as the player runs. There are two common approaches:</p>
+
+        <h3>Approach 1: Time-Based (Simpler)</h3>
+        <p>Multiply elapsed time by the current speed to estimate distance. This is simpler but can drift from the player's actual position if speed changes frequently.</p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Time-based distance</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Each frame, add distance based on current speed
+float distanceThisFrame = currentSpeed * Time.deltaTime;
+totalDistanceTraveled += distanceThisFrame;</code></pre></div>
+
+        <h3>Approach 2: Position-Based (More Accurate)</h3>
+        <p>Track the player's actual Z position delta each frame. This is more accurate if the player can slow down, speed up, or stop.</p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Position-based distance</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Track how far the player actually moved this frame
+float deltaZ = playerTransform.position.z - lastZPosition;
+if (deltaZ > 0) // Only count forward movement
+{
+    totalDistanceTraveled += deltaZ;
+}
+lastZPosition = playerTransform.position.z;</code></pre></div>
+
+        <p>We will use <strong>Approach 1</strong> (time-based) because our player always moves at a constant forward speed determined by the game, and origin shifting (Chapter 14) can reset the player's Z position, which would confuse the position-based approach.</p>
+
+        <h3>Converting Distance to Score</h3>
+        <p>Raw distance in meters is not very exciting as a score number. We convert it using a multiplier so the score feels larger and more satisfying:</p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Distance to score conversion</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// 1 meter = 10 points by default
+// At 10 m/s speed, player earns 100 points per second from distance alone
+int distanceScore = Mathf.FloorToInt(totalDistanceTraveled * distanceMultiplier);</code></pre></div>
+      </section>
+
+      <!-- SECTION: Coin Scoring -->
+      <section>
+        <h2>Coin Scoring</h2>
+        <p>Each coin has a base value (set on the Coin component, typically 1). When collected, the coin fires <code>GameEvents.OnCoinCollected</code> with its value. The ScoreManager receives this, applies any active score multiplier, and adds the result to the coin score.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Coin score calculation</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// When a coin is collected:
+// coinValue = the base value from Coin.cs (usually 1)
+// currentMultiplier = 1 normally, 2 with Score Multiplier power-up
+int pointsEarned = coinValue * pointsPerCoin * currentMultiplier;
+totalCoinScore += pointsEarned;
+totalCoinsCollected += coinValue; // Raw count, unaffected by multiplier</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">Separating Coin Count from Coin Score</div>
+          <p>We track <code>CoinsCollected</code> (the raw number of coins) separately from <code>CoinScore</code> (the points earned from coins). This is important because if you later add a coin shop, you want the currency to be the actual coin count, not the inflated score. A player who collects 50 coins with a 2x multiplier earns 100 coin points but still only has 50 coins to spend.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Score Formatting -->
+      <section>
+        <h2>Score Display Formatting</h2>
+        <p>A score of "1234567" is hard to read at a glance. "1,234,567" is much clearer. C# makes this easy with string formatting:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Score formatting</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">/// &lt;summary&gt;
+/// Formats a score integer with comma separators.
+/// Examples: 0 -> "0", 1234 -> "1,234", 1234567 -> "1,234,567"
+/// &lt;/summary&gt;
+public static string FormatScore(int score)
+{
+    return score.ToString("N0");
+}
+
+/// &lt;summary&gt;
+/// Formats distance as meters with one decimal place.
+/// Examples: 123.4 -> "123.4m", 2500.0 -> "2,500.0m"
+/// &lt;/summary&gt;
+public static string FormatDistance(float distance)
+{
+    return distance.ToString("N1") + "m";
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">C# Format Strings</div>
+          <p><code>"N0"</code> is a standard numeric format string. The <code>N</code> means "number" (with comma separators), and the <code>0</code> means zero decimal places. <code>"N1"</code> gives one decimal place. These automatically use the system's culture settings for the separator character, but in most cases you will see commas.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: ScoreManager.cs -->
+      <section>
+        <h2>The Complete ScoreManager</h2>
+        <p>Now let us bring everything together into the <code>ScoreManager</code>. This is the central class that tracks all scoring, responds to game events, and notifies the UI.</p>
+
+        <h3>Step 1: Create the Script</h3>
+        <ol class="steps">
+          <li>Navigate to <code>Assets/Scripts/Gameplay</code> in the Project window.</li>
+          <li>Right-click &gt; <strong>Create &gt; C# Script</strong> and name it <code>ScoreManager</code>.</li>
+          <li>Open it in your code editor and replace the contents with the code below.</li>
+        </ol>
+
+        <h3>Step 2: The Full ScoreManager Script</h3>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ScoreManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Central scoring system that tracks distance score, coin score,
+    /// total score, and high score persistence. Communicates entirely
+    /// through events for decoupled architecture.
+    ///
+    /// Attach this to a persistent manager GameObject in the scene.
+    /// &lt;/summary&gt;
+    public class ScoreManager : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Singleton
+        // ---------------------------------------------------------------
+
+        public static ScoreManager Instance { get; private set; }
+
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Distance Scoring")]
+        [Tooltip("How many score points per meter traveled. " +
+                 "Higher values make the score grow faster.")]
+        [SerializeField] private float distanceMultiplier = 10f;
+
+        [Header("Coin Scoring")]
+        [Tooltip("Base points awarded per coin value unit. " +
+                 "A coin with value 1 earns this many points.")]
+        [SerializeField] private int pointsPerCoin = 10;
+
+        [Header("Update Rate")]
+        [Tooltip("How often (in seconds) the score update event fires. " +
+                 "Lower values = smoother UI updates but more events.")]
+        [SerializeField] private float updateInterval = 0.1f;
+
+        // ---------------------------------------------------------------
+        // PlayerPrefs Keys
+        // ---------------------------------------------------------------
+
+        // Constants for PlayerPrefs keys. Using constants prevents typos.
+        private const string HIGH_SCORE_KEY = "InfiniteRunner_HighScore";
+        private const string TOTAL_COINS_KEY = "InfiniteRunner_TotalCoins";
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // Running totals for this play session.
+        private float distanceTraveled;
+        private int distanceScore;
+        private int coinScore;
+        private int coinsCollected;
+        private int highScore;
+        private int totalCoinsEver; // Lifetime coin count (for a future shop).
+
+        // The current multiplier (1 normally, 2+ with power-up).
+        private int currentMultiplier = 1;
+
+        // Whether scoring is currently active (only during gameplay).
+        private bool isScoring;
+
+        // Timer for throttling score update events.
+        private float updateTimer;
+
+        // Current player speed (received from the game systems).
+        private float currentSpeed;
+
+        // Flag to track if we beat the high score this run.
+        private bool isNewHighScore;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Singleton pattern.
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            // Load persisted data.
+            LoadHighScore();
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to game events.
+            GameEvents.OnGameStarted += HandleGameStarted;
+            GameEvents.OnGameOver += HandleGameOver;
+            GameEvents.OnCoinCollected += HandleCoinCollected;
+            GameEvents.OnMultiplierChanged += HandleMultiplierChanged;
+            GameEvents.OnSpeedChanged += HandleSpeedChanged;
+        }
+
+        private void OnDisable()
+        {
+            // Unsubscribe to prevent memory leaks.
+            GameEvents.OnGameStarted -= HandleGameStarted;
+            GameEvents.OnGameOver -= HandleGameOver;
+            GameEvents.OnCoinCollected -= HandleCoinCollected;
+            GameEvents.OnMultiplierChanged -= HandleMultiplierChanged;
+            GameEvents.OnSpeedChanged -= HandleSpeedChanged;
+        }
+
+        private void Update()
+        {
+            if (!isScoring) return;
+
+            // Accumulate distance based on current speed.
+            UpdateDistanceScore();
+
+            // Throttle score update events to avoid overwhelming the UI.
+            updateTimer += Time.deltaTime;
+            if (updateTimer >= updateInterval)
+            {
+                updateTimer = 0f;
+                BroadcastScoreUpdate();
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Distance Scoring
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called every frame to accumulate distance traveled and
+        /// convert it into score points.
+        /// &lt;/summary&gt;
+        private void UpdateDistanceScore()
+        {
+            // Calculate distance traveled this frame.
+            // Speed is in units/second, deltaTime is in seconds,
+            // so the product is units (meters) traveled this frame.
+            float distanceThisFrame = currentSpeed * Time.deltaTime;
+            distanceTraveled += distanceThisFrame;
+
+            // Convert total distance to score points.
+            // FloorToInt ensures we only count whole points.
+            int newDistanceScore = Mathf.FloorToInt(
+                distanceTraveled * distanceMultiplier * currentMultiplier
+            );
+
+            // Only update if the score actually changed.
+            if (newDistanceScore != distanceScore)
+            {
+                distanceScore = newDistanceScore;
+                CheckHighScore();
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Coin Scoring
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when the player collects a coin. Adds points
+        /// based on coin value, points-per-coin rate, and multiplier.
+        /// &lt;/summary&gt;
+        /// &lt;param name="coinValue"&gt;The base value of the collected coin.&lt;/param&gt;
+        private void HandleCoinCollected(int coinValue)
+        {
+            // Track raw coin count (unaffected by multiplier).
+            coinsCollected += coinValue;
+
+            // Calculate points with multiplier applied.
+            int points = coinValue * pointsPerCoin * currentMultiplier;
+            coinScore += points;
+
+            // Check if this pushed us past the high score.
+            CheckHighScore();
+
+            // Fire an immediate score update so the UI responds instantly
+            // to coin collection (don't wait for the throttled update).
+            BroadcastScoreUpdate();
+
+            Debug.Log($"[ScoreManager] Coin collected! " +
+                      $"+{points} points (x{currentMultiplier}). " +
+                      $"Total coins: {coinsCollected}");
+        }
+
+        // ---------------------------------------------------------------
+        // High Score
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Checks whether the current total score exceeds the high score.
+        /// Sets the isNewHighScore flag if it does.
+        /// &lt;/summary&gt;
+        private void CheckHighScore()
+        {
+            int totalScore = GetTotalScore();
+
+            if (totalScore > highScore)
+            {
+                highScore = totalScore;
+                isNewHighScore = true;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Saves the high score and lifetime coin count to PlayerPrefs.
+        /// Called when the game ends.
+        /// &lt;/summary&gt;
+        private void SaveHighScore()
+        {
+            PlayerPrefs.SetInt(HIGH_SCORE_KEY, highScore);
+            PlayerPrefs.SetInt(TOTAL_COINS_KEY, totalCoinsEver + coinsCollected);
+            PlayerPrefs.Save(); // Force immediate write to disk.
+
+            Debug.Log($"[ScoreManager] Saved high score: {highScore}");
+        }
+
+        /// &lt;summary&gt;
+        /// Loads the high score and lifetime coin count from PlayerPrefs.
+        /// Called once during Awake().
+        /// &lt;/summary&gt;
+        private void LoadHighScore()
+        {
+            // GetInt returns 0 if the key does not exist (first time playing).
+            highScore = PlayerPrefs.GetInt(HIGH_SCORE_KEY, 0);
+            totalCoinsEver = PlayerPrefs.GetInt(TOTAL_COINS_KEY, 0);
+
+            Debug.Log($"[ScoreManager] Loaded high score: {highScore}, " +
+                      $"lifetime coins: {totalCoinsEver}");
+        }
+
+        // ---------------------------------------------------------------
+        // Event Handlers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when a new game starts. Resets all per-run scores.
+        /// &lt;/summary&gt;
+        private void HandleGameStarted()
+        {
+            // Reset per-run data.
+            distanceTraveled = 0f;
+            distanceScore = 0;
+            coinScore = 0;
+            coinsCollected = 0;
+            currentMultiplier = 1;
+            isNewHighScore = false;
+            updateTimer = 0f;
+
+            // Begin scoring.
+            isScoring = true;
+
+            // Send initial score update (all zeros).
+            BroadcastScoreUpdate();
+
+            Debug.Log("[ScoreManager] Scoring started.");
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the game ends. Saves the high score and
+        /// sends a final score update.
+        /// &lt;/summary&gt;
+        private void HandleGameOver()
+        {
+            // Stop scoring.
+            isScoring = false;
+
+            // Final high score check.
+            CheckHighScore();
+
+            // Persist the high score.
+            SaveHighScore();
+
+            // Send one final score update with all final values.
+            BroadcastScoreUpdate();
+
+            // Fire a dedicated game over score event with the final data.
+            GameEvents.OnFinalScoreCalculated?.Invoke(GetScoreData());
+
+            Debug.Log($"[ScoreManager] Game over! Final score: " +
+                      $"{FormatScore(GetTotalScore())}. " +
+                      $"New high score: {isNewHighScore}");
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the score multiplier changes (power-up).
+        /// &lt;/summary&gt;
+        private void HandleMultiplierChanged(int newMultiplier)
+        {
+            currentMultiplier = Mathf.Max(1, newMultiplier);
+            Debug.Log($"[ScoreManager] Multiplier changed to " +
+                      $"x{currentMultiplier}");
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player's forward speed changes.
+        /// We need this to calculate distance-based scoring.
+        /// &lt;/summary&gt;
+        private void HandleSpeedChanged(float newSpeed)
+        {
+            currentSpeed = newSpeed;
+        }
+
+        // ---------------------------------------------------------------
+        // Broadcasting
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Fires a score update event with the current scoring data.
+        /// UI systems listen for this to refresh their displays.
+        /// &lt;/summary&gt;
+        private void BroadcastScoreUpdate()
+        {
+            ScoreData data = GetScoreData();
+            GameEvents.OnScoreUpdated?.Invoke(data);
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Returns the current total score (distance + coins).
+        /// &lt;/summary&gt;
+        public int GetTotalScore()
+        {
+            return distanceScore + coinScore;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns a complete snapshot of all scoring data.
+        /// &lt;/summary&gt;
+        public ScoreData GetScoreData()
+        {
+            return new ScoreData
+            {
+                DistanceScore = distanceScore,
+                CoinScore = coinScore,
+                TotalScore = GetTotalScore(),
+                CoinsCollected = coinsCollected,
+                DistanceTraveled = distanceTraveled,
+                HighScore = highScore,
+                IsNewHighScore = isNewHighScore,
+                CurrentMultiplier = currentMultiplier
+            };
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the all-time high score.
+        /// &lt;/summary&gt;
+        public int GetHighScore()
+        {
+            return highScore;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the lifetime total coins collected across all runs.
+        /// Useful for a shop or upgrade system.
+        /// &lt;/summary&gt;
+        public int GetLifetimeCoins()
+        {
+            return totalCoinsEver + coinsCollected;
+        }
+
+        // ---------------------------------------------------------------
+        // Static Formatting Utilities
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Formats a score integer with comma separators.
+        /// Example: 1234567 becomes "1,234,567".
+        /// Static so it can be called from anywhere without a reference.
+        /// &lt;/summary&gt;
+        /// &lt;param name="score"&gt;The score to format.&lt;/param&gt;
+        /// &lt;returns&gt;A formatted string with comma separators.&lt;/returns&gt;
+        public static string FormatScore(int score)
+        {
+            return score.ToString("N0");
+        }
+
+        /// &lt;summary&gt;
+        /// Formats a distance value as meters with one decimal place.
+        /// Example: 2500.3 becomes "2,500.3m".
+        /// &lt;/summary&gt;
+        /// &lt;param name="distance"&gt;The distance in meters.&lt;/param&gt;
+        /// &lt;returns&gt;A formatted distance string.&lt;/returns&gt;
+        public static string FormatDistance(float distance)
+        {
+            return distance.ToString("N1") + "m";
+        }
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Game Events for Scoring -->
+      <section>
+        <h2>Required Event Declarations</h2>
+        <p>The ScoreManager depends on several events. Make sure these are declared in your <code>GameEvents</code> static class:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameEvents.cs (scoring additions)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System;
+
+namespace InfiniteRunner.Core
+{
+    public static partial class GameEvents
+    {
+        // --- Game State ---
+        /// &lt;summary&gt;Fired when a new game begins.&lt;/summary&gt;
+        public static Action OnGameStarted;
+
+        /// &lt;summary&gt;Fired when the player dies and the run ends.&lt;/summary&gt;
+        public static Action OnGameOver;
+
+        // --- Scoring ---
+        /// &lt;summary&gt;Fired periodically with the latest score data.&lt;/summary&gt;
+        public static Action&lt;ScoreData&gt; OnScoreUpdated;
+
+        /// &lt;summary&gt;Fired once at game over with the final score snapshot.&lt;/summary&gt;
+        public static Action&lt;ScoreData&gt; OnFinalScoreCalculated;
+
+        // --- Speed ---
+        /// &lt;summary&gt;Fired when the player's forward speed changes.&lt;/summary&gt;
+        public static Action&lt;float&gt; OnSpeedChanged;
+    }
+}</code></pre></div>
+
+        <div class="callout warning">
+          <div class="callout-title">Events Must Be Declared Before Use</div>
+          <p>If you try to invoke an event that has not been declared, you will get a compile error. If you invoke an event that has been declared but has no subscribers, the <code>?.</code> (null-conditional) operator safely does nothing. Always use <code>OnSomeEvent?.Invoke()</code> with the question mark to avoid null reference exceptions.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: High Score with PlayerPrefs -->
+      <section>
+        <h2>High Score Persistence with PlayerPrefs</h2>
+        <p><code>PlayerPrefs</code> is Unity's simplest way to save small amounts of data between play sessions. It stores key-value pairs (like a dictionary) that persist even after the game is closed. It is perfect for high scores and settings, though not suitable for large or complex data (we will build a proper save system in Chapter 23).</p>
+
+        <h3>How PlayerPrefs Works</h3>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PlayerPrefs basics</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Saving a value
+PlayerPrefs.SetInt("HighScore", 12345);
+PlayerPrefs.SetFloat("MusicVolume", 0.8f);
+PlayerPrefs.SetString("PlayerName", "Runner");
+PlayerPrefs.Save(); // Force write to disk
+
+// Loading a value (with default if key doesn't exist)
+int highScore = PlayerPrefs.GetInt("HighScore", 0);
+float volume = PlayerPrefs.GetFloat("MusicVolume", 1.0f);
+string name = PlayerPrefs.GetString("PlayerName", "Player");
+
+// Checking if a key exists
+bool hasHighScore = PlayerPrefs.HasKey("HighScore");
+
+// Deleting data
+PlayerPrefs.DeleteKey("HighScore");  // Delete one key
+PlayerPrefs.DeleteAll();             // Delete everything (careful!)</code></pre></div>
+
+        <div class="callout warning">
+          <div class="callout-title">PlayerPrefs Is Not Secure</div>
+          <p>PlayerPrefs stores data in plain text on the device. On Windows, it is in the registry. On Android, it is in shared preferences XML. Players can easily edit these values to cheat. For a tutorial game this is fine, but for a released game with leaderboards, you would need server-side validation. We will discuss better approaches in Chapter 23 (Save System).</p>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Why We Call PlayerPrefs.Save()</div>
+          <p>Unity normally writes PlayerPrefs to disk when the application quits. However, if the game crashes or is force-closed (common on mobile), unsaved data is lost. Calling <code>PlayerPrefs.Save()</code> explicitly forces an immediate write. We call it at game over to ensure the high score is always persisted.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Connecting to the Game -->
+      <section>
+        <h2>Connecting the ScoreManager to the Game</h2>
+        <p>Let us set up the ScoreManager in the Unity scene and verify everything works.</p>
+
+        <h3>Step 1: Add ScoreManager to the Scene</h3>
+        <ol class="steps">
+          <li>In the Hierarchy, find your <code>Managers</code> GameObject (or create one if you do not have it).</li>
+          <li>Add the <code>ScoreManager</code> component to it.</li>
+          <li>In the Inspector, set <strong>Distance Multiplier</strong> to <code>10</code> and <strong>Points Per Coin</strong> to <code>10</code>.</li>
+          <li>Set <strong>Update Interval</strong> to <code>0.1</code> (10 updates per second).</li>
+        </ol>
+
+        <h3>Step 2: Verify Event Flow</h3>
+        <p>The scoring system relies on these events being fired by other systems:</p>
+        <ul>
+          <li><strong>OnGameStarted</strong> &mdash; Fired by the GameManager when the player taps Play.</li>
+          <li><strong>OnGameOver</strong> &mdash; Fired by the GameManager when the player hits an obstacle (and has no shield).</li>
+          <li><strong>OnCoinCollected</strong> &mdash; Fired by the Coin script when collected (Chapter 16).</li>
+          <li><strong>OnMultiplierChanged</strong> &mdash; Fired by the PowerUpManager (Chapter 16).</li>
+          <li><strong>OnSpeedChanged</strong> &mdash; Fired by whatever system controls the player's forward speed (PlayerController or DifficultyManager).</li>
+        </ul>
+
+        <h3>Step 3: Quick Debug Test</h3>
+        <p>To verify the ScoreManager is working before we build the UI, create a temporary debug display:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ScoreDebugDisplay.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.Debug
+{
+    /// &lt;summary&gt;
+    /// Temporary debug script that displays score data on screen
+    /// using Unity's OnGUI. Remove this once the proper UI is built.
+    /// &lt;/summary&gt;
+    public class ScoreDebugDisplay : MonoBehaviour
+    {
+        private ScoreData latestScore;
+
+        private void OnEnable()
+        {
+            GameEvents.OnScoreUpdated += data => latestScore = data;
+        }
+
+        private void OnGUI()
+        {
+            // Display in the top-left corner.
+            GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+            GUILayout.Label($"Score: {ScoreManager.FormatScore(latestScore.TotalScore)}");
+            GUILayout.Label($"Distance: {ScoreManager.FormatDistance(latestScore.DistanceTraveled)}");
+            GUILayout.Label($"Coins: {latestScore.CoinsCollected}");
+            GUILayout.Label($"Multiplier: x{latestScore.CurrentMultiplier}");
+            GUILayout.Label($"High Score: {ScoreManager.FormatScore(latestScore.HighScore)}");
+            if (latestScore.IsNewHighScore)
+            {
+                GUILayout.Label("*** NEW HIGH SCORE! ***");
+            }
+            GUILayout.EndArea();
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">OnGUI for Debugging</div>
+          <p><code>OnGUI</code> is Unity's old immediate-mode GUI system. It is ugly and slow, but it is perfect for quick debug displays because it requires no setup &mdash; just write text to the screen. We will replace this with a proper UI Canvas in Chapter 19.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>Chapter Summary</h2>
+        <p>In this chapter, you built a complete scoring system for the infinite runner:</p>
+        <ul>
+          <li><strong>ScoreData struct</strong> &mdash; A lightweight value type that holds all scoring information for passing through events.</li>
+          <li><strong>Distance scoring</strong> &mdash; Automatically accumulates based on speed and time, converted to points via a multiplier.</li>
+          <li><strong>Coin scoring</strong> &mdash; Points per coin, affected by the Score Multiplier power-up, with a separate raw coin count.</li>
+          <li><strong>ScoreManager.cs</strong> &mdash; Singleton manager that tracks everything, responds to events, and broadcasts score updates.</li>
+          <li><strong>High score persistence</strong> &mdash; Saved and loaded via PlayerPrefs, with immediate disk writes at game over.</li>
+          <li><strong>Score formatting</strong> &mdash; Static utility methods for displaying scores with comma separators and distances with units.</li>
+        </ul>
+        <p>The scoring system is entirely event-driven. It does not reference the UI, the coin scripts, or the power-up manager directly. This decoupled design means you can change any of those systems without touching the ScoreManager. In the next chapter, we will build the difficulty progression system that gradually increases challenge as the player's score grows.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Scoring system tracks distance and coins. Quick commit.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add scoring system with distance and coin tracking"</code></pre>
+        </div>
+        <p>By now, <code>git add .</code> and <code>git commit</code> should feel automatic. That's the goal. Professional developers commit so often they don't even think about it — like saving a document.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="16-collectibles.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Collectibles &amp; Power-ups</span></a>
+        <a href="18-difficulty.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Difficulty Progression</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

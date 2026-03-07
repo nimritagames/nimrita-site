@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link active"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 8</span>
+        <h1>Input System</h1>
+        <p class="chapter-desc">Set up Unity's New Input System to handle keyboard, touch, and swipe controls for your infinite runner.</p>
+      </div>
+
+      <!-- SECTION: Old vs New Input -->
+      <section>
+        <h2>Old Input Manager vs New Input System</h2>
+        <p>Unity has two input systems. The <strong>old Input Manager</strong> is simpler but limited. The <strong>New Input System</strong> (a separate package) is more powerful and is the recommended approach for modern Unity projects.</p>
+
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>Old Input Manager</th><th>New Input System</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Multi-device support</td><td>Manual, painful</td><td>Built-in, automatic</td></tr>
+            <tr><td>Rebinding controls</td><td>You build it yourself</td><td>Built-in UI support</td></tr>
+            <tr><td>Touch/gamepad</td><td>Separate code paths</td><td>Unified API</td></tr>
+            <tr><td>Action Maps</td><td>Not available</td><td>Organized by context</td></tr>
+            <tr><td>Setup complexity</td><td>Very simple</td><td>More initial setup</td></tr>
+          </tbody>
+        </table>
+
+        <p>For our infinite runner, the New Input System is perfect because we need to support both keyboard (desktop) and touch/swipe (mobile) with the same code. Let us set it up.</p>
+      </section>
+
+      <!-- SECTION: Installing -->
+      <section>
+        <h2>Installing the New Input System</h2>
+
+        <ol class="steps">
+          <li>Open <strong>Window &gt; Package Manager</strong>.</li>
+          <li>In the top-left dropdown, select <strong>"Unity Registry"</strong> (to see official packages).</li>
+          <li>Search for <strong>"Input System"</strong>.</li>
+          <li>Click the <strong>Input System</strong> package, then click <strong>Install</strong>.</li>
+          <li>Unity will prompt you: <em>"This package requires a restart to enable the new backend."</em> Click <strong>Yes</strong>.</li>
+          <li>Unity will restart. After restarting, the New Input System is active.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Active Input Handling Setting</div>
+          <p>After installing, go to <strong>Edit &gt; Project Settings &gt; Player</strong> and scroll to <strong>Active Input Handling</strong>. Set it to <strong>"Both"</strong> (this lets you use both old and new input during development). For the final build, you can switch to "Input System Package (New)" only.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Creating Input Actions -->
+      <section>
+        <h2>Creating an Input Actions Asset</h2>
+        <p>The Input Actions asset is a file that defines what actions the player can perform and what buttons/keys trigger them. Think of it as a configuration file for all your controls.</p>
+
+        <ol class="steps">
+          <li>In the Project window, create a folder: <code>Assets/Input/</code></li>
+          <li>Right-click inside and select <strong>Create &gt; Input Actions</strong>.</li>
+          <li>Name it <code>PlayerInputActions</code>.</li>
+          <li>Double-click it to open the <strong>Input Actions Editor</strong>.</li>
+        </ol>
+
+        <h3>Setting Up Action Maps</h3>
+        <p>An <strong>Action Map</strong> is a group of related actions. We need one for gameplay:</p>
+
+        <ol class="steps">
+          <li>In the Input Actions Editor, click the <strong>+</strong> next to "Action Maps" and name it <code>Gameplay</code>.</li>
+          <li>Now we will add three actions inside this map: <strong>Move</strong>, <strong>Jump</strong>, and <strong>Slide</strong>.</li>
+        </ol>
+
+        <h3>Defining the Move Action</h3>
+        <ol class="steps">
+          <li>Click the <strong>+</strong> next to "Actions" to add an action. Name it <code>Move</code>.</li>
+          <li>Set <strong>Action Type</strong> to <code>Value</code>.</li>
+          <li>Set <strong>Control Type</strong> to <code>Vector2</code>.</li>
+          <li>Click the <strong>+</strong> next to the Move action to add a binding. Choose <strong>Add Up/Down/Left/Right Composite</strong>.</li>
+          <li>Name the composite <code>WASD</code>.</li>
+          <li>Set the bindings:
+            <ul>
+              <li><strong>Up:</strong> <code>W</code> key</li>
+              <li><strong>Down:</strong> <code>S</code> key</li>
+              <li><strong>Left:</strong> <code>A</code> key</li>
+              <li><strong>Right:</strong> <code>D</code> key</li>
+            </ul>
+          </li>
+          <li>Add another composite called <code>Arrows</code> with Arrow keys.</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">Why Vector2 for a 3-Lane Game?</div>
+          <p>Even though our runner only moves left and right (and technically only switches lanes), using Vector2 gives us flexibility. The X component tells us left (-1) or right (+1). We ignore Y for lane switching but could use it for jump/slide on gamepads later. Our InputReader script will convert this into simple lane-change commands.</p>
+        </div>
+
+        <h3>Defining the Jump Action</h3>
+        <ol class="steps">
+          <li>Add a new action called <code>Jump</code>.</li>
+          <li>Set <strong>Action Type</strong> to <code>Button</code>.</li>
+          <li>Add a binding: <code>Space</code> key.</li>
+          <li>Add another binding: <code>W</code> key (alternative).</li>
+          <li>Add another binding: <code>Up Arrow</code> key.</li>
+        </ol>
+
+        <h3>Defining the Slide Action</h3>
+        <ol class="steps">
+          <li>Add a new action called <code>Slide</code>.</li>
+          <li>Set <strong>Action Type</strong> to <code>Button</code>.</li>
+          <li>Add a binding: <code>S</code> key.</li>
+          <li>Add another binding: <code>Down Arrow</code> key.</li>
+          <li>Add another binding: <code>Left Ctrl</code> key (alternative).</li>
+        </ol>
+
+        <h3>Generate the C# Class</h3>
+        <ol class="steps">
+          <li>In the Inspector for the <code>PlayerInputActions</code> asset, check <strong>"Generate C# Class"</strong>.</li>
+          <li>Set the file path to <code>Assets/Scripts/Input/PlayerInputActions.cs</code>.</li>
+          <li>Set the class name to <code>PlayerInputActions</code>.</li>
+          <li>Click <strong>Apply</strong>. Unity generates a C# class that wraps all your actions.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Why Generate a C# Class?</div>
+          <p>The generated class gives you strongly-typed access to all your actions. Instead of looking up actions by string name (error-prone), you get properties like <code>actions.Gameplay.Jump</code> that are checked at compile time. If you rename an action and forget to update your code, the compiler catches it immediately.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: InputReader Script -->
+      <section>
+        <h2>Creating the InputReader Script</h2>
+        <p>We do not want our PlayerController to deal with raw input details. Instead, we create an <strong>InputReader</strong> &mdash; a clean wrapper that translates raw input into game-meaningful actions. This follows the same principle from Chapter 7: keep systems decoupled.</p>
+
+        <p>Our InputReader will be a <strong>ScriptableObject</strong> so that any script can reference the same input data without needing a scene reference.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">InputReader.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace InfiniteRunner.Input
+{
+    /// &lt;summary&gt;
+    /// Reads player input and exposes it as C# events.
+    /// This is a ScriptableObject so any system can reference it
+    /// without a scene dependency.
+    ///
+    /// Create via: Right-click &gt; Infinite Runner &gt; Input &gt; Input Reader
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "InputReader",
+        menuName = "Infinite Runner/Input/Input Reader",
+        order = 0)]
+    public class InputReader : ScriptableObject,
+        PlayerInputActions.IGameplayActions
+    {
+        // ─── Events ─────────────────────────────────────────────
+        // Other scripts subscribe to these to react to input.
+        // The PlayerController will listen for these.
+
+        /// &lt;summary&gt;Fired when the player presses left or right.
+        /// Parameter: -1 for left, +1 for right.&lt;/summary&gt;
+        public event Action&lt;int&gt; OnMoveInput;
+
+        /// &lt;summary&gt;Fired when the player presses the jump button.&lt;/summary&gt;
+        public event Action OnJumpInput;
+
+        /// &lt;summary&gt;Fired when the player presses the slide button.&lt;/summary&gt;
+        public event Action OnSlideInput;
+
+        // ─── Internal State ─────────────────────────────────────
+        private PlayerInputActions _inputActions;
+
+        // ─── Lifecycle ──────────────────────────────────────────
+
+        private void OnEnable()
+        {
+            // Create the generated input actions class
+            if (_inputActions == null)
+            {
+                _inputActions = new PlayerInputActions();
+
+                // Tell the input system: "Send Gameplay callbacks to ME"
+                _inputActions.Gameplay.SetCallbacks(this);
+            }
+
+            EnableGameplayInput();
+        }
+
+        private void OnDisable()
+        {
+            DisableAllInput();
+        }
+
+        // ─── Public Methods ─────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Enable the Gameplay action map (normal play).
+        /// &lt;/summary&gt;
+        public void EnableGameplayInput()
+        {
+            _inputActions.Gameplay.Enable();
+        }
+
+        /// &lt;summary&gt;
+        /// Disable all input (during menus, cutscenes, etc.).
+        /// &lt;/summary&gt;
+        public void DisableAllInput()
+        {
+            _inputActions.Gameplay.Disable();
+        }
+
+        // ─── IGameplayActions Implementation ────────────────────
+        // These methods are called automatically by the Input System
+        // when the corresponding action is performed.
+
+        /// &lt;summary&gt;
+        /// Called by the Input System when the Move action fires.
+        /// We extract the X direction and convert to a lane change command.
+        /// &lt;/summary&gt;
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            // We only care about the "performed" phase (key pressed)
+            // not "started" or "canceled"
+            if (context.phase == InputActionPhase.Performed)
+            {
+                // Read the Vector2 value from the input
+                Vector2 moveInput = context.ReadValue&lt;Vector2&gt;();
+
+                // Convert to a lane change direction:
+                //  -1 = move left one lane
+                //   0 = no horizontal input (ignore)
+                //  +1 = move right one lane
+                int direction = 0;
+                if (moveInput.x &lt; -0.5f) direction = -1;
+                else if (moveInput.x &gt; 0.5f) direction = 1;
+
+                // Only fire the event if there is actual horizontal input
+                if (direction != 0)
+                {
+                    OnMoveInput?.Invoke(direction);
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called by the Input System when the Jump action fires.
+        /// &lt;/summary&gt;
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            // Only on the initial press, not on hold or release
+            if (context.phase == InputActionPhase.Performed)
+            {
+                OnJumpInput?.Invoke();
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called by the Input System when the Slide action fires.
+        /// &lt;/summary&gt;
+        public void OnSlide(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Performed)
+            {
+                OnSlideInput?.Invoke();
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Input/InputReader.cs</code>.</p>
+
+        <h3>Key Concepts Explained</h3>
+
+        <ul>
+          <li><strong><code>PlayerInputActions.IGameplayActions</code></strong> &mdash; This interface was auto-generated when we created the Input Actions asset. By implementing it, our InputReader receives callbacks for all Gameplay actions automatically.</li>
+          <li><strong><code>InputAction.CallbackContext</code></strong> &mdash; Contains information about the input event: what phase it is in (Started, Performed, Canceled) and the value.</li>
+          <li><strong><code>context.phase == InputActionPhase.Performed</code></strong> &mdash; We only react when the button is actually pressed. Without this check, the method fires three times: on press, on hold, and on release.</li>
+          <li><strong><code>context.ReadValue&lt;Vector2&gt;()</code></strong> &mdash; Reads the input value. For our WASD/Arrow composite, this returns a Vector2 where X is the horizontal direction.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Touch/Swipe Detection -->
+      <section>
+        <h2>Touch and Swipe Detection for Mobile</h2>
+        <p>On mobile devices, players use swipes instead of keys. We need to detect swipe direction and translate it into the same events our keyboard input produces. We will create a separate component for this so the InputReader stays clean.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">SwipeDetector.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using UnityEngine.InputSystem;
+
+namespace InfiniteRunner.Input
+{
+    /// &lt;summary&gt;
+    /// Detects swipe gestures on touchscreens and translates them
+    /// into InputReader events. Attach to a GameObject in the scene.
+    ///
+    /// How swipe detection works:
+    /// 1. When a finger touches the screen, we record the start position.
+    /// 2. When the finger lifts off, we record the end position.
+    /// 3. We calculate the direction and distance of the swipe.
+    /// 4. If the distance exceeds a threshold, we fire the appropriate event.
+    /// &lt;/summary&gt;
+    public class SwipeDetector : MonoBehaviour
+    {
+        [Header("References")]
+        [SerializeField] private InputReader inputReader;
+
+        [Header("Swipe Settings")]
+        [Tooltip("Minimum swipe distance in pixels to register as a swipe.")]
+        [SerializeField] private float minSwipeDistance = 50f;
+
+        [Tooltip("Maximum time in seconds for a swipe to be valid.")]
+        [SerializeField] private float maxSwipeTime = 0.5f;
+
+        // Internal tracking
+        private Vector2 _touchStartPosition;
+        private float _touchStartTime;
+        private bool _isSwiping;
+
+        // Reference to the touchscreen (New Input System)
+        private Touchscreen _touchscreen;
+
+        private void Awake()
+        {
+            _touchscreen = Touchscreen.current;
+        }
+
+        private void Update()
+        {
+            // Only run on devices with a touchscreen
+            if (_touchscreen == null)
+            {
+                // Try to find it again (in case it was connected)
+                _touchscreen = Touchscreen.current;
+                if (_touchscreen == null) return;
+            }
+
+            DetectSwipe();
+        }
+
+        private void DetectSwipe()
+        {
+            var primaryTouch = _touchscreen.primaryTouch;
+
+            // Phase 1: Finger just touched the screen
+            if (primaryTouch.press.wasPressedThisFrame)
+            {
+                _touchStartPosition = primaryTouch.position.ReadValue();
+                _touchStartTime = Time.unscaledTime;
+                _isSwiping = true;
+            }
+
+            // Phase 2: Finger lifted off the screen
+            if (primaryTouch.press.wasReleasedThisFrame &amp;&amp; _isSwiping)
+            {
+                _isSwiping = false;
+
+                Vector2 touchEndPosition = primaryTouch.position.ReadValue();
+                float swipeDuration = Time.unscaledTime - _touchStartTime;
+
+                // Check if the swipe was fast enough
+                if (swipeDuration &gt; maxSwipeTime) return;
+
+                // Calculate the swipe vector
+                Vector2 swipeDelta = touchEndPosition - _touchStartPosition;
+                float swipeDistance = swipeDelta.magnitude;
+
+                // Check if the swipe was long enough
+                if (swipeDistance &lt; minSwipeDistance) return;
+
+                // Determine the swipe direction
+                ProcessSwipe(swipeDelta);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Determines swipe direction and fires the appropriate event.
+        /// &lt;/summary&gt;
+        private void ProcessSwipe(Vector2 swipeDelta)
+        {
+            // Normalize to get pure direction
+            swipeDelta.Normalize();
+
+            // Is the swipe more horizontal or more vertical?
+            if (Mathf.Abs(swipeDelta.x) &gt; Mathf.Abs(swipeDelta.y))
+            {
+                // Horizontal swipe
+                if (swipeDelta.x &gt; 0)
+                {
+                    // Swipe RIGHT — move to right lane
+                    Debug.Log("[SwipeDetector] Swipe Right");
+                    // We fire the same events that keyboard input fires.
+                    // The InputReader exposes events, but for swipes we need
+                    // to go through a different path. See note below.
+                    SimulateMoveInput(1);
+                }
+                else
+                {
+                    // Swipe LEFT — move to left lane
+                    Debug.Log("[SwipeDetector] Swipe Left");
+                    SimulateMoveInput(-1);
+                }
+            }
+            else
+            {
+                // Vertical swipe
+                if (swipeDelta.y &gt; 0)
+                {
+                    // Swipe UP — jump
+                    Debug.Log("[SwipeDetector] Swipe Up (Jump)");
+                    SimulateJumpInput();
+                }
+                else
+                {
+                    // Swipe DOWN — slide
+                    Debug.Log("[SwipeDetector] Swipe Down (Slide)");
+                    SimulateSlideInput();
+                }
+            }
+        }
+
+        // ─── Simulate Input Events ─────────────────────────────
+        // These methods invoke the same events on the InputReader
+        // that keyboard input would. This keeps the PlayerController
+        // completely unaware of input source.
+
+        private void SimulateMoveInput(int direction)
+        {
+            // We need the InputReader to fire its OnMoveInput event.
+            // Since OnMoveInput is an event (can only be invoked by owner),
+            // we add a public method to InputReader for this purpose.
+            inputReader.RaiseMoveInput(direction);
+        }
+
+        private void SimulateJumpInput()
+        {
+            inputReader.RaiseJumpInput();
+        }
+
+        private void SimulateSlideInput()
+        {
+            inputReader.RaiseSlideInput();
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>We need to add the public raise methods to InputReader so the SwipeDetector can fire events through it. Add these methods to the InputReader class:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">InputReader.cs (add these methods)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Add these inside the InputReader class, after the IGameplayActions methods:
+
+// ─── Public Raise Methods (for SwipeDetector) ──────────────
+// These allow external sources (like SwipeDetector) to fire input events.
+
+/// &lt;summary&gt;Manually raise a move input event.&lt;/summary&gt;
+public void RaiseMoveInput(int direction)
+{
+    OnMoveInput?.Invoke(direction);
+}
+
+/// &lt;summary&gt;Manually raise a jump input event.&lt;/summary&gt;
+public void RaiseJumpInput()
+{
+    OnJumpInput?.Invoke();
+}
+
+/// &lt;summary&gt;Manually raise a slide input event.&lt;/summary&gt;
+public void RaiseSlideInput()
+{
+    OnSlideInput?.Invoke();
+}</code></pre>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title">The Swipe Algorithm Visualized</div>
+          <p>
+            Imagine the screen as a grid. When the finger touches down, we mark that point. When it lifts off, we draw an arrow from start to end. If the arrow is long enough (passes the threshold), we look at its angle. Mostly horizontal and pointing right? Swipe right. Mostly vertical and pointing up? Jump. The <code>Mathf.Abs(x) &gt; Mathf.Abs(y)</code> check determines whether the swipe is more horizontal or vertical.
+          </p>
+        </div>
+      </section>
+
+      <!-- SECTION: Testing Input -->
+      <section>
+        <h2>Testing Your Input</h2>
+        <p>Before connecting input to the player, let us verify it works with a simple test script.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">InputTester.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Input
+{
+    /// &lt;summary&gt;
+    /// Temporary script to test input events.
+    /// Attach to any GameObject and assign the InputReader asset.
+    /// Delete this before shipping!
+    /// &lt;/summary&gt;
+    public class InputTester : MonoBehaviour
+    {
+        [SerializeField] private InputReader inputReader;
+
+        private void OnEnable()
+        {
+            inputReader.OnMoveInput += HandleMove;
+            inputReader.OnJumpInput += HandleJump;
+            inputReader.OnSlideInput += HandleSlide;
+        }
+
+        private void OnDisable()
+        {
+            inputReader.OnMoveInput -= HandleMove;
+            inputReader.OnJumpInput -= HandleJump;
+            inputReader.OnSlideInput -= HandleSlide;
+        }
+
+        private void HandleMove(int direction)
+        {
+            string dir = direction &lt; 0 ? "LEFT" : "RIGHT";
+            Debug.Log($"&lt;color=green&gt;[Input]&lt;/color&gt; Move {dir}");
+        }
+
+        private void HandleJump()
+        {
+            Debug.Log("&lt;color=yellow&gt;[Input]&lt;/color&gt; JUMP!");
+        }
+
+        private void HandleSlide()
+        {
+            Debug.Log("&lt;color=cyan&gt;[Input]&lt;/color&gt; SLIDE!");
+        }
+    }
+}</code></pre>
+        </div>
+
+        <ol class="steps">
+          <li>In the Project window, right-click in <code>Assets/ScriptableObjects/</code> and select <strong>Create &gt; Infinite Runner &gt; Input &gt; Input Reader</strong>. Name it <code>InputReader</code>.</li>
+          <li>Create an empty GameObject named <code>[InputTester]</code>.</li>
+          <li>Attach the <code>InputTester</code> script.</li>
+          <li>Drag the <code>InputReader</code> ScriptableObject asset into the "Input Reader" field.</li>
+          <li>Press <strong>Play</strong>.</li>
+          <li>Press <strong>A/D</strong> or <strong>Left/Right arrows</strong> &mdash; you should see "Move LEFT" or "Move RIGHT" in the Console.</li>
+          <li>Press <strong>Space</strong> &mdash; you should see "JUMP!" in the Console.</li>
+          <li>Press <strong>S</strong> or <strong>Down Arrow</strong> &mdash; you should see "SLIDE!" in the Console.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Testing Touch on Desktop</div>
+          <p>You can test touch input without a phone. In the Unity Editor, go to <strong>Window &gt; Analysis &gt; Input Debugger</strong>. This shows all connected input devices. You can also use Unity's <strong>Device Simulator</strong> (Window &gt; General &gt; Device Simulator) to simulate a mobile screen and touch gestures.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Architecture Overview -->
+      <section>
+        <h2>Input Architecture Overview</h2>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Input Flow</span><span class="lang-badge">Architecture</span></div>
+          <pre><code>  PHYSICAL INPUT              INPUT READER              GAME SYSTEMS
+  (hardware)              (ScriptableObject)           (subscribers)
+
+  +----------------+      +------------------+      +------------------+
+  | Keyboard       |      |                  |      | PlayerController |
+  | A/D, Space, S  | --&gt;  |   InputReader    | --&gt;  | "switch lane,    |
+  +----------------+      |                  |      |  jump, slide"    |
+                           |  OnMoveInput     |      +------------------+
+  +----------------+      |  OnJumpInput     |
+  | Touchscreen    |      |  OnSlideInput    |      +------------------+
+  | Swipe gestures | --&gt;  |                  | --&gt;  | UI System        |
+  +----------------+      +------------------+      | "navigate menus" |
+       |                         ^                   +------------------+
+       v                         |
+  +----------------+             |
+  | SwipeDetector  | ────────────+
+  | (MonoBehaviour)|  calls RaiseMoveInput(), etc.
+  +----------------+
+
+  Key: The PlayerController never knows if input came from
+  a keyboard or a touchscreen. It just reacts to events.</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Project Files -->
+      <section>
+        <h2>Project Files After This Chapter</h2>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Input/
+    PlayerInputActions.inputactions   &lt;-- The Input Actions asset
+  Scripts/
+    Input/
+      PlayerInputActions.cs           &lt;-- Auto-generated C# wrapper
+      InputReader.cs                  &lt;-- Our ScriptableObject input wrapper
+      SwipeDetector.cs                &lt;-- Touch/swipe handler for mobile
+      InputTester.cs                  &lt;-- Temporary test script
+  ScriptableObjects/
+    InputReader.asset                 &lt;-- The InputReader SO instance</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <ul>
+          <li>Installed Unity's <strong>New Input System</strong> package.</li>
+          <li>Created an <strong>Input Actions asset</strong> with Move, Jump, and Slide actions.</li>
+          <li>Set up <strong>keyboard bindings</strong> (WASD, Arrows, Space, Ctrl).</li>
+          <li>Built an <strong>InputReader</strong> ScriptableObject that translates raw input into clean C# events.</li>
+          <li>Created a <strong>SwipeDetector</strong> for mobile touch/swipe input that feeds into the same event system.</li>
+          <li>Verified everything with a test script and Debug.Log output.</li>
+        </ul>
+        <p>In the next chapter, we will build the <strong>Player Controller</strong> that subscribes to these input events and makes the character run, switch lanes, jump, and slide.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Input is wired up. Before moving on, save this working state.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git add .
+git commit -m "Add input system with keyboard and swipe support"</code></pre>
+        </div>
+        <p>Before staging, try running <code>git diff</code> to see exactly what lines you changed since your last commit. This is incredibly useful for reviewing your own work before committing.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="07-event-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Event System</span></a>
+        <a href="09-player-controller.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Player Controller</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

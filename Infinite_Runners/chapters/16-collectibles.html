@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collectibles &amp; Power-ups - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link active"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 16</span>
+        <h1>Collectibles &amp; Power-ups</h1>
+        <p class="chapter-desc">Build a coin collection system with object pooling, create pattern-based coin layouts, and implement three distinct power-ups that transform gameplay.</p>
+      </div>
+
+      <!-- SECTION: Introduction -->
+      <section>
+        <h2>What Makes Collectibles Fun?</h2>
+        <p>Think about Subway Surfers, Temple Run, or any endless runner you have played. Coins are everywhere &mdash; they draw lines through the air, form arcs over obstacles, and create irresistible paths that pull you toward danger and reward simultaneously. Collectibles serve three critical purposes in an infinite runner:</p>
+        <ul>
+          <li><strong>Guidance:</strong> Coin trails silently teach the player where to go, forming a visual breadcrumb trail through the world.</li>
+          <li><strong>Risk-Reward:</strong> Placing coins near obstacles forces the player to choose between safety and greed.</li>
+          <li><strong>Progression:</strong> Coins give the player a secondary goal beyond simply surviving, and they feel rewarding to collect.</li>
+        </ul>
+        <p>Power-ups layer on top of this by temporarily changing the rules of the game. A magnet makes coins fly toward you. A shield lets you survive a hit. A score multiplier rewards skilled play. These moments of empowerment keep the game fresh across long play sessions.</p>
+        <p>In this chapter, we will build all of these systems from scratch, tying them into the object pooling and chunk systems we already have.</p>
+      </section>
+
+      <!-- SECTION: Coin System Design -->
+      <section>
+        <h2>Coin System Design</h2>
+        <p>Before writing any code, let us think about how coins will work in our game. Our design must answer several questions:</p>
+        <ul>
+          <li><strong>Where do coins come from?</strong> Each world chunk has predefined spawn points for collectibles. When a chunk is activated, a CoinSpawner places coins at those points.</li>
+          <li><strong>How are coins managed?</strong> We use the object pool from Chapter 12. Coins are never instantiated or destroyed at runtime &mdash; they are borrowed from and returned to the pool.</li>
+          <li><strong>What happens when a player collects a coin?</strong> The coin fires a collection event, plays a visual/audio effect, and returns itself to the pool.</li>
+          <li><strong>How do coin patterns work?</strong> We define pattern templates (lines, arcs, zigzags) that are placed along the chunk's collectible spawn points.</li>
+        </ul>
+
+        <div class="callout info">
+          <div class="callout-title">Architecture Recap</div>
+          <p>Remember from Chapter 12 that our <code>IPoolable</code> interface requires <code>OnSpawnFromPool()</code> and <code>OnReturnToPool()</code> methods. Every coin implements this interface so the pool can initialize and reset it properly.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: IPoolable Interface Reminder -->
+      <section>
+        <h2>The IPoolable Interface</h2>
+        <p>Here is the <code>IPoolable</code> interface we defined in Chapter 12. We will reference it throughout this chapter, so here it is again for convenience:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">IPoolable.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Interface for objects that can be managed by the ObjectPool.
+    /// Any pooled object must implement these two lifecycle methods.
+    /// &lt;/summary&gt;
+    public interface IPoolable
+    {
+        /// &lt;summary&gt;
+        /// Called when this object is taken from the pool and placed in the world.
+        /// Use this to reset state, enable visuals, and start behavior.
+        /// &lt;/summary&gt;
+        void OnSpawnFromPool();
+
+        /// &lt;summary&gt;
+        /// Called when this object is returned to the pool.
+        /// Use this to disable visuals, stop coroutines, and clean up.
+        /// &lt;/summary&gt;
+        void OnReturnToPool();
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Coin.cs -->
+      <section>
+        <h2>Building the Coin Script</h2>
+        <p>The <code>Coin</code> class is the heart of our collectible system. It handles the spinning animation that makes coins visually appealing, detects when the player touches it, fires a collection event, and returns itself to the object pool. Let us build it step by step.</p>
+
+        <h3>Step 1: Create the Script</h3>
+        <ol class="steps">
+          <li>In your Project window, navigate to <code>Assets/Scripts/Gameplay</code>.</li>
+          <li>Right-click and select <strong>Create &gt; C# Script</strong>.</li>
+          <li>Name it <code>Coin</code>.</li>
+          <li>Double-click to open it in your code editor.</li>
+        </ol>
+
+        <h3>Step 2: Write the Full Coin Script</h3>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Coin.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Represents a single collectible coin in the game world.
+    /// Coins spin to attract the player's attention, detect collection
+    /// via trigger colliders, and return themselves to the object pool
+    /// when collected or when the chunk they belong to is recycled.
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Collider))]
+    public class Coin : MonoBehaviour, IPoolable
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Spin Animation")]
+        [Tooltip("How fast the coin rotates around its Y-axis in degrees per second.")]
+        [SerializeField] private float spinSpeed = 180f;
+
+        [Header("Hover Animation")]
+        [Tooltip("How far up and down the coin bobs (in Unity units).")]
+        [SerializeField] private float hoverAmplitude = 0.15f;
+
+        [Tooltip("How fast the coin bobs up and down (cycles per second).")]
+        [SerializeField] private float hoverFrequency = 2f;
+
+        [Header("Collection")]
+        [Tooltip("How many base points this coin is worth.")]
+        [SerializeField] private int coinValue = 1;
+
+        [Tooltip("Tag that identifies the player GameObject.")]
+        [SerializeField] private string playerTag = "Player";
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // The Y position where this coin was originally placed.
+        // We use this as the center point for the hover animation.
+        private float baseYPosition;
+
+        // Tracks how far along the hover sine wave we are.
+        // Randomized on spawn so not all coins bob in sync.
+        private float hoverTimer;
+
+        // Whether this coin is currently active and collectible.
+        // Prevents double-collection if two triggers overlap.
+        private bool isActive;
+
+        // Cached reference to our visual child (the mesh/sprite).
+        // We disable this on collection for an instant visual response.
+        private GameObject visual;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Cache the visual child. We assume the first child is the
+            // coin's visual representation (mesh or sprite).
+            if (transform.childCount > 0)
+            {
+                visual = transform.GetChild(0).gameObject;
+            }
+
+            // Make sure our collider is set to trigger mode.
+            // Triggers detect overlap without causing physics collisions.
+            Collider col = GetComponent&lt;Collider&gt;();
+            if (col != null)
+            {
+                col.isTrigger = true;
+            }
+        }
+
+        private void Update()
+        {
+            // Only animate while the coin is active.
+            if (!isActive) return;
+
+            // --- Spin Animation ---
+            // Rotate around the Y-axis (up) each frame.
+            // Time.deltaTime ensures smooth, frame-rate-independent rotation.
+            transform.Rotate(Vector3.up, spinSpeed * Time.deltaTime, Space.Self);
+
+            // --- Hover Animation ---
+            // Advance the hover timer by the elapsed frame time.
+            hoverTimer += Time.deltaTime;
+
+            // Calculate a new Y position using a sine wave.
+            // Sin oscillates between -1 and 1, so multiplying by amplitude
+            // gives us smooth up-and-down motion centered on baseYPosition.
+            float newY = baseYPosition
+                + Mathf.Sin(hoverTimer * hoverFrequency * Mathf.PI * 2f)
+                * hoverAmplitude;
+
+            // Apply the new position, keeping X and Z unchanged.
+            Vector3 pos = transform.position;
+            pos.y = newY;
+            transform.position = pos;
+        }
+
+        // ---------------------------------------------------------------
+        // Trigger Detection
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called by Unity's physics system when another collider enters
+        /// our trigger volume. We check if it is the player and, if so,
+        /// collect this coin.
+        /// &lt;/summary&gt;
+        private void OnTriggerEnter(Collider other)
+        {
+            // Ignore if we have already been collected.
+            if (!isActive) return;
+
+            // Only the player can collect coins.
+            if (!other.CompareTag(playerTag)) return;
+
+            Collect();
+        }
+
+        // ---------------------------------------------------------------
+        // Collection Logic
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Handles the collection of this coin. Fires an event so other
+        /// systems (scoring, audio, particles) can react, then returns
+        /// this coin to the object pool.
+        /// &lt;/summary&gt;
+        private void Collect()
+        {
+            // Mark as inactive to prevent double-collection.
+            isActive = false;
+
+            // Fire the coin collected event so the ScoreManager,
+            // AudioManager, and particle systems can respond.
+            GameEvents.OnCoinCollected?.Invoke(coinValue);
+
+            // Hide the visual immediately for instant feedback.
+            // The actual pool return can happen a frame later if needed.
+            if (visual != null)
+            {
+                visual.SetActive(false);
+            }
+
+            // Return this coin to the object pool.
+            // The pool will deactivate the entire GameObject.
+            ObjectPool.Instance.Return(gameObject);
+        }
+
+        // ---------------------------------------------------------------
+        // IPoolable Implementation
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when this coin is spawned from the pool.
+        /// Resets all state so it behaves like a fresh coin.
+        /// &lt;/summary&gt;
+        public void OnSpawnFromPool()
+        {
+            // Mark as active and collectible.
+            isActive = true;
+
+            // Show the visual.
+            if (visual != null)
+            {
+                visual.SetActive(true);
+            }
+
+            // Record the starting Y position for the hover animation.
+            baseYPosition = transform.position.y;
+
+            // Randomize the hover timer so coins placed in a line
+            // do not all bob in perfect sync. This looks more natural.
+            hoverTimer = Random.Range(0f, 2f);
+
+            // Reset rotation so every coin starts facing the same way.
+            transform.rotation = Quaternion.identity;
+        }
+
+        /// &lt;summary&gt;
+        /// Called when this coin is returned to the pool.
+        /// Cleans up state and stops animations.
+        /// &lt;/summary&gt;
+        public void OnReturnToPool()
+        {
+            isActive = false;
+
+            if (visual != null)
+            {
+                visual.SetActive(false);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Returns the point value of this coin.
+        /// Used by external systems that need to know coin worth.
+        /// &lt;/summary&gt;
+        public int GetValue()
+        {
+            return coinValue;
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">Why Randomize the Hover Timer?</div>
+          <p>If you place 10 coins in a line and they all start their sine wave at the same time, they bob up and down in perfect unison. This looks robotic and unnatural. By giving each coin a random starting offset for <code>hoverTimer</code>, they all hover at slightly different phases, creating a much more organic, wave-like visual.</p>
+        </div>
+
+        <h3>Step 3: Set Up the Coin Prefab in Unity</h3>
+        <ol class="steps">
+          <li>In the Hierarchy, create an empty GameObject and name it <code>Coin</code>.</li>
+          <li>Add a <strong>Sphere Collider</strong> component. Set its <strong>Radius</strong> to <code>0.5</code> and check <strong>Is Trigger</strong>.</li>
+          <li>Create a child object: right-click on Coin &gt; <strong>3D Object &gt; Cylinder</strong>. This will be our coin visual.</li>
+          <li>Scale the cylinder to <code>(0.5, 0.05, 0.5)</code> to flatten it into a disc shape.</li>
+          <li>Create a gold-colored material and assign it to the cylinder.</li>
+          <li>Add the <code>Coin</code> script to the parent <code>Coin</code> GameObject.</li>
+          <li>Drag the entire <code>Coin</code> object from the Hierarchy into your <code>Assets/Prefabs/Collectibles</code> folder to create the prefab.</li>
+          <li>Delete the instance from the scene &mdash; the pool will manage spawning.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Do Not Forget the Player Tag</div>
+          <p>The coin uses <code>CompareTag("Player")</code> to detect collection. Make sure your player GameObject has the <strong>Player</strong> tag assigned in the Inspector. You can set this at the top of the Inspector when you select the player.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Coin Patterns -->
+      <section>
+        <h2>Coin Patterns</h2>
+        <p>Placing coins randomly looks messy and does not guide the player. Professional runners use <em>patterns</em> &mdash; predefined arrangements of coins that form recognizable shapes. These patterns serve as visual language: a line of coins says "go straight," an arc says "jump here," and a zigzag says "weave between lanes."</p>
+
+        <h3>Defining Pattern Types</h3>
+        <p>We start by defining an enum for the different pattern shapes we support:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">CoinPattern.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Defines the different arrangements coins can be placed in.
+    /// Each pattern creates a distinct visual shape that guides the player.
+    /// &lt;/summary&gt;
+    public enum CoinPatternType
+    {
+        /// &lt;summary&gt;A straight line of coins along a single lane.&lt;/summary&gt;
+        Line,
+
+        /// &lt;summary&gt;An arc of coins that rises and falls, suggesting a jump.&lt;/summary&gt;
+        Arc,
+
+        /// &lt;summary&gt;Coins that alternate between two lanes, forming a zigzag.&lt;/summary&gt;
+        Zigzag,
+
+        /// &lt;summary&gt;A cluster of coins grouped tightly together.&lt;/summary&gt;
+        Cluster,
+
+        /// &lt;summary&gt;No coins for this section (used for spacing).&lt;/summary&gt;
+        None
+    }
+}</code></pre></div>
+
+        <h3>Pattern Data Structure</h3>
+        <p>Each pattern is described by a ScriptableObject that defines exactly where coins go relative to a starting point. This lets designers create and tweak patterns in the Unity Inspector without touching code.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">CoinPatternData.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// ScriptableObject that defines a coin placement pattern.
+    /// Each pattern stores an array of local offsets where coins
+    /// should be placed relative to the pattern's origin point.
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewCoinPattern",
+        menuName = "Infinite Runner/Coin Pattern"
+    )]
+    public class CoinPatternData : ScriptableObject
+    {
+        [Tooltip("Human-readable name for this pattern.")]
+        public string patternName = "New Pattern";
+
+        [Tooltip("The type of pattern for categorization.")]
+        public CoinPatternType patternType = CoinPatternType.Line;
+
+        [Tooltip("Local position offsets for each coin in this pattern. " +
+                 "X = lane offset, Y = height, Z = forward distance.")]
+        public Vector3[] coinOffsets;
+
+        [Tooltip("How likely this pattern is to be selected (higher = more common).")]
+        [Range(0f, 1f)]
+        public float spawnWeight = 0.5f;
+
+        [Tooltip("Minimum difficulty level before this pattern can appear.")]
+        [Range(0f, 1f)]
+        public float minDifficulty = 0f;
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Creating Patterns in the Inspector</div>
+          <p>To create a line of 5 coins: set <code>coinOffsets</code> to have 5 entries with values like <code>(0, 1, 0)</code>, <code>(0, 1, 2)</code>, <code>(0, 1, 4)</code>, <code>(0, 1, 6)</code>, <code>(0, 1, 8)</code>. The X value of <code>0</code> means center lane, Y of <code>1</code> puts them at collectible height, and Z values space them 2 units apart going forward.</p>
+        </div>
+
+        <h3>Example Patterns</h3>
+        <p>Here are the offset arrays for each built-in pattern type. You will enter these values in the Unity Inspector when creating your ScriptableObject assets:</p>
+
+        <p><strong>Line Pattern (5 coins, straight ahead):</strong></p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Line Pattern Offsets</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Coins spaced 2 units apart along the Z-axis (forward)
+// All at Y=1 (comfortable collection height)
+coinOffsets = new Vector3[]
+{
+    new Vector3(0f, 1f, 0f),
+    new Vector3(0f, 1f, 2f),
+    new Vector3(0f, 1f, 4f),
+    new Vector3(0f, 1f, 6f),
+    new Vector3(0f, 1f, 8f)
+};</code></pre></div>
+
+        <p><strong>Arc Pattern (7 coins, rises and falls):</strong></p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Arc Pattern Offsets</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Coins form an arch shape - great for placing over obstacles
+// Y values rise to a peak at the center, then fall back down
+coinOffsets = new Vector3[]
+{
+    new Vector3(0f, 1.0f, 0f),
+    new Vector3(0f, 1.5f, 1.5f),
+    new Vector3(0f, 2.2f, 3f),
+    new Vector3(0f, 2.8f, 4.5f),  // Peak of the arc
+    new Vector3(0f, 2.2f, 6f),
+    new Vector3(0f, 1.5f, 7.5f),
+    new Vector3(0f, 1.0f, 9f)
+};</code></pre></div>
+
+        <p><strong>Zigzag Pattern (6 coins, alternates lanes):</strong></p>
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Zigzag Pattern Offsets</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Coins alternate left and right on the X-axis
+// laneWidth is typically 2.0 units in our game
+coinOffsets = new Vector3[]
+{
+    new Vector3(-2f, 1f, 0f),    // Left lane
+    new Vector3( 0f, 1f, 2f),    // Center lane
+    new Vector3( 2f, 1f, 4f),    // Right lane
+    new Vector3( 0f, 1f, 6f),    // Center lane
+    new Vector3(-2f, 1f, 8f),    // Left lane
+    new Vector3( 0f, 1f, 10f)    // Center lane
+};</code></pre></div>
+      </section>
+
+      <!-- SECTION: CoinSpawner.cs -->
+      <section>
+        <h2>The Coin Spawner</h2>
+        <p>The <code>CoinSpawner</code> is responsible for placing coins on each chunk when it is activated. It selects a pattern, pulls coins from the object pool, and positions them at the chunk's collectible spawn points.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">CoinSpawner.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Places coins on world chunks using predefined patterns.
+    /// Works with the ObjectPool to borrow and return coin instances.
+    ///
+    /// Attach this to the same GameObject as the WorldGenerator,
+    /// or any persistent manager object.
+    /// &lt;/summary&gt;
+    public class CoinSpawner : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Coin Prefab")]
+        [Tooltip("The coin prefab registered with the ObjectPool.")]
+        [SerializeField] private GameObject coinPrefab;
+
+        [Header("Patterns")]
+        [Tooltip("All available coin patterns. The spawner will randomly " +
+                 "select from these based on weight and difficulty.")]
+        [SerializeField] private CoinPatternData[] availablePatterns;
+
+        [Header("Spawn Settings")]
+        [Tooltip("Probability (0-1) that a chunk will have coins at all.")]
+        [Range(0f, 1f)]
+        [SerializeField] private float spawnChance = 0.7f;
+
+        [Tooltip("Maximum number of coins that can be active at once. " +
+                 "Prevents performance issues from too many coins.")]
+        [SerializeField] private int maxActiveCoins = 50;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // Tracks all currently active coins so we can return them
+        // when their parent chunk is recycled.
+        private List&lt;GameObject&gt; activeCoins = new List&lt;GameObject&gt;();
+
+        // Reference to the current difficulty level (0 to 1).
+        // Updated by the DifficultyManager.
+        private float currentDifficulty = 0f;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void OnEnable()
+        {
+            // Listen for chunk activation events from the WorldGenerator.
+            GameEvents.OnChunkActivated += HandleChunkActivated;
+
+            // Listen for chunk deactivation so we can reclaim coins.
+            GameEvents.OnChunkDeactivated += HandleChunkDeactivated;
+
+            // Listen for difficulty changes to filter patterns.
+            GameEvents.OnDifficultyChanged += HandleDifficultyChanged;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnChunkActivated -= HandleChunkActivated;
+            GameEvents.OnChunkDeactivated -= HandleChunkDeactivated;
+            GameEvents.OnDifficultyChanged -= HandleDifficultyChanged;
+        }
+
+        // ---------------------------------------------------------------
+        // Event Handlers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when a new chunk enters the world.
+        /// Decides whether to spawn coins and, if so, which pattern to use.
+        /// &lt;/summary&gt;
+        /// &lt;param name="chunkTransform"&gt;The transform of the activated chunk.&lt;/param&gt;
+        /// &lt;param name="spawnPoints"&gt;Collectible spawn points on the chunk.&lt;/param&gt;
+        private void HandleChunkActivated(
+            Transform chunkTransform,
+            Transform[] spawnPoints)
+        {
+            // Roll the dice - should this chunk have coins?
+            if (Random.value > spawnChance) return;
+
+            // Don't exceed our coin budget.
+            if (activeCoins.Count >= maxActiveCoins) return;
+
+            // No spawn points? Nothing to do.
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+
+            // Pick a pattern that matches the current difficulty.
+            CoinPatternData pattern = SelectPattern();
+            if (pattern == null) return;
+
+            // Place coins at the spawn point using the chosen pattern.
+            // We use the first spawn point as the pattern origin.
+            SpawnPattern(pattern, spawnPoints[0].position);
+        }
+
+        /// &lt;summary&gt;
+        /// Called when a chunk is recycled. Returns all coins that
+        /// were on that chunk back to the object pool.
+        /// &lt;/summary&gt;
+        private void HandleChunkDeactivated(Transform chunkTransform)
+        {
+            // We need to return coins that are children of this chunk
+            // or within its bounds. For simplicity, we track coins by
+            // their parent association.
+            ReturnCoinsForChunk(chunkTransform);
+        }
+
+        /// &lt;summary&gt;
+        /// Updates our local difficulty reference.
+        /// &lt;/summary&gt;
+        private void HandleDifficultyChanged(float newDifficulty)
+        {
+            currentDifficulty = newDifficulty;
+        }
+
+        // ---------------------------------------------------------------
+        // Pattern Selection
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Selects a coin pattern based on spawn weights and current
+        /// difficulty. Patterns with higher weights are more likely
+        /// to be chosen. Patterns with a minDifficulty above the
+        /// current level are excluded.
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;A suitable pattern, or null if none qualify.&lt;/returns&gt;
+        private CoinPatternData SelectPattern()
+        {
+            // Build a list of eligible patterns.
+            float totalWeight = 0f;
+            List&lt;CoinPatternData&gt; eligible = new List&lt;CoinPatternData&gt;();
+
+            for (int i = 0; i &lt; availablePatterns.Length; i++)
+            {
+                CoinPatternData pattern = availablePatterns[i];
+
+                // Skip patterns that require higher difficulty than current.
+                if (pattern.minDifficulty > currentDifficulty) continue;
+
+                eligible.Add(pattern);
+                totalWeight += pattern.spawnWeight;
+            }
+
+            if (eligible.Count == 0) return null;
+
+            // Weighted random selection.
+            float roll = Random.Range(0f, totalWeight);
+            float cumulative = 0f;
+
+            for (int i = 0; i &lt; eligible.Count; i++)
+            {
+                cumulative += eligible[i].spawnWeight;
+                if (roll &lt;= cumulative)
+                {
+                    return eligible[i];
+                }
+            }
+
+            // Fallback (should not reach here, but just in case).
+            return eligible[eligible.Count - 1];
+        }
+
+        // ---------------------------------------------------------------
+        // Spawning
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Spawns coins in the world according to the given pattern,
+        /// anchored at the specified origin position.
+        /// &lt;/summary&gt;
+        private void SpawnPattern(CoinPatternData pattern, Vector3 origin)
+        {
+            for (int i = 0; i &lt; pattern.coinOffsets.Length; i++)
+            {
+                // Don't exceed our coin budget mid-pattern.
+                if (activeCoins.Count >= maxActiveCoins) break;
+
+                // Calculate world position from pattern offset.
+                Vector3 worldPos = origin + pattern.coinOffsets[i];
+
+                // Get a coin from the pool.
+                GameObject coin = ObjectPool.Instance.Get(coinPrefab);
+                if (coin == null) continue;
+
+                // Position the coin in the world.
+                coin.transform.position = worldPos;
+
+                // Initialize the coin via IPoolable.
+                IPoolable poolable = coin.GetComponent&lt;IPoolable&gt;();
+                poolable?.OnSpawnFromPool();
+
+                // Track this coin.
+                activeCoins.Add(coin);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Returns all coins associated with a deactivated chunk
+        /// back to the object pool.
+        /// &lt;/summary&gt;
+        private void ReturnCoinsForChunk(Transform chunkTransform)
+        {
+            // Get the chunk's Z range to determine which coins belong to it.
+            float chunkStartZ = chunkTransform.position.z;
+            float chunkLength = 50f; // Should match your chunk length.
+            float chunkEndZ = chunkStartZ + chunkLength;
+
+            for (int i = activeCoins.Count - 1; i >= 0; i--)
+            {
+                if (activeCoins[i] == null)
+                {
+                    activeCoins.RemoveAt(i);
+                    continue;
+                }
+
+                float coinZ = activeCoins[i].transform.position.z;
+
+                // If this coin is within the chunk's Z range, return it.
+                if (coinZ >= chunkStartZ && coinZ &lt;= chunkEndZ)
+                {
+                    IPoolable poolable =
+                        activeCoins[i].GetComponent&lt;IPoolable&gt;();
+                    poolable?.OnReturnToPool();
+
+                    ObjectPool.Instance.Return(activeCoins[i]);
+                    activeCoins.RemoveAt(i);
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Returns all active coins to the pool. Called on game restart.
+        /// &lt;/summary&gt;
+        public void ReturnAllCoins()
+        {
+            for (int i = activeCoins.Count - 1; i >= 0; i--)
+            {
+                if (activeCoins[i] == null) continue;
+
+                IPoolable poolable =
+                    activeCoins[i].GetComponent&lt;IPoolable&gt;();
+                poolable?.OnReturnToPool();
+
+                ObjectPool.Instance.Return(activeCoins[i]);
+            }
+
+            activeCoins.Clear();
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">Iterating Backwards When Removing</div>
+          <p>Notice that in <code>ReturnCoinsForChunk</code> and <code>ReturnAllCoins</code>, we iterate the list backwards (<code>i--</code>). This is a critical pattern in C#: when you remove items from a list while iterating, going backwards prevents index shifting from causing you to skip elements or go out of bounds.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Power-up Base Class -->
+      <section>
+        <h2>Power-up System Design</h2>
+        <p>Power-ups are temporary abilities that change the rules of the game. They make the player feel powerful for a short time, creating memorable moments. Our system supports three power-ups:</p>
+
+        <ul>
+          <li><strong>Magnet:</strong> Attracts nearby coins automatically, so you do not need to run directly over them.</li>
+          <li><strong>Shield:</strong> Absorbs one hit from an obstacle, saving you from death.</li>
+          <li><strong>Score Multiplier:</strong> Doubles all points earned while active.</li>
+        </ul>
+
+        <p>All three share common behavior: they can be picked up, they have a duration, and they expire. We use a base class to capture this shared behavior, then create subclasses for the specific effects.</p>
+
+        <h3>The PowerUp Base Class</h3>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PowerUp.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// The type of power-up. Used to identify power-ups throughout
+    /// the codebase and prevent stacking of the same type.
+    /// &lt;/summary&gt;
+    public enum PowerUpType
+    {
+        Magnet,
+        Shield,
+        ScoreMultiplier
+    }
+
+    /// &lt;summary&gt;
+    /// Base class for all power-up pickups in the game world.
+    /// Handles the common behavior: trigger detection, pool lifecycle,
+    /// spinning animation, and event firing.
+    ///
+    /// Subclasses define the specific effect by overriding
+    /// GetPowerUpType() and GetDuration().
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Collider))]
+    public abstract class PowerUp : MonoBehaviour, IPoolable
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Pickup Settings")]
+        [Tooltip("How long the power-up effect lasts in seconds.")]
+        [SerializeField] protected float duration = 8f;
+
+        [Tooltip("How fast the pickup spins in the world.")]
+        [SerializeField] private float spinSpeed = 120f;
+
+        [Tooltip("Tag that identifies the player.")]
+        [SerializeField] private string playerTag = "Player";
+
+        [Header("Visuals")]
+        [Tooltip("The glow or particle effect shown on the pickup.")]
+        [SerializeField] private GameObject glowEffect;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        private bool isActive;
+
+        // ---------------------------------------------------------------
+        // Abstract Methods (subclasses must implement)
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Returns the type of this power-up.
+        /// Each subclass provides its own type.
+        /// &lt;/summary&gt;
+        public abstract PowerUpType GetPowerUpType();
+
+        /// &lt;summary&gt;
+        /// Returns how long this power-up's effect lasts.
+        /// &lt;/summary&gt;
+        public virtual float GetDuration()
+        {
+            return duration;
+        }
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Ensure the collider is a trigger.
+            Collider col = GetComponent&lt;Collider&gt;();
+            if (col != null)
+            {
+                col.isTrigger = true;
+            }
+        }
+
+        private void Update()
+        {
+            if (!isActive) return;
+
+            // Spin the pickup to make it visually distinct from coins.
+            transform.Rotate(Vector3.up, spinSpeed * Time.deltaTime);
+        }
+
+        // ---------------------------------------------------------------
+        // Trigger Detection
+        // ---------------------------------------------------------------
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!isActive) return;
+            if (!other.CompareTag(playerTag)) return;
+
+            PickUp();
+        }
+
+        // ---------------------------------------------------------------
+        // Pickup Logic
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when the player collects this power-up.
+        /// Fires an event and returns the pickup to the pool.
+        /// &lt;/summary&gt;
+        private void PickUp()
+        {
+            isActive = false;
+
+            // Notify the PowerUpManager that a power-up was collected.
+            // The manager handles activating the effect and managing timers.
+            GameEvents.OnPowerUpCollected?.Invoke(
+                GetPowerUpType(),
+                GetDuration()
+            );
+
+            // Return to pool.
+            ObjectPool.Instance.Return(gameObject);
+        }
+
+        // ---------------------------------------------------------------
+        // IPoolable Implementation
+        // ---------------------------------------------------------------
+
+        public void OnSpawnFromPool()
+        {
+            isActive = true;
+
+            if (glowEffect != null)
+            {
+                glowEffect.SetActive(true);
+            }
+
+            transform.rotation = Quaternion.identity;
+        }
+
+        public void OnReturnToPool()
+        {
+            isActive = false;
+
+            if (glowEffect != null)
+            {
+                glowEffect.SetActive(false);
+            }
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">Why Use an Abstract Base Class?</div>
+          <p>The <code>abstract</code> keyword means you cannot create a <code>PowerUp</code> directly &mdash; you must create a specific subclass like <code>MagnetPowerUp</code>. This enforces the rule that every power-up must define its type and duration. The shared code (spinning, trigger detection, pooling) lives in the base class so we never duplicate it.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Three Power-ups -->
+      <section>
+        <h2>The Three Power-ups</h2>
+        <p>Each power-up is a small subclass that identifies its type. The actual <em>effect</em> logic lives in the <code>PowerUpManager</code> (next section), not in the pickup itself. This separation means the pickup is just a trigger &mdash; it tells the manager "the player collected a Magnet" and the manager applies the effect.</p>
+
+        <h3>Magnet Power-up</h3>
+        <p>The Magnet attracts nearby coins within a configurable radius, pulling them toward the player automatically. This makes it incredibly satisfying &mdash; coins fly from all lanes toward you.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">MagnetPowerUp.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Magnet power-up pickup. When collected, nearby coins are
+    /// attracted toward the player for the duration.
+    /// &lt;/summary&gt;
+    public class MagnetPowerUp : PowerUp
+    {
+        [Header("Magnet Settings")]
+        [Tooltip("The radius within which coins are attracted to the player.")]
+        [SerializeField] private float attractRadius = 8f;
+
+        [Tooltip("How fast coins move toward the player when attracted.")]
+        [SerializeField] private float attractSpeed = 15f;
+
+        /// &lt;summary&gt;
+        /// Identifies this as a Magnet power-up.
+        /// &lt;/summary&gt;
+        public override PowerUpType GetPowerUpType()
+        {
+            return PowerUpType.Magnet;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the attraction radius for the PowerUpManager to use.
+        /// &lt;/summary&gt;
+        public float GetAttractRadius()
+        {
+            return attractRadius;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the attraction speed for the PowerUpManager to use.
+        /// &lt;/summary&gt;
+        public float GetAttractSpeed()
+        {
+            return attractSpeed;
+        }
+    }
+}</code></pre></div>
+
+        <h3>Shield Power-up</h3>
+        <p>The Shield absorbs one collision with an obstacle, saving the player from death. It shows a visible bubble or glow around the player while active.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ShieldPowerUp.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Shield power-up pickup. When collected, the player can
+    /// survive one obstacle collision without dying.
+    /// The shield breaks on the first hit and the visual disappears.
+    /// &lt;/summary&gt;
+    public class ShieldPowerUp : PowerUp
+    {
+        /// &lt;summary&gt;
+        /// Identifies this as a Shield power-up.
+        /// &lt;/summary&gt;
+        public override PowerUpType GetPowerUpType()
+        {
+            return PowerUpType.Shield;
+        }
+    }
+}</code></pre></div>
+
+        <h3>Score Multiplier Power-up</h3>
+        <p>The Score Multiplier doubles all points earned (both distance and coin points) for its duration. This encourages skilled play &mdash; the better you perform while the multiplier is active, the more you benefit.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ScoreMultiplierPowerUp.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Score Multiplier power-up pickup. When collected, all score
+    /// gains are multiplied for the duration.
+    /// &lt;/summary&gt;
+    public class ScoreMultiplierPowerUp : PowerUp
+    {
+        [Header("Multiplier Settings")]
+        [Tooltip("The score multiplier applied while this power-up is active.")]
+        [SerializeField] private int multiplierValue = 2;
+
+        /// &lt;summary&gt;
+        /// Identifies this as a Score Multiplier power-up.
+        /// &lt;/summary&gt;
+        public override PowerUpType GetPowerUpType()
+        {
+            return PowerUpType.ScoreMultiplier;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the multiplier value (e.g., 2 for double points).
+        /// &lt;/summary&gt;
+        public int GetMultiplierValue()
+        {
+            return multiplierValue;
+        }
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: PowerUpManager.cs -->
+      <section>
+        <h2>The Power-up Manager</h2>
+        <p>The <code>PowerUpManager</code> is the brain of the power-up system. It listens for collection events, activates effects, manages timers, handles stacking rules, and fires events when power-ups start or expire. This is where the actual gameplay effects live.</p>
+
+        <h3>Stacking Rules</h3>
+        <p>What happens if the player picks up a Magnet while one is already active? We have a few options:</p>
+        <ul>
+          <li><strong>Refresh:</strong> Reset the timer back to full duration. (We use this approach.)</li>
+          <li><strong>Stack:</strong> Add the duration to the remaining time.</li>
+          <li><strong>Ignore:</strong> Do nothing if the same type is already active.</li>
+        </ul>
+        <p>We choose <strong>refresh</strong> because it feels rewarding without being overpowered. Different power-up <em>types</em> can be active simultaneously (e.g., Magnet + Shield), but you cannot have two Magnets at once.</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PowerUpManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Manages all active power-up effects. Listens for power-up
+    /// collection events, activates effects, counts down timers,
+    /// and fires events when power-ups start or expire.
+    ///
+    /// Attach this to a persistent manager GameObject.
+    /// &lt;/summary&gt;
+    public class PowerUpManager : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Singleton
+        // ---------------------------------------------------------------
+
+        public static PowerUpManager Instance { get; private set; }
+
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Magnet Settings")]
+        [Tooltip("The radius within which the magnet attracts coins.")]
+        [SerializeField] private float magnetRadius = 8f;
+
+        [Tooltip("How fast coins are pulled toward the player.")]
+        [SerializeField] private float magnetSpeed = 15f;
+
+        [Header("References")]
+        [Tooltip("Reference to the player's transform for magnet logic.")]
+        [SerializeField] private Transform playerTransform;
+
+        // ---------------------------------------------------------------
+        // Internal Data Structure
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Tracks the state of a single active power-up effect.
+        /// &lt;/summary&gt;
+        private class ActivePowerUp
+        {
+            public PowerUpType Type;
+            public float RemainingTime;
+            public float TotalDuration;
+
+            public ActivePowerUp(PowerUpType type, float duration)
+            {
+                Type = type;
+                RemainingTime = duration;
+                TotalDuration = duration;
+            }
+
+            /// &lt;summary&gt;
+            /// Returns 0-1 indicating how much time is left (1 = just started).
+            /// Used for UI display.
+            /// &lt;/summary&gt;
+            public float GetNormalizedTimeRemaining()
+            {
+                if (TotalDuration &lt;= 0f) return 0f;
+                return Mathf.Clamp01(RemainingTime / TotalDuration);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // All currently active power-ups, keyed by type.
+        // Using a dictionary ensures only one of each type at a time.
+        private Dictionary&lt;PowerUpType, ActivePowerUp&gt; activePowerUps
+            = new Dictionary&lt;PowerUpType, ActivePowerUp&gt;();
+
+        // Reusable list for collecting expired power-ups to remove.
+        // Avoids allocating a new list every frame.
+        private List&lt;PowerUpType&gt; expiredTypes = new List&lt;PowerUpType&gt;();
+
+        // The current score multiplier (1 when no multiplier is active).
+        private int currentMultiplier = 1;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            // Singleton setup.
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
+        private void OnEnable()
+        {
+            // Listen for power-up collection events.
+            GameEvents.OnPowerUpCollected += HandlePowerUpCollected;
+
+            // Listen for game over to clear all power-ups.
+            GameEvents.OnGameOver += HandleGameOver;
+
+            // Listen for obstacle hits to consume shields.
+            GameEvents.OnObstacleHit += HandleObstacleHit;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnPowerUpCollected -= HandlePowerUpCollected;
+            GameEvents.OnGameOver -= HandleGameOver;
+            GameEvents.OnObstacleHit -= HandleObstacleHit;
+        }
+
+        private void Update()
+        {
+            // Tick down all active power-up timers.
+            UpdateTimers();
+
+            // If the magnet is active, attract nearby coins.
+            if (IsPowerUpActive(PowerUpType.Magnet))
+            {
+                AttractNearbyCoins();
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Timer Management
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Updates all active power-up timers. Removes expired ones.
+        /// &lt;/summary&gt;
+        private void UpdateTimers()
+        {
+            expiredTypes.Clear();
+
+            // Iterate over all active power-ups and count down.
+            foreach (var kvp in activePowerUps)
+            {
+                ActivePowerUp powerUp = kvp.Value;
+                powerUp.RemainingTime -= Time.deltaTime;
+
+                // Fire a timer update event for UI.
+                GameEvents.OnPowerUpTimerUpdated?.Invoke(
+                    kvp.Key,
+                    powerUp.GetNormalizedTimeRemaining()
+                );
+
+                // Check if expired.
+                if (powerUp.RemainingTime &lt;= 0f)
+                {
+                    expiredTypes.Add(kvp.Key);
+                }
+            }
+
+            // Remove expired power-ups.
+            // We do this in a separate pass because you cannot modify
+            // a dictionary while iterating over it.
+            for (int i = 0; i &lt; expiredTypes.Count; i++)
+            {
+                DeactivatePowerUp(expiredTypes[i]);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Activation / Deactivation
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Handles a power-up being collected by the player.
+        /// If the same type is already active, refreshes the timer.
+        /// Otherwise, activates a new power-up.
+        /// &lt;/summary&gt;
+        private void HandlePowerUpCollected(
+            PowerUpType type,
+            float duration)
+        {
+            if (activePowerUps.ContainsKey(type))
+            {
+                // Refresh: reset the timer to the new duration.
+                activePowerUps[type].RemainingTime = duration;
+                activePowerUps[type].TotalDuration = duration;
+
+                Debug.Log($"[PowerUpManager] Refreshed {type} " +
+                          $"for {duration}s");
+            }
+            else
+            {
+                // Activate a new power-up.
+                activePowerUps[type] =
+                    new ActivePowerUp(type, duration);
+
+                // Apply the effect.
+                ApplyEffect(type);
+
+                Debug.Log($"[PowerUpManager] Activated {type} " +
+                          $"for {duration}s");
+            }
+
+            // Notify UI and other systems.
+            GameEvents.OnPowerUpActivated?.Invoke(type, duration);
+        }
+
+        /// &lt;summary&gt;
+        /// Removes a power-up and reverses its effect.
+        /// &lt;/summary&gt;
+        private void DeactivatePowerUp(PowerUpType type)
+        {
+            if (!activePowerUps.ContainsKey(type)) return;
+
+            // Remove the effect.
+            RemoveEffect(type);
+
+            // Remove from active tracking.
+            activePowerUps.Remove(type);
+
+            // Notify UI and other systems.
+            GameEvents.OnPowerUpExpired?.Invoke(type);
+
+            Debug.Log($"[PowerUpManager] Expired: {type}");
+        }
+
+        /// &lt;summary&gt;
+        /// Applies the gameplay effect of a power-up.
+        /// &lt;/summary&gt;
+        private void ApplyEffect(PowerUpType type)
+        {
+            switch (type)
+            {
+                case PowerUpType.Magnet:
+                    // Magnet effect is applied in Update() via
+                    // AttractNearbyCoins(). Nothing to set here.
+                    break;
+
+                case PowerUpType.Shield:
+                    // Show the shield visual on the player.
+                    GameEvents.OnShieldActivated?.Invoke(true);
+                    break;
+
+                case PowerUpType.ScoreMultiplier:
+                    // Set the score multiplier.
+                    currentMultiplier = 2;
+                    GameEvents.OnMultiplierChanged?.Invoke(currentMultiplier);
+                    break;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Removes the gameplay effect when a power-up expires.
+        /// &lt;/summary&gt;
+        private void RemoveEffect(PowerUpType type)
+        {
+            switch (type)
+            {
+                case PowerUpType.Magnet:
+                    // Nothing to clean up - Update() checks IsActive.
+                    break;
+
+                case PowerUpType.Shield:
+                    // Hide the shield visual.
+                    GameEvents.OnShieldActivated?.Invoke(false);
+                    break;
+
+                case PowerUpType.ScoreMultiplier:
+                    // Reset the multiplier.
+                    currentMultiplier = 1;
+                    GameEvents.OnMultiplierChanged?.Invoke(currentMultiplier);
+                    break;
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Magnet Logic
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Finds all coins within the magnet radius and moves them
+        /// toward the player. Uses Physics.OverlapSphere for detection.
+        /// &lt;/summary&gt;
+        private void AttractNearbyCoins()
+        {
+            if (playerTransform == null) return;
+
+            Vector3 playerPos = playerTransform.position;
+
+            // Find all colliders within the magnet radius.
+            Collider[] nearby = Physics.OverlapSphere(
+                playerPos,
+                magnetRadius
+            );
+
+            for (int i = 0; i &lt; nearby.Length; i++)
+            {
+                // Check if this collider is a coin.
+                Coin coin = nearby[i].GetComponent&lt;Coin&gt;();
+                if (coin == null) continue;
+
+                // Move the coin toward the player.
+                Vector3 direction =
+                    (playerPos - coin.transform.position).normalized;
+
+                coin.transform.position += direction
+                    * magnetSpeed
+                    * Time.deltaTime;
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Shield Hit Logic
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Called when the player hits an obstacle. If a shield is
+        /// active, consumes it instead of killing the player.
+        /// &lt;/summary&gt;
+        private void HandleObstacleHit()
+        {
+            if (IsPowerUpActive(PowerUpType.Shield))
+            {
+                // Consume the shield.
+                DeactivatePowerUp(PowerUpType.Shield);
+
+                // Notify systems that the shield absorbed the hit.
+                GameEvents.OnShieldConsumed?.Invoke();
+
+                Debug.Log("[PowerUpManager] Shield absorbed a hit!");
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Game Over
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Clears all active power-ups when the game ends.
+        /// &lt;/summary&gt;
+        private void HandleGameOver()
+        {
+            // Build a list of all active types to deactivate.
+            List&lt;PowerUpType&gt; toRemove =
+                new List&lt;PowerUpType&gt;(activePowerUps.Keys);
+
+            for (int i = 0; i &lt; toRemove.Count; i++)
+            {
+                DeactivatePowerUp(toRemove[i]);
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Checks whether a specific power-up type is currently active.
+        /// &lt;/summary&gt;
+        public bool IsPowerUpActive(PowerUpType type)
+        {
+            return activePowerUps.ContainsKey(type);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the current score multiplier.
+        /// Returns 1 if no multiplier power-up is active.
+        /// &lt;/summary&gt;
+        public int GetCurrentMultiplier()
+        {
+            return currentMultiplier;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the normalized time remaining (0-1) for a power-up.
+        /// Returns 0 if the power-up is not active.
+        /// &lt;/summary&gt;
+        public float GetTimeRemaining(PowerUpType type)
+        {
+            if (activePowerUps.TryGetValue(type, out ActivePowerUp powerUp))
+            {
+                return powerUp.GetNormalizedTimeRemaining();
+            }
+            return 0f;
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout warning">
+          <div class="callout-title">Dictionary Modification During Iteration</div>
+          <p>You <strong>cannot</strong> add or remove items from a C# Dictionary while iterating over it with <code>foreach</code>. That is why <code>UpdateTimers()</code> collects expired types into a separate list, then removes them in a second pass. Trying to modify the dictionary during iteration would throw an <code>InvalidOperationException</code>.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Power-up Spawn Probability -->
+      <section>
+        <h2>Power-up Spawn Probability</h2>
+        <p>Power-ups should be rare &mdash; if they appear too often, they stop feeling special. We control spawn probability through the <code>CoinSpawner</code> (or a separate <code>PowerUpSpawner</code> that follows the same pattern). Here is the key logic:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PowerUpSpawner.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Spawns power-up pickups on world chunks. Power-ups are much
+    /// rarer than coins and their spawn rate is influenced by the
+    /// current difficulty level.
+    ///
+    /// Attach this to the same manager object as CoinSpawner.
+    /// &lt;/summary&gt;
+    public class PowerUpSpawner : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Power-up Prefabs")]
+        [Tooltip("Prefab for the Magnet pickup.")]
+        [SerializeField] private GameObject magnetPrefab;
+
+        [Tooltip("Prefab for the Shield pickup.")]
+        [SerializeField] private GameObject shieldPrefab;
+
+        [Tooltip("Prefab for the Score Multiplier pickup.")]
+        [SerializeField] private GameObject multiplierPrefab;
+
+        [Header("Spawn Probability")]
+        [Tooltip("Base chance (0-1) that a chunk contains a power-up. " +
+                 "This is very low - power-ups are rare!")]
+        [Range(0f, 1f)]
+        [SerializeField] private float baseSpawnChance = 0.08f;
+
+        [Tooltip("How much difficulty increases the spawn chance. " +
+                 "At max difficulty, chance = baseChance + difficultyBonus.")]
+        [Range(0f, 0.2f)]
+        [SerializeField] private float difficultyBonus = 0.05f;
+
+        [Header("Type Weights")]
+        [Tooltip("Relative weight for Magnet spawning.")]
+        [SerializeField] private float magnetWeight = 1f;
+
+        [Tooltip("Relative weight for Shield spawning.")]
+        [SerializeField] private float shieldWeight = 1f;
+
+        [Tooltip("Relative weight for Score Multiplier spawning.")]
+        [SerializeField] private float multiplierWeight = 0.7f;
+
+        [Header("Placement")]
+        [Tooltip("Height above ground to place power-ups.")]
+        [SerializeField] private float spawnHeight = 1.5f;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        private float currentDifficulty = 0f;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void OnEnable()
+        {
+            GameEvents.OnChunkActivated += HandleChunkActivated;
+            GameEvents.OnDifficultyChanged += d => currentDifficulty = d;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnChunkActivated -= HandleChunkActivated;
+        }
+
+        // ---------------------------------------------------------------
+        // Spawning Logic
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Decides whether to spawn a power-up on the given chunk.
+        /// &lt;/summary&gt;
+        private void HandleChunkActivated(
+            Transform chunkTransform,
+            Transform[] spawnPoints)
+        {
+            // Calculate effective spawn chance based on difficulty.
+            float effectiveChance =
+                baseSpawnChance + (currentDifficulty * difficultyBonus);
+
+            // Roll the dice.
+            if (Random.value > effectiveChance) return;
+
+            // No spawn points? Can't place anything.
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+
+            // Pick a random spawn point on the chunk.
+            Transform spawnPoint =
+                spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+            // Select which power-up type to spawn.
+            GameObject prefab = SelectPowerUpPrefab();
+            if (prefab == null) return;
+
+            // Get from pool and position.
+            GameObject pickup = ObjectPool.Instance.Get(prefab);
+            if (pickup == null) return;
+
+            Vector3 position = spawnPoint.position;
+            position.y = spawnHeight;
+            pickup.transform.position = position;
+
+            // Initialize via IPoolable.
+            IPoolable poolable = pickup.GetComponent&lt;IPoolable&gt;();
+            poolable?.OnSpawnFromPool();
+        }
+
+        /// &lt;summary&gt;
+        /// Selects a power-up prefab using weighted random selection.
+        /// &lt;/summary&gt;
+        private GameObject SelectPowerUpPrefab()
+        {
+            float totalWeight =
+                magnetWeight + shieldWeight + multiplierWeight;
+
+            float roll = Random.Range(0f, totalWeight);
+
+            if (roll &lt; magnetWeight)
+                return magnetPrefab;
+
+            roll -= magnetWeight;
+            if (roll &lt; shieldWeight)
+                return shieldPrefab;
+
+            return multiplierPrefab;
+        }
+    }
+}</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">Tuning Spawn Rates</div>
+          <p>Start with a very low base spawn chance (around 5-10%) and playtest. If power-ups feel too rare, increase gradually. A common mistake is making power-ups too common, which removes the excitement of finding one. In Subway Surfers, you might run for 15-30 seconds between power-ups &mdash; that rarity is what makes them feel special.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Visual Indicators -->
+      <section>
+        <h2>Visual Indicators for Active Power-ups</h2>
+        <p>Players need clear visual feedback about which power-ups are active and how much time is left. We will connect the power-up events to the UI system (built in Chapter 19), but here are the visual effects you should set up in the scene:</p>
+
+        <h3>Shield Visual</h3>
+        <ol class="steps">
+          <li>Create a child object under the Player called <code>ShieldVisual</code>.</li>
+          <li>Add a semi-transparent sphere mesh (or a particle effect) around the player.</li>
+          <li>Set it to <strong>inactive by default</strong> in the Inspector.</li>
+          <li>Create a script that listens for <code>GameEvents.OnShieldActivated</code> and enables/disables the visual.</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ShieldVisual.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Controls the visual representation of the shield power-up
+    /// on the player. Shows a semi-transparent bubble when active.
+    /// &lt;/summary&gt;
+    public class ShieldVisual : MonoBehaviour
+    {
+        [Tooltip("The shield mesh/particle child object.")]
+        [SerializeField] private GameObject shieldEffect;
+
+        [Tooltip("How fast the shield pulses (scale oscillation).")]
+        [SerializeField] private float pulseSpeed = 2f;
+
+        [Tooltip("How much the shield scales during pulse (1 +/- this).")]
+        [SerializeField] private float pulseAmount = 0.05f;
+
+        private bool isShieldActive;
+        private Vector3 baseScale;
+
+        private void Awake()
+        {
+            if (shieldEffect != null)
+            {
+                baseScale = shieldEffect.transform.localScale;
+                shieldEffect.SetActive(false);
+            }
+        }
+
+        private void OnEnable()
+        {
+            GameEvents.OnShieldActivated += SetShieldActive;
+            GameEvents.OnShieldConsumed += PlayBreakEffect;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnShieldActivated -= SetShieldActive;
+            GameEvents.OnShieldConsumed -= PlayBreakEffect;
+        }
+
+        private void Update()
+        {
+            if (!isShieldActive || shieldEffect == null) return;
+
+            // Gentle pulsing effect to show the shield is alive.
+            float pulse = 1f + Mathf.Sin(Time.time * pulseSpeed) * pulseAmount;
+            shieldEffect.transform.localScale = baseScale * pulse;
+        }
+
+        /// &lt;summary&gt;
+        /// Shows or hides the shield visual.
+        /// &lt;/summary&gt;
+        private void SetShieldActive(bool active)
+        {
+            isShieldActive = active;
+
+            if (shieldEffect != null)
+            {
+                shieldEffect.SetActive(active);
+                shieldEffect.transform.localScale = baseScale;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Plays a break/shatter effect when the shield is consumed.
+        /// For now, we just deactivate. Add particle burst here later.
+        /// &lt;/summary&gt;
+        private void PlayBreakEffect()
+        {
+            isShieldActive = false;
+
+            if (shieldEffect != null)
+            {
+                // TODO: Instantiate a shield-break particle effect here.
+                shieldEffect.SetActive(false);
+            }
+        }
+    }
+}</code></pre></div>
+
+        <h3>Magnet Visual</h3>
+        <p>For the magnet, add a subtle blue glow or electric particle effect around the player. Follow the same pattern: a child object toggled by the <code>OnPowerUpActivated</code> and <code>OnPowerUpExpired</code> events.</p>
+
+        <h3>Multiplier Visual</h3>
+        <p>For the score multiplier, a "2x" floating text or golden glow effect works well. This connects to the HUD system we will build in Chapter 19.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Connecting Events</div>
+          <p>You may have noticed we reference events like <code>GameEvents.OnCoinCollected</code>, <code>GameEvents.OnPowerUpCollected</code>, and others. These should be declared in your <code>GameEvents</code> static class from Chapter 7. Here is a summary of the new events needed for this chapter:</p>
+        </div>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameEvents.cs (additions)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Add these new events to your existing GameEvents class.
+    /// &lt;/summary&gt;
+    public static partial class GameEvents
+    {
+        // --- Coin Events ---
+        /// &lt;summary&gt;Fired when a coin is collected. Parameter: coin value.&lt;/summary&gt;
+        public static Action&lt;int&gt; OnCoinCollected;
+
+        // --- Power-up Events ---
+        /// &lt;summary&gt;Fired when a power-up pickup is collected.&lt;/summary&gt;
+        public static Action&lt;PowerUpType, float&gt; OnPowerUpCollected;
+
+        /// &lt;summary&gt;Fired when a power-up becomes active.&lt;/summary&gt;
+        public static Action&lt;PowerUpType, float&gt; OnPowerUpActivated;
+
+        /// &lt;summary&gt;Fired when a power-up's timer expires.&lt;/summary&gt;
+        public static Action&lt;PowerUpType&gt; OnPowerUpExpired;
+
+        /// &lt;summary&gt;Fired every frame with normalized time remaining.&lt;/summary&gt;
+        public static Action&lt;PowerUpType, float&gt; OnPowerUpTimerUpdated;
+
+        // --- Shield Events ---
+        /// &lt;summary&gt;Fired to show/hide the shield visual.&lt;/summary&gt;
+        public static Action&lt;bool&gt; OnShieldActivated;
+
+        /// &lt;summary&gt;Fired when the shield absorbs a hit.&lt;/summary&gt;
+        public static Action OnShieldConsumed;
+
+        // --- Multiplier Events ---
+        /// &lt;summary&gt;Fired when the score multiplier changes.&lt;/summary&gt;
+        public static Action&lt;int&gt; OnMultiplierChanged;
+
+        // --- Obstacle Events ---
+        /// &lt;summary&gt;Fired when the player hits an obstacle.&lt;/summary&gt;
+        public static Action OnObstacleHit;
+
+        // --- Chunk Events ---
+        /// &lt;summary&gt;Fired when a chunk is activated in the world.&lt;/summary&gt;
+        public static Action&lt;Transform, Transform[]&gt; OnChunkActivated;
+
+        /// &lt;summary&gt;Fired when a chunk is deactivated/recycled.&lt;/summary&gt;
+        public static Action&lt;Transform&gt; OnChunkDeactivated;
+
+        // --- Difficulty Events ---
+        /// &lt;summary&gt;Fired when the difficulty level changes (0-1).&lt;/summary&gt;
+        public static Action&lt;float&gt; OnDifficultyChanged;
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>Chapter Summary</h2>
+        <p>In this chapter, you built a complete collectible and power-up system:</p>
+        <ul>
+          <li><strong>Coin.cs</strong> &mdash; Poolable coins with spin and hover animations that detect player collection via triggers.</li>
+          <li><strong>CoinPatternData</strong> &mdash; ScriptableObject patterns (lines, arcs, zigzags) that define coin arrangements.</li>
+          <li><strong>CoinSpawner.cs</strong> &mdash; Places coin patterns on chunks using weighted random selection.</li>
+          <li><strong>PowerUp base class</strong> &mdash; Abstract base with three concrete subclasses: Magnet, Shield, and Score Multiplier.</li>
+          <li><strong>PowerUpManager.cs</strong> &mdash; Manages active power-ups, timers, stacking rules, and gameplay effects.</li>
+          <li><strong>PowerUpSpawner.cs</strong> &mdash; Controls rare power-up spawning with difficulty-influenced probability.</li>
+          <li><strong>ShieldVisual.cs</strong> &mdash; Visual feedback for the shield power-up with pulsing animation.</li>
+        </ul>
+        <p>All of these systems communicate through events, keeping them decoupled and easy to extend. In the next chapter, we will build the scoring system that tracks distance, coins, and multipliers.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">Playtest Checkpoint</div>
+          <p>Before moving on, enter Play Mode and verify: coins appear on chunks and spin, collecting a coin fires the event (check the console with a Debug.Log), power-up pickups work, and the magnet pulls coins toward the player. If anything is not working, double-check your event subscriptions and make sure prefabs are registered with the ObjectPool.</p>
+        </div>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Coins, magnets, shields, multipliers — the collectibles system is packed with content. Save it.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Implement collectibles with coins and power-up system"</code></pre>
+        </div>
+        <p>Try running <code>git log --oneline</code> on this branch. Notice only the gameplay-related commits appear. The world generation commits are on <code>main</code>. Each branch tells a clean story.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="15-obstacles.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Obstacles</span></a>
+        <a href="17-scoring.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Scoring System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Origin Shifting - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link active"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 14</span>
+        <h1>Origin Shifting</h1>
+        <p class="chapter-desc">Solve the floating point precision problem by periodically shifting the entire world back toward the origin &mdash; enabling truly infinite gameplay without visual artifacts.</p>
+      </div>
+
+      <!-- Section: The Problem -->
+      <h2>The Floating Point Precision Problem</h2>
+      <p>Computers store decimal numbers using a format called <strong>floating point</strong>. In C# and Unity, the standard <code>float</code> type uses 32 bits to represent a number. This gives approximately <strong>7 digits of precision</strong>. That sounds like a lot, but it creates a subtle and devastating problem for infinite runner games.</p>
+      <p>Here's the key insight: those 7 digits of precision are <em>total</em>, not after the decimal point. As numbers get larger, the precision after the decimal point gets worse:</p>
+
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Position (Z)</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Smallest Representable Step</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Visual Effect</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">1.0</td>
+            <td style="padding: 0.75rem;">0.0000001 (7 decimal places)</td>
+            <td style="padding: 0.75rem;">Perfect &mdash; no visible issues</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">100.0</td>
+            <td style="padding: 0.75rem;">0.00001 (5 decimal places)</td>
+            <td style="padding: 0.75rem;">Still fine</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">10,000.0</td>
+            <td style="padding: 0.75rem;">0.001 (3 decimal places)</td>
+            <td style="padding: 0.75rem;">Slight jitter visible if you look closely</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem;">100,000.0</td>
+            <td style="padding: 0.75rem;">0.01 (2 decimal places)</td>
+            <td style="padding: 0.75rem;">Objects visibly snap between positions</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem;">1,000,000.0</td>
+            <td style="padding: 0.75rem;">0.1 (1 decimal place)</td>
+            <td style="padding: 0.75rem;">Severe jitter, physics break down, unplayable</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>In our infinite runner, the player moves forward at ~20 units per second. After just 500 seconds (about 8 minutes), the player is at Z = 10,000 and precision starts degrading. After 83 minutes, they're at Z = 100,000 and the game looks broken. For a game that's supposed to be <em>infinite</em>, this is a critical problem.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">What Precision Loss Looks Like</div>
+        <p>At large positions, you'll see: objects jittering (vibrating rapidly between positions), mesh faces z-fighting (flickering between visible and invisible), physics collisions becoming unreliable (objects passing through each other or bouncing erratically), and animations stuttering. The worst part? These bugs are intermittent and hard to reproduce because they only happen after the player has been running for a while. Many developers ship games with this bug and never realize it because they only test for a few minutes at a time.</p>
+      </div>
+
+      <!-- Section: Why This Matters for Runners -->
+      <h2>Why This Matters Specifically for Infinite Runners</h2>
+      <p>Most game genres don't have this problem because the player stays within a bounded area. In a first-person shooter, the map might be 1,000 units across. In an RPG, the open world might be 10,000 units. These are fine for float precision.</p>
+      <p>But an infinite runner is different. The player moves in one direction <em>forever</em>. There is no upper bound on how far they can travel. And in our 3-lane runner, precision matters enormously because:</p>
+      <ul>
+        <li><strong>Lane switching</strong> requires exact positioning (X = -2, 0, or 2). Any jitter makes the player look like they're wobbling between lanes.</li>
+        <li><strong>Obstacle collision</strong> depends on precise trigger volumes. Imprecise physics means unfair deaths or missed collisions.</li>
+        <li><strong>Chunk alignment</strong> must be seamless. Precision loss causes visible gaps between chunks.</li>
+        <li><strong>Camera follow</strong> amplifies jitter. If the player jitters by 0.01 units, the camera jitters too, and on a large screen, that's very noticeable.</li>
+      </ul>
+
+      <!-- Section: The Solution -->
+      <h2>The Solution: Origin Shifting</h2>
+      <p>The fix is elegant: instead of letting the player run infinitely far from the origin, we periodically <strong>move the entire world back</strong> so the player is near the origin again. If the player has traveled 1,000 units forward, we subtract 1,000 from the Z position of <em>every single object in the scene</em> &mdash; the player, all chunks, all obstacles, all collectibles, the camera, everything.</p>
+      <p>Because everything moves by the same amount at the same time, the relative positions between objects don't change. The player doesn't notice anything happened. But now the player is at Z = 0 instead of Z = 1,000, and we have full float precision again.</p>
+
+      <h3>Step-by-Step: What Happens During a Shift</h3>
+      <ol class="steps">
+        <li>The player reaches Z = 1,000 (our threshold).</li>
+        <li>The OriginShifter calculates the shift amount: <code>(0, 0, -1000)</code>.</li>
+        <li>The OriginShifter moves EVERY root-level GameObject in the scene by (0, 0, -1000).</li>
+        <li>The player is now at Z = 0. The chunk that was at Z = 950 is now at Z = -50. The chunk that was at Z = 1,100 is now at Z = 100.</li>
+        <li>The OriginShifter fires an event to notify other systems (WorldGenerator, PlayerController) to update their internal tracking values.</li>
+        <li>Gameplay continues as if nothing happened.</li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-title">How Often Should You Shift?</div>
+        <p>The shift threshold is a balance between frequency and safety. A threshold of 1,000 units means a shift every ~50 seconds at typical runner speeds. That's frequent enough that precision never degrades noticeably, but infrequent enough that the (very small) cost of shifting is negligible. Some developers use 5,000 or 10,000 units, which is also fine. The important thing is that it happens well before precision becomes visible (around 10,000 units).</p>
+      </div>
+
+      <!-- Section: The OriginShifter Script -->
+      <h2>The OriginShifter Script</h2>
+      <p>Here's the complete implementation. It's simpler than you might expect &mdash; the concept is more complex than the code.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">OriginShifter.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Periodically shifts all objects in the scene back toward the origin
+    /// to prevent floating point precision loss.
+    ///
+    /// This script monitors the player's Z position. When it exceeds the
+    /// threshold, everything is shifted back by that amount.
+    ///
+    /// Other systems must subscribe to OnOriginShift to update their
+    /// internal position tracking.
+    /// &lt;/summary&gt;
+    public class OriginShifter : MonoBehaviour
+    {
+        [Header("References")]
+        [Tooltip("The player's Transform. Shift triggers based on this position.")]
+        [SerializeField] private Transform playerTransform;
+
+        [Header("Settings")]
+        [Tooltip("How far from origin (Z-axis) the player can get before a shift. " +
+                 "Lower = more frequent shifts. 1000 is a good default.")]
+        [SerializeField] private float shiftThreshold = 1000f;
+
+        [Tooltip("If true, the shift only occurs along the Z-axis (forward). " +
+                 "Disable for games with free movement in all directions.")]
+        [SerializeField] private bool zAxisOnly = true;
+
+        [Header("Debug")]
+        [Tooltip("Log a message every time a shift occurs.")]
+        [SerializeField] private bool logShifts = true;
+
+        [Tooltip("Track total distance shifted (for debugging).")]
+        [SerializeField] private float totalShifted = 0f;
+
+        // ---- Events ----
+
+        /// &lt;summary&gt;
+        /// Fired after an origin shift occurs.
+        /// The Vector3 parameter is the shift amount (negative Z in our case).
+        /// Systems that track absolute positions must subscribe to this
+        /// and adjust their values accordingly.
+        /// &lt;/summary&gt;
+        public static event Action&lt;Vector3&gt; OnOriginShift;
+
+        // Count total shifts for debugging
+        private int shiftCount = 0;
+
+        // ---- Lifecycle ----
+
+        private void LateUpdate()
+        {
+            // We check in LateUpdate so all movement for this frame is done.
+            // This prevents other scripts from moving objects AFTER the shift,
+            // which would put them at wrong positions.
+
+            if (playerTransform == null) return;
+
+            Vector3 playerPos = playerTransform.position;
+
+            // Check if we've exceeded the threshold
+            if (zAxisOnly)
+            {
+                if (Mathf.Abs(playerPos.z) &gt;= shiftThreshold)
+                {
+                    PerformShift(new Vector3(0f, 0f, -playerPos.z));
+                }
+            }
+            else
+            {
+                if (playerPos.magnitude &gt;= shiftThreshold)
+                {
+                    PerformShift(-playerPos);
+                }
+            }
+        }
+
+        // ---- Core Logic ----
+
+        /// &lt;summary&gt;
+        /// Shifts all root GameObjects in the active scene by the given amount.
+        /// Then notifies all subscribers via the OnOriginShift event.
+        /// &lt;/summary&gt;
+        /// &lt;param name="shiftAmount"&gt;How much to move everything (typically negative Z).&lt;/param&gt;
+        private void PerformShift(Vector3 shiftAmount)
+        {
+            // Step 1: Shift all root-level GameObjects in the scene
+            ShiftAllObjects(shiftAmount);
+
+            // Step 2: Track for debugging
+            shiftCount++;
+            totalShifted += Mathf.Abs(shiftAmount.z);
+
+            if (logShifts)
+            {
+                Debug.Log(
+                    $"OriginShifter: Shift #{shiftCount} by {shiftAmount}. " +
+                    $"Player was at Z={playerTransform.position.z - shiftAmount.z:F1}. " +
+                    $"Now at Z={playerTransform.position.z:F1}. " +
+                    $"Total shifted: {totalShifted:F0} units."
+                );
+            }
+
+            // Step 3: Notify all subscribers
+            // This is how the WorldGenerator, PlayerController, etc.
+            // know to update their internal values.
+            OnOriginShift?.Invoke(shiftAmount);
+        }
+
+        /// &lt;summary&gt;
+        /// Moves every root-level GameObject in the active scene.
+        /// Child objects move automatically because they're parented.
+        /// &lt;/summary&gt;
+        private void ShiftAllObjects(Vector3 shiftAmount)
+        {
+            // Get all root GameObjects in the active scene
+            Scene activeScene = SceneManager.GetActiveScene();
+            List&lt;GameObject&gt; rootObjects = new List&lt;GameObject&gt;();
+            activeScene.GetRootGameObjects(rootObjects);
+
+            foreach (GameObject rootObj in rootObjects)
+            {
+                // Skip objects that shouldn't move (e.g., lights, event systems)
+                // We move everything by default because it's simpler and safer.
+                // Only skip objects explicitly marked to stay put.
+                if (rootObj.CompareTag("OriginStatic"))
+                {
+                    continue;
+                }
+
+                rootObj.transform.position += shiftAmount;
+            }
+        }
+
+        // ---- Public API ----
+
+        /// &lt;summary&gt;
+        /// Returns the total distance the world has been shifted.
+        /// Useful for calculating the player's true distance traveled.
+        /// &lt;/summary&gt;
+        public float GetTotalShifted()
+        {
+            return totalShifted;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns how many shifts have occurred since game start.
+        /// &lt;/summary&gt;
+        public int GetShiftCount()
+        {
+            return shiftCount;
+        }
+
+        /// &lt;summary&gt;
+        /// Resets shift tracking. Call when starting a new run.
+        /// &lt;/summary&gt;
+        public void ResetTracking()
+        {
+            totalShifted = 0f;
+            shiftCount = 0;
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's break down the critical parts:</p>
+
+      <h3>Why LateUpdate?</h3>
+      <p>We check for the shift in <code>LateUpdate()</code> rather than <code>Update()</code>. This is important because <code>Update()</code> is where movement happens (the player moves forward, obstacles move, etc.). If we shifted during <code>Update()</code>, some objects might have already moved for this frame while others haven't yet, causing a single frame where positions are inconsistent. <code>LateUpdate()</code> runs after all <code>Update()</code> calls are done, so all movement is complete before we shift.</p>
+
+      <h3>Why Shift Root Objects Only?</h3>
+      <p>We only shift <strong>root-level</strong> GameObjects (objects with no parent). Child objects automatically move with their parents. So when we move a chunk root, all its spawn points, obstacle children, and ground mesh move along with it. This means we only need to iterate over ~20-30 root objects rather than every single object in the scene.</p>
+
+      <h3>The OriginStatic Tag</h3>
+      <p>Some objects genuinely shouldn't be shifted &mdash; for example, a directional light that represents the sun doesn't need to move because its position doesn't affect its lighting direction. We use a custom tag <code>"OriginStatic"</code> to skip these. In practice, you'll rarely need this; most objects should be shifted.</p>
+
+      <h3>The OnOriginShift Event</h3>
+      <p>After shifting all objects, we fire a static event. This is how other systems learn about the shift and can adjust their internal bookkeeping. Let's look at how each system handles it.</p>
+
+      <!-- Section: Handling the Shift in Other Systems -->
+      <h2>Handling the Shift in Other Systems</h2>
+
+      <h3>WorldGenerator</h3>
+      <p>The WorldGenerator tracks <code>nextSpawnZ</code> &mdash; the Z position where the next chunk should be placed. After a shift, this value needs to be adjusted.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">WorldGenerator.cs (add to existing code)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">private void OnEnable()
+{
+    OriginShifter.OnOriginShift += HandleOriginShift;
+}
+
+private void OnDisable()
+{
+    OriginShifter.OnOriginShift -= HandleOriginShift;
+}
+
+private void HandleOriginShift(Vector3 shiftAmount)
+{
+    // Adjust the next spawn position by the shift amount.
+    // If the shift was (0, 0, -1000), nextSpawnZ decreases by 1000.
+    nextSpawnZ += shiftAmount.z;
+}</code></pre></div>
+
+      <div class="callout tip">
+        <div class="callout-title">Always Unsubscribe From Events</div>
+        <p>Notice that we subscribe in <code>OnEnable()</code> and unsubscribe in <code>OnDisable()</code>. This is a critical pattern. If you subscribe but forget to unsubscribe, the event will try to call a method on a destroyed object, causing a NullReferenceException. Always pair <code>+=</code> with <code>-=</code>.</p>
+      </div>
+
+      <h3>PlayerController (Distance Tracking)</h3>
+      <p>The PlayerController tracks how far the player has traveled for the score display. After a shift, the player's Z position resets to near zero, but the score shouldn't reset. We use the <code>totalShifted</code> value to calculate true distance.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">PlayerController.cs (distance tracking addition)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Add these fields to your PlayerController:
+private float distanceOffset = 0f;
+
+private void OnEnable()
+{
+    OriginShifter.OnOriginShift += HandleOriginShift;
+}
+
+private void OnDisable()
+{
+    OriginShifter.OnOriginShift -= HandleOriginShift;
+}
+
+private void HandleOriginShift(Vector3 shiftAmount)
+{
+    // When the world shifts back by 1000, we need to ADD 1000 to our
+    // distance offset so the displayed distance doesn't jump.
+    distanceOffset -= shiftAmount.z;
+}
+
+/// &lt;summary&gt;
+/// Returns the true distance the player has traveled since game start,
+/// accounting for all origin shifts.
+/// &lt;/summary&gt;
+public float GetTrueDistance()
+{
+    return transform.position.z + distanceOffset;
+}</code></pre></div>
+
+      <p>The math works like this: if the player is at Z = 50 and the offset is 2000 (meaning two shifts of 1000 each have occurred), the true distance is 2050. The shift moves the player's position back, but the offset remembers how far we've shifted, so the sum is always correct.</p>
+
+      <h3>Camera System</h3>
+      <p>If you're using Cinemachine (which we set up in Chapter 10), the camera handles origin shifts automatically. Cinemachine follows a target transform, and since we shift the target (the player) along with everything else, the camera just follows along. The relative offset between the camera and the player never changes.</p>
+      <p>If you're using a custom camera script, you need to handle the shift the same way as the player &mdash; the camera's position gets shifted along with all other root objects, so no special handling is needed unless your camera script caches absolute positions.</p>
+
+      <div class="callout info">
+        <div class="callout-title">Cinemachine and Origin Shifting</div>
+        <p>Cinemachine works based on the <em>relative position</em> between the camera and its target. Since origin shifting moves both the camera and the target by the same amount, the relative position doesn't change. Cinemachine doesn't even notice the shift happened. This is one of the benefits of using Cinemachine &mdash; it handles edge cases like this gracefully.</p>
+      </div>
+
+      <!-- Section: Physics Stability -->
+      <h2>Keeping Physics Stable During a Shift</h2>
+      <p>Unity's physics engine (PhysX) tracks object positions internally. When we teleport objects by modifying <code>transform.position</code>, the physics engine notices the sudden position change and can react unexpectedly &mdash; objects might briefly collide with things they shouldn't, or velocity calculations might produce wrong results.</p>
+      <p>For our infinite runner, physics stability during shifts is manageable because:</p>
+      <ul>
+        <li><strong>We shift in LateUpdate</strong> &mdash; Physics simulation (<code>FixedUpdate</code>) is already done for this frame. The next physics step will see the shifted positions as the "new normal."</li>
+        <li><strong>We shift everything uniformly</strong> &mdash; Since all objects move by the same amount, relative velocities and positions don't change. Two objects that were 5 units apart before the shift are still 5 units apart after.</li>
+        <li><strong>Our runner has simple physics</strong> &mdash; We use triggers (not complex rigid body interactions). Triggers just check overlap, and since everything shifts together, overlaps don't change.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">Particle Systems Need Special Attention</div>
+        <p>Unity's particle systems simulate in <strong>world space</strong> by default. When you shift the particle system's transform, existing particles don't move &mdash; they stay at their old world positions, which are now wrong. There are two fixes: (1) Set particle systems to <strong>Simulation Space: Local</strong> in the Particle System component, which makes particles relative to the emitter. (2) Or manually call <code>ParticleSystem.Simulate()</code> to reposition existing particles after a shift. Option 1 is much simpler and works perfectly for our runner.</p>
+      </div>
+
+      <!-- Section: Common Pitfalls -->
+      <h2>Common Pitfalls and How to Avoid Them</h2>
+
+      <h3>Pitfall 1: Forgetting to Shift Something</h3>
+      <p>If even one object is missed during the shift, it will suddenly appear to teleport 1,000 units in the wrong direction. This is immediately visible. To prevent this:</p>
+      <ul>
+        <li>Use the scene's root object list (which we do) rather than tagging objects manually.</li>
+        <li>Test by lowering the shift threshold to 50 units during development, so shifts happen frequently and you'll notice missed objects quickly.</li>
+      </ul>
+
+      <h3>Pitfall 2: Caching Absolute Positions</h3>
+      <p>If any script stores a world position in a variable (like <code>targetPosition = new Vector3(0, 0, 500)</code>) and doesn't update it after a shift, the script will reference a position that no longer exists. Always either:</p>
+      <ul>
+        <li>Subscribe to <code>OnOriginShift</code> and adjust cached positions, or</li>
+        <li>Use relative positions (offset from a transform) instead of absolute ones.</li>
+      </ul>
+
+      <h3>Pitfall 3: UI Position Offsets</h3>
+      <p>World-space UI canvases are affected by origin shifting (they're GameObjects too). Screen-space canvases are not, because they use screen coordinates, not world coordinates. Make sure your UI uses <strong>Screen Space - Overlay</strong> or <strong>Screen Space - Camera</strong> mode (not World Space) unless you specifically want it to move with the world.</p>
+
+      <h3>Pitfall 4: Audio Listeners and Sources</h3>
+      <p>3D audio sources calculate volume based on distance from the Audio Listener. Since both the listener (usually on the camera) and the sources shift together, distances don't change and audio is unaffected. This "just works" with our approach.</p>
+
+      <h3>Pitfall 5: NavMesh and AI Pathfinding</h3>
+      <p>If you're using Unity's NavMesh system (we're not in this project), origin shifting will invalidate baked navmeshes. NavMesh agents won't know where to go. This is a known limitation. For games that need NavMesh + origin shifting, you'd need to rebake at runtime, which is complex. Fortunately, our infinite runner doesn't use NavMesh.</p>
+
+      <!-- Section: Testing Origin Shifting -->
+      <h2>Testing Origin Shifting</h2>
+      <p>Origin shifting bugs are sneaky because they only appear after the player has traveled far enough to trigger a shift. Here's how to test thoroughly:</p>
+
+      <h3>Test 1: Frequent Shifts</h3>
+      <ol class="steps">
+        <li>Temporarily set <code>shiftThreshold</code> to 50 units.</li>
+        <li>Play the game. Shifts will occur every few seconds.</li>
+        <li>Watch the Console for shift log messages. Verify they're happening.</li>
+        <li>Look for any visual glitches: objects jumping, gaps appearing between chunks, particles in wrong positions.</li>
+        <li>Check the score display. The distance should increase smoothly without any jumps when shifts occur.</li>
+      </ol>
+
+      <h3>Test 2: Speed Test</h3>
+      <ol class="steps">
+        <li>Set the player speed very high (e.g., 200 units per second) to quickly reach large Z values.</li>
+        <li>With origin shifting enabled, the game should look smooth at Z = 100,000 because positions are always being reset to near zero.</li>
+        <li>Disable origin shifting (uncheck the component) and repeat. At large Z values, you should see jitter. This confirms the shift is working.</li>
+      </ol>
+
+      <h3>Test 3: Game Over and Restart</h3>
+      <ol class="steps">
+        <li>Play until several shifts have occurred.</li>
+        <li>Trigger a game over.</li>
+        <li>Restart the game. Verify the world resets cleanly to Z = 0 and the shift counter resets.</li>
+        <li>Check that no objects are at old (pre-shift) positions.</li>
+      </ol>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">OriginShiftTester.cs (debugging helper)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Attach to the player to display origin shift debug info on screen.
+    /// Delete before shipping.
+    /// &lt;/summary&gt;
+    public class OriginShiftTester : MonoBehaviour
+    {
+        [SerializeField] private OriginShifter originShifter;
+
+        private float trueDistance = 0f;
+        private float distanceOffset = 0f;
+        private GUIStyle style;
+
+        private void OnEnable()
+        {
+            OriginShifter.OnOriginShift += OnShift;
+        }
+
+        private void OnDisable()
+        {
+            OriginShifter.OnOriginShift -= OnShift;
+        }
+
+        private void OnShift(Vector3 amount)
+        {
+            distanceOffset -= amount.z;
+        }
+
+        private void Update()
+        {
+            trueDistance = transform.position.z + distanceOffset;
+        }
+
+        private void OnGUI()
+        {
+            if (style == null)
+            {
+                style = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 16,
+                    normal = { textColor = Color.white }
+                };
+            }
+
+            float y = Screen.height - 120f;
+            float lineH = 22f;
+
+            GUI.Label(new Rect(10, y, 500, lineH),
+                $"Current Z: {transform.position.z:F2}", style);
+            y += lineH;
+
+            GUI.Label(new Rect(10, y, 500, lineH),
+                $"True Distance: {trueDistance:F0} m", style);
+            y += lineH;
+
+            if (originShifter != null)
+            {
+                GUI.Label(new Rect(10, y, 500, lineH),
+                    $"Total Shifted: {originShifter.GetTotalShifted():F0} m", style);
+                y += lineH;
+
+                GUI.Label(new Rect(10, y, 500, lineH),
+                    $"Shift Count: {originShifter.GetShiftCount()}", style);
+            }
+        }
+    }
+}</code></pre></div>
+
+      <!-- Section: Setting Up in Unity -->
+      <h2>Setting Up Origin Shifting in Unity</h2>
+      <ol class="steps">
+        <li>Create an empty GameObject called <code>OriginShifter</code> in your scene (or add the component to an existing manager object).</li>
+        <li>Add the <code>OriginShifter</code> script component.</li>
+        <li>Assign the Player Transform reference.</li>
+        <li>Set the Shift Threshold to 1000 (or lower for testing).</li>
+        <li>Leave "Z Axis Only" checked (our runner only moves on Z).</li>
+        <li>Enable "Log Shifts" during development, disable for production.</li>
+        <li>Go to <strong>Edit &gt; Project Settings &gt; Tags and Layers</strong> and add the tag <code>OriginStatic</code>. Apply this tag to any object that should NOT be shifted (typically just your Directional Light, if that).</li>
+        <li>Make sure all particle systems in your project are set to <strong>Simulation Space: Local</strong>.</li>
+      </ol>
+
+      <!-- Section: Summary -->
+      <h2>What We Built</h2>
+      <p>Origin shifting is the final piece of our world generation puzzle. With this system in place, our infinite runner is truly infinite &mdash; the player can run for hours without any visual degradation.</p>
+      <ul>
+        <li><strong>OriginShifter.cs</strong> &mdash; Monitors the player's position and shifts the entire world back toward the origin when a threshold is exceeded. Uses <code>LateUpdate</code> to ensure all movement is done before shifting. Fires an event to notify other systems.</li>
+        <li><strong>WorldGenerator integration</strong> &mdash; Adjusts <code>nextSpawnZ</code> when a shift occurs.</li>
+        <li><strong>PlayerController integration</strong> &mdash; Uses a <code>distanceOffset</code> to calculate true distance traveled despite shifts.</li>
+        <li><strong>Camera handling</strong> &mdash; Cinemachine handles it automatically; custom cameras shift with everything else.</li>
+        <li><strong>Physics safety</strong> &mdash; Shifting in LateUpdate and moving everything uniformly keeps physics stable.</li>
+      </ul>
+      <p>Part 3 is complete. We now have a full world generation pipeline: modular chunks, object pooling for zero-allocation spawning, procedural world generation, and origin shifting for infinite precision. In the next chapter, we start Part 4 (Gameplay) by building the <strong>obstacle system</strong>.</p>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Origin shifting is done. The entire world generation system is complete! Time to merge our feature branch back into main.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Implement origin shifting for infinite precision"
+
+# Now merge the feature branch back into main
+git checkout main
+git merge feature/world-generation
+git log --oneline</code></pre>
+        </div>
+        <p>We just <strong>merged</strong> our feature branch into <code>main</code>. All the commits we made on <code>feature/world-generation</code> are now part of <code>main</code>. Run <code>git log --oneline</code> and you'll see the full history. This branch workflow — create branch, work, commit several times, merge back — is how professional teams work. It keeps <code>main</code> stable while you experiment.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="13-world-generation.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">World Generation</span></a>
+        <a href="15-obstacles.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Obstacles</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

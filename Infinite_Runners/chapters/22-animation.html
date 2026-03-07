@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link active"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 22</span>
+        <h1>Animation System</h1>
+        <p class="chapter-desc">Bring your player character to life with Unity's Animator &mdash; run cycles, jumps, slides, death sequences, and blend trees that respond to gameplay speed.</p>
+      </div>
+
+      <!-- SECTION: Unity Animator Overview -->
+      <section>
+        <h2>Unity Animator Overview</h2>
+        <p>Unity's animation system has three key pieces that work together:</p>
+        <ul>
+          <li><strong>Animation Clips</strong> &mdash; Individual animations (a run cycle, a jump, a slide). Each clip stores keyframe data &mdash; positions, rotations, and scales at specific times. These can be created in Unity's Animation window or imported from external tools like Blender or Mixamo.</li>
+          <li><strong>Animator Controller</strong> &mdash; A visual state machine that defines which clips can play and how the character transitions between them. You create this as an asset in your Project window.</li>
+          <li><strong>Animator Component</strong> &mdash; A component you attach to your character GameObject. It references an Animator Controller and drives the character's mesh (or transforms) based on the current animation state.</li>
+        </ul>
+
+        <p>Think of it like a music player. Animation clips are the songs. The Animator Controller is the playlist with rules for which song plays next. The Animator component is the actual speaker attached to your character.</p>
+
+        <div class="callout info">
+          <div class="callout-title">Mecanim vs. Legacy</div>
+          <p>Unity has two animation systems: the modern <strong>Mecanim</strong> system (Animator + Animator Controller) and the older <strong>Legacy</strong> system (Animation component). We use Mecanim exclusively. If you ever see tutorials referencing the "Animation" component (without the "r"), that is the legacy system &mdash; skip those.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Setting Up Animator Controller -->
+      <section>
+        <h2>Setting Up an Animator Controller</h2>
+        <p>Let us create the Animator Controller that will govern all of our player's animation states.</p>
+
+        <ol class="steps">
+          <li>In the Project window, navigate to <code>Assets/Animation/</code>. If this folder does not exist, right-click in <code>Assets/</code> and choose <strong>Create &gt; Folder</strong>, name it <code>Animation</code>.</li>
+          <li>Right-click inside the <code>Animation</code> folder and select <strong>Create &gt; Animator Controller</strong>. Name it <code>PlayerAnimatorController</code>.</li>
+          <li>Double-click the new controller to open the <strong>Animator window</strong>. You will see a grid with an "Entry" node, an "Any State" node, and an "Exit" node. This is where we build our state machine.</li>
+          <li>Select your Player GameObject in the Hierarchy. In the Inspector, add an <strong>Animator</strong> component (Add Component &gt; Animator).</li>
+          <li>Drag the <code>PlayerAnimatorController</code> asset into the Animator component's <strong>Controller</strong> field.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Avatar Setup</div>
+          <p>If you are using a 3D humanoid model (from Mixamo, the Asset Store, etc.), make sure the model's import settings have <strong>Animation Type</strong> set to <strong>Humanoid</strong> and that an <strong>Avatar</strong> is configured. The Animator component's <strong>Avatar</strong> field should reference this avatar. For our prototype cube, you can leave Avatar empty &mdash; we will animate the transform directly.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Animation States -->
+      <section>
+        <h2>Animation States</h2>
+        <p>Our player character needs these animation states:</p>
+
+        <table>
+          <thead>
+            <tr><th>State</th><th>When It Plays</th><th>Loop?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Idle</strong></td><td>On the main menu, before the game starts</td><td>Yes</td></tr>
+            <tr><td><strong>Run</strong></td><td>During gameplay (the default playing state)</td><td>Yes</td></tr>
+            <tr><td><strong>Jump</strong></td><td>When the player swipes up</td><td>No</td></tr>
+            <tr><td><strong>Slide</strong></td><td>When the player swipes down</td><td>No</td></tr>
+            <tr><td><strong>Stumble</strong></td><td>When the player grazes an obstacle (optional near-miss)</td><td>No</td></tr>
+            <tr><td><strong>Death</strong></td><td>When the player crashes into an obstacle</td><td>No</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Creating States in the Animator Window</h3>
+        <ol class="steps">
+          <li>Open the Animator window (double-click your <code>PlayerAnimatorController</code>).</li>
+          <li>Right-click on the grid and select <strong>Create State &gt; Empty</strong>. Name it <code>Idle</code>. This is your first state.</li>
+          <li>Repeat for <code>Run</code>, <code>Jump</code>, <code>Slide</code>, <code>Stumble</code>, and <code>Death</code>.</li>
+          <li>Right-click the <code>Idle</code> state and choose <strong>Set as Layer Default State</strong>. It turns orange, meaning the Animator starts here.</li>
+          <li>For each state, select it and in the Inspector assign the corresponding Animation Clip to the <strong>Motion</strong> field. (We will create prototype clips in a moment.)</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">No 3D Model? No Problem!</div>
+          <p>If you are using a prototype cube as your player, you can still animate it. Use Unity's Animation window to create clips that scale, rotate, or move the cube. For example, a "Jump" animation could scale the cube's Y to 1.5 and move it up, then back down. A "Slide" could flatten the cube's Y scale to 0.5. This is perfectly fine for prototyping &mdash; you can swap in a real character model later.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Creating Prototype Animations -->
+      <section>
+        <h2>Creating Prototype Animations</h2>
+        <p>If you do not have a 3D character model yet, here is how to create simple animations for a cube player:</p>
+
+        <ol class="steps">
+          <li>Select your Player GameObject in the Hierarchy.</li>
+          <li>Open the <strong>Animation window</strong> (Window &gt; Animation &gt; Animation).</li>
+          <li>Click <strong>Create</strong> and save as <code>Player_Idle.anim</code> in <code>Assets/Animation/Clips/</code>.</li>
+          <li>
+            <strong>Idle animation:</strong> A gentle bobbing motion.
+            <ul>
+              <li>At frame 0: Position Y = 0.5</li>
+              <li>At frame 30: Position Y = 0.6</li>
+              <li>At frame 60: Position Y = 0.5</li>
+              <li>Set the clip to <strong>Loop</strong> (select the .anim file, check Loop Time in the Inspector).</li>
+            </ul>
+          </li>
+          <li>
+            Click the clip dropdown in the Animation window and choose <strong>Create New Clip</strong>. Save as <code>Player_Run.anim</code>.
+            <ul>
+              <li>At frame 0: Scale = (1, 1, 1)</li>
+              <li>At frame 5: Scale = (1.05, 0.95, 1)</li>
+              <li>At frame 10: Scale = (1, 1, 1)</li>
+              <li>At frame 15: Scale = (0.95, 1.05, 1)</li>
+              <li>At frame 20: Scale = (1, 1, 1)</li>
+              <li>Set to Loop. This creates a subtle "squash and stretch" bounce.</li>
+            </ul>
+          </li>
+          <li>
+            Create <code>Player_Jump.anim</code>:
+            <ul>
+              <li>At frame 0: Scale Y = 1.0</li>
+              <li>At frame 3: Scale Y = 0.7 (anticipation squash)</li>
+              <li>At frame 8: Scale Y = 1.3, Position Y rises</li>
+              <li>At frame 20: Scale Y = 1.0, back to ground</li>
+              <li>Do NOT loop.</li>
+            </ul>
+          </li>
+          <li>
+            Create <code>Player_Slide.anim</code>:
+            <ul>
+              <li>At frame 0: Scale Y = 1.0</li>
+              <li>At frame 5: Scale Y = 0.4 (flattened)</li>
+              <li>At frame 25: Scale Y = 0.4 (hold)</li>
+              <li>At frame 30: Scale Y = 1.0 (return to normal)</li>
+              <li>Do NOT loop.</li>
+            </ul>
+          </li>
+          <li>
+            Create <code>Player_Death.anim</code>:
+            <ul>
+              <li>At frame 0: Rotation X = 0</li>
+              <li>At frame 15: Rotation X = 90 (topple forward)</li>
+              <li>At frame 20: Scale = (1.2, 0.3, 1.2) (squash on impact)</li>
+              <li>Do NOT loop.</li>
+            </ul>
+          </li>
+        </ol>
+
+        <p>Assign each clip to its corresponding state in the Animator Controller by selecting the state and dragging the clip into the <strong>Motion</strong> field.</p>
+      </section>
+
+      <!-- SECTION: Transitions -->
+      <section>
+        <h2>Transitions with Conditions</h2>
+        <p>States alone are not enough &mdash; we need <strong>transitions</strong> that define how the Animator moves from one state to another. Transitions are the arrows between states, and they are controlled by <strong>parameters</strong>.</p>
+
+        <h3>Setting Up Parameters</h3>
+        <ol class="steps">
+          <li>In the Animator window, click the <strong>Parameters</strong> tab (next to "Layers" at the top left).</li>
+          <li>Click the <strong>+</strong> button and add these parameters:
+            <ul>
+              <li><strong>Bool:</strong> <code>IsRunning</code></li>
+              <li><strong>Bool:</strong> <code>IsJumping</code></li>
+              <li><strong>Bool:</strong> <code>IsSliding</code></li>
+              <li><strong>Bool:</strong> <code>IsDead</code></li>
+              <li><strong>Trigger:</strong> <code>Stumble</code></li>
+              <li><strong>Float:</strong> <code>Speed</code> (used for the blend tree later)</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h3>Creating Transitions</h3>
+        <p>Right-click a state and choose <strong>Make Transition</strong>, then click the destination state. Here are the transitions we need:</p>
+
+        <table>
+          <thead>
+            <tr><th>From</th><th>To</th><th>Condition</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Idle</td><td>Run</td><td>IsRunning = true</td></tr>
+            <tr><td>Run</td><td>Idle</td><td>IsRunning = false</td></tr>
+            <tr><td>Run</td><td>Jump</td><td>IsJumping = true</td></tr>
+            <tr><td>Jump</td><td>Run</td><td>IsJumping = false</td></tr>
+            <tr><td>Run</td><td>Slide</td><td>IsSliding = true</td></tr>
+            <tr><td>Slide</td><td>Run</td><td>IsSliding = false</td></tr>
+            <tr><td>Any State</td><td>Death</td><td>IsDead = true</td></tr>
+            <tr><td>Any State</td><td>Stumble</td><td>Stumble (trigger)</td></tr>
+            <tr><td>Stumble</td><td>Run</td><td>(Has Exit Time = true, no condition)</td></tr>
+          </tbody>
+        </table>
+
+        <h3>Transition Settings</h3>
+        <p>Select each transition arrow and configure these settings in the Inspector:</p>
+
+        <ul>
+          <li><strong>Has Exit Time:</strong> Uncheck this for most gameplay transitions. When unchecked, the transition happens <em>immediately</em> when the condition is met, even if the current animation is not finished. This is critical for responsive controls &mdash; when the player swipes jump, the jump animation must start NOW, not after the current run cycle completes. The exception is Stumble &rarr; Run, where we want the stumble to play fully before returning to run.</li>
+          <li><strong>Transition Duration:</strong> Set to <strong>0.1</strong> seconds for most transitions. This creates a brief blend between animations. Set to <strong>0</strong> for instant transitions (e.g., Any State &rarr; Death).</li>
+          <li><strong>Interruption Source:</strong> Set to <strong>Current State</strong> for Run &rarr; Jump and Run &rarr; Slide. This allows a new transition to interrupt the current one (e.g., the player can jump mid-slide if you allow it).</li>
+          <li><strong>Can Transition To Self:</strong> Uncheck this to prevent a state from re-entering itself.</li>
+        </ul>
+
+        <div class="callout warning">
+          <div class="callout-title">The #1 Animator Mistake</div>
+          <p>Leaving <strong>Has Exit Time</strong> checked on gameplay transitions is the most common beginner mistake. It causes your character to feel "laggy" because the Animator waits for the current clip to finish before transitioning. For an infinite runner where responsiveness is everything, always uncheck Has Exit Time on transitions triggered by player input.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Blend Trees -->
+      <section>
+        <h2>Blend Trees for Run Speed</h2>
+        <p>As the game speeds up (from the difficulty system in Chapter 18), the player runs faster. It looks wrong if the run animation plays at the same speed regardless. A <strong>Blend Tree</strong> solves this by blending between a slow run and a fast run based on a parameter.</p>
+
+        <ol class="steps">
+          <li>In the Animator window, right-click and select <strong>Create State &gt; From New Blend Tree</strong>. Name it <code>RunBlend</code>.</li>
+          <li>Double-click <code>RunBlend</code> to enter the blend tree editor.</li>
+          <li>Set the <strong>Blend Type</strong> to <strong>1D</strong> (we are blending based on a single value: speed).</li>
+          <li>Set the <strong>Parameter</strong> to <code>Speed</code>.</li>
+          <li>Click <strong>+</strong> &gt; <strong>Add Motion Field</strong> twice to create two slots:
+            <ul>
+              <li>Slot 1: Your slow run animation clip. Threshold = 0.</li>
+              <li>Slot 2: Your fast run animation clip. Threshold = 1.</li>
+            </ul>
+          </li>
+          <li>Navigate back to the base layer (click "Base Layer" in the breadcrumb at the top).</li>
+          <li>Delete the old <code>Run</code> state. Re-create the transitions that pointed to/from <code>Run</code> to now point to/from <code>RunBlend</code>.</li>
+        </ol>
+
+        <p>Now, when your code sets <code>Speed</code> to 0.0, the slow run plays. At 1.0, the fast run plays. At 0.5, Unity blends both clips 50/50. The result is a smooth acceleration in the run animation that matches the actual game speed.</p>
+
+        <div class="callout tip">
+          <div class="callout-title">No Fast Run Clip?</div>
+          <p>If you only have one run animation, you can still use a blend tree. Add the same clip to both slots and instead adjust the <strong>Speed</strong> multiplier on each motion. Set the slow run to 0.7x speed and the fast run to 1.5x speed. The blend tree will interpolate the playback speed based on the parameter.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Animation Events -->
+      <section>
+        <h2>Animation Events</h2>
+        <p>Animation Events let you call a C# method at a specific frame in an animation clip. This is perfect for timing sound effects or gameplay events to precise animation moments.</p>
+
+        <h3>Common Use Cases</h3>
+        <ul>
+          <li><strong>Footstep sounds:</strong> Place events at the frames where each foot hits the ground in the run cycle.</li>
+          <li><strong>Dust puffs:</strong> Trigger a small particle effect at the landing frame of the jump animation.</li>
+          <li><strong>Slide start/end:</strong> Play a whoosh sound at the start of the slide clip.</li>
+        </ul>
+
+        <h3>Adding an Animation Event</h3>
+        <ol class="steps">
+          <li>Select your player object and open the <strong>Animation window</strong>.</li>
+          <li>Select the animation clip you want to add an event to (e.g., <code>Player_Run</code>).</li>
+          <li>Scrub the playhead to the frame where you want the event (e.g., frame 5 for a footstep).</li>
+          <li>Click the <strong>Add Event</strong> button (the small marker icon above the timeline).</li>
+          <li>In the Inspector, set the <strong>Function</strong> field to the name of a public method on any component attached to the same GameObject (e.g., <code>PlayFootstep</code>).</li>
+          <li>Optionally pass a parameter (float, int, string, or Object reference).</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Animation Event Pitfalls</div>
+          <p>Animation Events call methods on components attached to the <strong>same GameObject</strong> that has the Animator. If your method is on a child object, it will not be found. Also, if the animation is interrupted before reaching the event frame, the event will not fire. Do not rely on Animation Events for critical gameplay logic &mdash; use them only for cosmetic effects like sounds and particles.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: PlayerAnimator.cs -->
+      <section>
+        <h2>The PlayerAnimator Script</h2>
+        <p>We need a script that acts as a bridge between the player's gameplay state (from <code>PlayerController</code>) and the Animator. This script translates gameplay actions into Animator parameter changes.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerAnimator.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Player
+{
+    /// &lt;summary&gt;
+    /// Controls the player's Animator based on gameplay state.
+    /// Acts as a bridge between PlayerController and the Animator component.
+    /// Attach this to the Player GameObject (same object as the Animator).
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Animator))]
+    public class PlayerAnimator : MonoBehaviour
+    {
+        // ─── Cached References ──────────────────────────────────
+        private Animator _animator;
+
+        // ─── Animator Parameter Hashes ──────────────────────────
+        // Using hashes instead of strings is faster. Animator.StringToHash()
+        // converts a parameter name to an integer ID at startup, so we never
+        // have to do string comparisons at runtime.
+        private static readonly int HashIsRunning = Animator.StringToHash("IsRunning");
+        private static readonly int HashIsJumping = Animator.StringToHash("IsJumping");
+        private static readonly int HashIsSliding = Animator.StringToHash("IsSliding");
+        private static readonly int HashIsDead    = Animator.StringToHash("IsDead");
+        private static readonly int HashStumble   = Animator.StringToHash("Stumble");
+        private static readonly int HashSpeed     = Animator.StringToHash("Speed");
+
+        // ─── State Tracking ─────────────────────────────────────
+        // We track the current state to avoid setting parameters every frame
+        // when nothing has changed. This is a minor optimization.
+        private bool _isRunning;
+        private bool _isJumping;
+        private bool _isSliding;
+        private bool _isDead;
+
+        // ─── Unity Lifecycle ────────────────────────────────────
+
+        private void Awake()
+        {
+            // Cache the Animator component — never call GetComponent in Update()
+            _animator = GetComponent&lt;Animator&gt;();
+
+            if (_animator == null)
+            {
+                Debug.LogError(
+                    "[PlayerAnimator] No Animator component found! " +
+                    "Attach an Animator to the Player GameObject.");
+            }
+        }
+
+        private void OnEnable()
+        {
+            // Subscribe to game state changes to handle menu/death/restart
+            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+        }
+
+        // ─── Public Methods (called by PlayerController) ────────
+
+        /// &lt;summary&gt;
+        /// Transition to the running state.
+        /// Called when the game starts or the player lands from a jump/slide.
+        /// &lt;/summary&gt;
+        public void SetRunning(bool running)
+        {
+            if (_isDead) return; // Do not change animation if dead
+
+            _isRunning = running;
+            _animator.SetBool(HashIsRunning, running);
+
+            // When starting to run, make sure jump and slide are cleared
+            if (running)
+            {
+                _isJumping = false;
+                _isSliding = false;
+                _animator.SetBool(HashIsJumping, false);
+                _animator.SetBool(HashIsSliding, false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Transition to the jumping state.
+        /// Called when the player swipes up.
+        /// &lt;/summary&gt;
+        public void SetJumping(bool jumping)
+        {
+            if (_isDead) return;
+
+            _isJumping = jumping;
+            _animator.SetBool(HashIsJumping, jumping);
+
+            // Cannot be sliding and jumping at the same time
+            if (jumping)
+            {
+                _isSliding = false;
+                _animator.SetBool(HashIsSliding, false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Transition to the sliding state.
+        /// Called when the player swipes down.
+        /// &lt;/summary&gt;
+        public void SetSliding(bool sliding)
+        {
+            if (_isDead) return;
+
+            _isSliding = sliding;
+            _animator.SetBool(HashIsSliding, sliding);
+
+            // Cannot be jumping and sliding at the same time
+            if (sliding)
+            {
+                _isJumping = false;
+                _animator.SetBool(HashIsJumping, false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Trigger the death animation. This is a one-way transition:
+        /// once dead, no other animation can play until Reset() is called.
+        /// &lt;/summary&gt;
+        public void TriggerDeath()
+        {
+            _isDead = true;
+            _animator.SetBool(HashIsDead, true);
+
+            // Clear all other states
+            _isRunning = false;
+            _isJumping = false;
+            _isSliding = false;
+            _animator.SetBool(HashIsRunning, false);
+            _animator.SetBool(HashIsJumping, false);
+            _animator.SetBool(HashIsSliding, false);
+        }
+
+        /// &lt;summary&gt;
+        /// Trigger the stumble animation (plays once, then returns to run).
+        /// Called when the player has a near-miss with an obstacle.
+        /// &lt;/summary&gt;
+        public void TriggerStumble()
+        {
+            if (_isDead) return;
+
+            _animator.SetTrigger(HashStumble);
+        }
+
+        /// &lt;summary&gt;
+        /// Updates the run speed parameter for the blend tree.
+        /// Call this every frame from PlayerController with the current
+        /// normalized speed (0 = minimum speed, 1 = maximum speed).
+        /// &lt;/summary&gt;
+        /// &lt;param name="normalizedSpeed"&gt;
+        /// Value from 0 to 1 representing current game speed.
+        /// &lt;/param&gt;
+        public void SetSpeed(float normalizedSpeed)
+        {
+            _animator.SetFloat(HashSpeed, normalizedSpeed);
+        }
+
+        /// &lt;summary&gt;
+        /// Resets all animator parameters to their defaults.
+        /// Call this when restarting the game to prepare for a fresh run.
+        /// &lt;/summary&gt;
+        public void ResetAnimator()
+        {
+            _isDead = false;
+            _isRunning = false;
+            _isJumping = false;
+            _isSliding = false;
+
+            _animator.SetBool(HashIsDead, false);
+            _animator.SetBool(HashIsRunning, false);
+            _animator.SetBool(HashIsJumping, false);
+            _animator.SetBool(HashIsSliding, false);
+            _animator.SetFloat(HashSpeed, 0f);
+
+            // Force the Animator back to the entry state
+            _animator.Rebind();
+            _animator.Update(0f);
+        }
+
+        // ─── Animation Event Callbacks ──────────────────────────
+        // These methods are called by Animation Events placed on clips.
+        // The method name must match exactly what is set in the Animation Event.
+
+        /// &lt;summary&gt;
+        /// Called by an Animation Event on the run cycle at footstep frames.
+        /// Plays a footstep sound effect.
+        /// &lt;/summary&gt;
+        public void PlayFootstep()
+        {
+            // AudioManager.Instance.PlaySFX("Footstep");
+            // Uncomment above when AudioManager is set up (Chapter 20)
+        }
+
+        /// &lt;summary&gt;
+        /// Called by an Animation Event at the landing frame of the jump clip.
+        /// Plays a landing sound and optional dust particle effect.
+        /// &lt;/summary&gt;
+        public void PlayLandingEffect()
+        {
+            // AudioManager.Instance.PlaySFX("Landing");
+            // ParticleManager.Instance.PlayCoinCollect(transform.position);
+            // Replace with a proper landing dust effect
+        }
+
+        // ─── Event Handlers ─────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Handles game state changes. Resets animations on restart,
+        /// starts idle on menu, starts running when game begins.
+        /// &lt;/summary&gt;
+        private void HandleGameStateChanged(GameState newState)
+        {
+            switch (newState)
+            {
+                case GameState.Menu:
+                    ResetAnimator();
+                    // Idle animation plays by default (it is the entry state)
+                    break;
+
+                case GameState.Playing:
+                    if (_isDead)
+                    {
+                        // Coming from GameOver — reset first
+                        ResetAnimator();
+                    }
+                    SetRunning(true);
+                    break;
+
+                case GameState.Paused:
+                    // Optionally freeze the animator so it does not
+                    // continue playing during pause
+                    _animator.speed = 0f;
+                    break;
+
+                case GameState.GameOver:
+                    // Death animation is triggered by TriggerDeath(),
+                    // which is called by PlayerController when collision happens.
+                    // Nothing extra needed here.
+                    break;
+            }
+
+            // Restore animator speed when unpausing
+            if (newState != GameState.Paused)
+            {
+                _animator.speed = 1f;
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Script Breakdown</h3>
+        <ul>
+          <li><strong>Hashed Parameters</strong> &mdash; We convert parameter names to integer hashes using <code>Animator.StringToHash()</code> at class load time (they are <code>static readonly</code>). This avoids string allocation and comparison every frame. It is a small optimization, but it is a good habit.</li>
+          <li><strong>Guard Clauses (<code>if (_isDead) return</code>)</strong> &mdash; Once the player is dead, we lock out all animation changes. This prevents the death animation from being interrupted by stale input.</li>
+          <li><strong>Mutual Exclusivity</strong> &mdash; When jumping starts, sliding is cleared, and vice versa. The player cannot be in two action states simultaneously.</li>
+          <li><strong>ResetAnimator()</strong> &mdash; Clears all parameters and calls <code>Rebind()</code> to force the Animator back to its entry state. This is essential when restarting the game.</li>
+          <li><strong>Pause Handling</strong> &mdash; Setting <code>_animator.speed = 0f</code> freezes the animation in place. We restore it when unpausing.</li>
+          <li><strong>Animation Event Callbacks</strong> &mdash; <code>PlayFootstep()</code> and <code>PlayLandingEffect()</code> are called from Animation Events on the clips. They are placeholders until you hook up the Audio Manager from Chapter 20.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Connecting to PlayerController -->
+      <section>
+        <h2>Connecting to PlayerController</h2>
+        <p>The <code>PlayerAnimator</code> is designed to be called by your <code>PlayerController</code> (from Chapter 9). Here is how they work together:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerController.cs (relevant excerpt)</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Player
+{
+    public class PlayerController : MonoBehaviour
+    {
+        // Reference to our animation controller
+        [SerializeField] private PlayerAnimator playerAnimator;
+
+        // Called when the player initiates a jump
+        private void StartJump()
+        {
+            // ... physics/movement code ...
+
+            // Tell the animator to play the jump animation
+            playerAnimator.SetJumping(true);
+        }
+
+        // Called when the player lands
+        private void Land()
+        {
+            // ... physics/movement code ...
+
+            // Return to the run animation
+            playerAnimator.SetJumping(false);
+        }
+
+        // Called when the player initiates a slide
+        private void StartSlide()
+        {
+            // ... physics/movement code ...
+
+            playerAnimator.SetSliding(true);
+        }
+
+        // Called when the slide ends
+        private void EndSlide()
+        {
+            // ... physics/movement code ...
+
+            playerAnimator.SetSliding(false);
+        }
+
+        // Called when the player collides with an obstacle
+        private void Die()
+        {
+            // ... disable input, stop movement ...
+
+            playerAnimator.TriggerDeath();
+
+            // Notify the GameManager
+            // GameManager.Instance.EndGame();
+        }
+
+        // Called every frame during gameplay
+        private void Update()
+        {
+            // ... movement logic ...
+
+            // Update the animation blend tree with current speed
+            // normalizedSpeed ranges from 0 (start speed) to 1 (max speed)
+            float normalizedSpeed = CalculateNormalizedSpeed();
+            playerAnimator.SetSpeed(normalizedSpeed);
+        }
+
+        private float CalculateNormalizedSpeed()
+        {
+            // Example: map current speed to a 0-1 range
+            // float minSpeed = 5f;
+            // float maxSpeed = 20f;
+            // return Mathf.InverseLerp(minSpeed, maxSpeed, currentSpeed);
+            return 0.5f; // placeholder
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Separation of Concerns</div>
+          <p>The <code>PlayerController</code> handles movement and physics. The <code>PlayerAnimator</code> handles animations. They communicate through simple method calls. This separation means you can completely change the animation system (e.g., swap from Mecanim to a custom solution) without touching any movement code, and vice versa.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Working with Mixamo -->
+      <section>
+        <h2>Tips for Downloaded Animation Assets</h2>
+        <p>Once your prototype is working, you will probably want to use real character animations. <strong>Mixamo</strong> (mixamo.com) is a free service by Adobe that provides hundreds of humanoid animations. Here is how to use them:</p>
+
+        <ol class="steps">
+          <li>Go to <a href="https://www.mixamo.com" target="_blank" rel="noopener">mixamo.com</a> and sign in with a free Adobe account.</li>
+          <li>Choose a character or upload your own 3D model.</li>
+          <li>Browse the animation library and search for "running," "jumping," "sliding," etc.</li>
+          <li>Download each animation as <strong>FBX for Unity (.fbx)</strong>. Choose "Without Skin" if you have already downloaded the character separately (this keeps file sizes small).</li>
+          <li>Import the .fbx files into <code>Assets/Animation/Mixamo/</code>.</li>
+          <li>
+            For each imported .fbx file:
+            <ul>
+              <li>Select it in the Project window.</li>
+              <li>In the <strong>Rig</strong> tab: Set Animation Type to <strong>Humanoid</strong>. Click Apply.</li>
+              <li>In the <strong>Animation</strong> tab: Check <strong>Loop Time</strong> for run/idle clips. Uncheck it for jump/death/slide. Click Apply.</li>
+            </ul>
+          </li>
+          <li>Expand the .fbx file in the Project window to reveal the animation clip inside. Drag it into the appropriate Animator Controller state's <strong>Motion</strong> field.</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Root Motion Warning</div>
+          <p>Some Mixamo animations include <strong>root motion</strong> &mdash; the character physically moves forward in the clip. This can conflict with your <code>PlayerController</code>'s movement code. To prevent this, uncheck <strong>Apply Root Motion</strong> on the Animator component. Your code should control all movement; the Animator only handles the visual pose.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <p>In this chapter, we set up a complete animation system for our player character:</p>
+        <ul>
+          <li>An <strong>Animator Controller</strong> with states for Idle, Run, Jump, Slide, Stumble, and Death.</li>
+          <li><strong>Transitions</strong> controlled by bool parameters, with responsive settings (no exit time, short transition durations).</li>
+          <li>A <strong>Blend Tree</strong> that smoothly adjusts the run animation speed based on the game's difficulty.</li>
+          <li><strong>Animation Events</strong> for triggering footstep sounds at precise frames.</li>
+          <li>A <strong>PlayerAnimator.cs</strong> script that bridges the gameplay layer (PlayerController) and the visual layer (Animator), using hashed parameter IDs for performance.</li>
+          <li>Prototype animations using cube transforms, with a clear path to upgrade with Mixamo or custom 3D character models.</li>
+        </ul>
+        <p>In the next chapter, we switch from visual polish to data persistence. We will build a <strong>Save System</strong> that stores high scores, unlocked items, and player settings across play sessions.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Animations bring the player to life. Commit.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Implement animation system with state machine and blend trees"
+git push</code></pre>
+        </div>
+        <p>That wraps up Part 5: Polish. Run <code>git log --oneline</code> — your commit history tells the entire story of building this game, system by system.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="21-particles.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Particles</span></a>
+        <a href="23-save-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Save System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

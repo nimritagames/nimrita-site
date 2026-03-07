@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Object Pooling - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link active"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 12</span>
+        <h1>Object Pooling</h1>
+        <p class="chapter-desc">Eliminate garbage collection stutters by pre-creating objects and recycling them instead of using Instantiate and Destroy at runtime.</p>
+      </div>
+
+      <!-- Section: The Problem -->
+      <h2>The Problem: Instantiate and Destroy Are Expensive</h2>
+      <p>In our infinite runner, chunks, obstacles, and collectibles constantly appear in front of the player and disappear behind them. The most obvious way to handle this is to call <code>Instantiate()</code> when you need a new object and <code>Destroy()</code> when you're done with it. This works, but it has a serious performance problem.</p>
+      <p>Every time you call <code>Instantiate()</code>, Unity has to:</p>
+      <ol>
+        <li><strong>Allocate memory</strong> on the managed heap for the new GameObject and all its components.</li>
+        <li><strong>Copy all component data</strong> from the prefab to the new instance.</li>
+        <li><strong>Initialize the object</strong> (call Awake, OnEnable, etc.).</li>
+        <li><strong>Register it</strong> with Unity's internal systems (physics, rendering, etc.).</li>
+      </ol>
+      <p>Every time you call <code>Destroy()</code>, Unity has to:</p>
+      <ol>
+        <li><strong>Unregister the object</strong> from all internal systems.</li>
+        <li><strong>Call cleanup methods</strong> (OnDisable, OnDestroy).</li>
+        <li><strong>Mark the memory as free</strong> for garbage collection.</li>
+      </ol>
+      <p>The real killer is step 4 of Destroy: <strong>garbage collection</strong>. C# uses a garbage collector (GC) to clean up memory that's no longer in use. The GC doesn't run continuously &mdash; it runs in bursts, and when it runs, it <strong>pauses your game</strong>. On mobile devices, a GC spike can cause a visible stutter that lasts 10-50 milliseconds. In a fast-paced runner where the player needs to react instantly, even a single frame of stutter can cause a death that feels unfair.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">GC Spikes Are the Enemy of Smooth Gameplay</div>
+        <p>In our runner, we might spawn 3-5 obstacles and 10-15 coins per chunk, with chunks spawning every 1-2 seconds. That's potentially 20 Instantiate calls and 20 Destroy calls every couple of seconds. Without pooling, this generates continuous garbage, triggering GC collections every few seconds. On a phone, this makes the game feel laggy and unresponsive &mdash; exactly what kills a runner game.</p>
+      </div>
+
+      <!-- Section: What is Object Pooling? -->
+      <h2>The Solution: Object Pooling</h2>
+      <p>Object pooling is a pattern where instead of creating and destroying objects at runtime, you <strong>pre-create</strong> a batch of objects when the game starts, <strong>disable</strong> them (so they're invisible and inactive), and then <strong>reuse</strong> them when needed.</p>
+      <p>Here's the lifecycle of a pooled object:</p>
+      <ol>
+        <li><strong>Pre-creation (warm-up)</strong> &mdash; At game start, create 10 coin objects. Set them all to inactive (<code>gameObject.SetActive(false)</code>). They exist in memory but are invisible and do nothing.</li>
+        <li><strong>Get from pool (spawn)</strong> &mdash; When you need a coin, take one from the pool. Set it to active, position it, and call its setup method. This is essentially free &mdash; the object already exists.</li>
+        <li><strong>Return to pool (despawn)</strong> &mdash; When the player passes the coin (or collects it), don't destroy it. Instead, set it to inactive and put it back in the pool. It's now available for reuse.</li>
+        <li><strong>Repeat</strong> &mdash; The same 10 coin objects get used over and over, forever. Zero memory allocations after the initial warm-up.</li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-title">A Real-World Analogy</div>
+        <p>Think of a restaurant. Without pooling, every time a customer orders water, the restaurant buys a new glass, serves the water, and then throws the glass in the trash when the customer leaves. With pooling, the restaurant has a cabinet of glasses. When a customer needs water, a glass comes out of the cabinet. When they're done, the glass is washed and put back. The restaurant never needs to buy new glasses (after the initial purchase), and no glass ever goes to the landfill.</p>
+      </div>
+
+      <!-- Section: The IPoolable Interface -->
+      <h2>The IPoolable Interface</h2>
+      <p>Before building the pool itself, we need a contract that pooled objects must follow. When an object is taken from the pool, it needs to initialize itself. When it's returned, it needs to clean up. We define this contract as an <strong>interface</strong>.</p>
+      <p>If you're new to interfaces: an interface is a promise. Any class that "implements" an interface promises to have certain methods. Our pool doesn't care whether it's holding coins, obstacles, or chunks &mdash; it only cares that they implement <code>IPoolable</code>.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">IPoolable.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Interface for objects managed by the object pool.
+    /// Any MonoBehaviour that wants to be pooled must implement this.
+    /// &lt;/summary&gt;
+    public interface IPoolable
+    {
+        /// &lt;summary&gt;
+        /// Called when the object is taken from the pool and "spawned" into the world.
+        /// Use this instead of Awake/Start for initialization that should happen
+        /// every time the object is reused, not just the first time.
+        ///
+        /// Example: reset health to max, enable colliders, start animations.
+        /// &lt;/summary&gt;
+        void OnSpawn();
+
+        /// &lt;summary&gt;
+        /// Called when the object is returned to the pool and "despawned."
+        /// Use this to clean up any state so the object is ready for reuse.
+        ///
+        /// Example: stop particles, cancel coroutines, reset position.
+        /// &lt;/summary&gt;
+        void OnDespawn();
+    }
+}</code></pre></div>
+
+      <p>This interface has only two methods:</p>
+      <ul>
+        <li><strong><code>OnSpawn()</code></strong> &mdash; Called when the object leaves the pool and enters the game world. This is where you reset the object to its default state: enable its colliders, reset any timers, set its visual appearance, etc. Think of it as a replacement for <code>Start()</code> that runs every time the object is reused, not just the first time.</li>
+        <li><strong><code>OnDespawn()</code></strong> &mdash; Called when the object is removed from the game world and returned to the pool. This is where you stop any running coroutines, disable particle effects, and clean up anything that shouldn't persist to the next use.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">OnSpawn vs. Awake/Start</div>
+        <p>With pooled objects, <code>Awake()</code> and <code>Start()</code> only run once &mdash; when the object is first created during warm-up. They do NOT run again when the object is reused. This is a common beginner mistake: putting reset logic in <code>Start()</code> and wondering why objects have stale data on their second use. Always put per-spawn initialization in <code>OnSpawn()</code>.</p>
+      </div>
+
+      <!-- Section: Generic ObjectPool<T> -->
+      <h2>Building the Generic ObjectPool&lt;T&gt; Class</h2>
+      <p>Now for the pool itself. We'll make it generic (using <code>&lt;T&gt;</code>) so the same pool class can hold any type of component: coins, obstacles, chunks, particles, or anything else.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ObjectPool.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// A generic object pool that manages reusable instances of a prefab.
+    /// T must be a MonoBehaviour that implements IPoolable.
+    ///
+    /// Usage:
+    ///   var coinPool = new ObjectPool&lt;Coin&gt;(coinPrefab, parent, 20);
+    ///   Coin coin = coinPool.Get();           // Take from pool
+    ///   coinPool.Return(coin);                // Return to pool
+    /// &lt;/summary&gt;
+    /// &lt;typeparam name="T"&gt;The component type on the pooled prefab.&lt;/typeparam&gt;
+    public class ObjectPool&lt;T&gt; where T : MonoBehaviour, IPoolable
+    {
+        private readonly T prefab;
+        private readonly Transform parentContainer;
+        private readonly Queue&lt;T&gt; availableObjects;
+        private readonly List&lt;T&gt; allObjects;
+        private readonly int maxSize;
+        private readonly bool canGrow;
+
+        /// &lt;summary&gt;
+        /// How many objects are currently in the pool (inactive, waiting to be used).
+        /// &lt;/summary&gt;
+        public int AvailableCount =&gt; availableObjects.Count;
+
+        /// &lt;summary&gt;
+        /// How many objects are currently active in the scene (taken from pool).
+        /// &lt;/summary&gt;
+        public int ActiveCount =&gt; allObjects.Count - availableObjects.Count;
+
+        /// &lt;summary&gt;
+        /// Total objects managed by this pool (active + available).
+        /// &lt;/summary&gt;
+        public int TotalCount =&gt; allObjects.Count;
+
+        /// &lt;summary&gt;
+        /// Creates a new object pool.
+        /// &lt;/summary&gt;
+        /// &lt;param name="prefab"&gt;The prefab to instantiate. Must have component T.&lt;/param&gt;
+        /// &lt;param name="parent"&gt;Parent transform for pooled objects (keeps Hierarchy clean).&lt;/param&gt;
+        /// &lt;param name="initialSize"&gt;How many objects to pre-create at startup.&lt;/param&gt;
+        /// &lt;param name="maxSize"&gt;Maximum pool size. 0 = unlimited.&lt;/param&gt;
+        /// &lt;param name="canGrow"&gt;If true, pool creates new objects when empty.
+        /// If false, Get() returns null when pool is exhausted.&lt;/param&gt;
+        public ObjectPool(
+            T prefab,
+            Transform parent,
+            int initialSize = 10,
+            int maxSize = 0,
+            bool canGrow = true)
+        {
+            this.prefab = prefab;
+            this.parentContainer = parent;
+            this.maxSize = maxSize;
+            this.canGrow = canGrow;
+
+            availableObjects = new Queue&lt;T&gt;(initialSize);
+            allObjects = new List&lt;T&gt;(initialSize);
+
+            // Warm up: pre-create the initial batch
+            WarmUp(initialSize);
+        }
+
+        /// &lt;summary&gt;
+        /// Pre-creates objects and adds them to the pool.
+        /// Called automatically by the constructor, but you can call it again
+        /// to add more objects later (e.g., if you anticipate a busy section).
+        /// &lt;/summary&gt;
+        /// &lt;param name="count"&gt;Number of objects to create.&lt;/param&gt;
+        public void WarmUp(int count)
+        {
+            for (int i = 0; i &lt; count; i++)
+            {
+                if (maxSize &gt; 0 &amp;&amp; allObjects.Count &gt;= maxSize)
+                {
+                    Debug.LogWarning(
+                        $"ObjectPool&lt;{typeof(T).Name}&gt;: " +
+                        $"Cannot warm up beyond max size ({maxSize})."
+                    );
+                    break;
+                }
+
+                T instance = CreateInstance();
+                availableObjects.Enqueue(instance);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Gets an object from the pool. If the pool is empty and canGrow is true,
+        /// a new object is created. If canGrow is false, returns null.
+        /// &lt;/summary&gt;
+        /// &lt;returns&gt;An active, initialized pooled object, or null if exhausted.&lt;/returns&gt;
+        public T Get()
+        {
+            T instance;
+
+            if (availableObjects.Count &gt; 0)
+            {
+                // Take from the pool
+                instance = availableObjects.Dequeue();
+            }
+            else if (canGrow)
+            {
+                // Pool is empty but allowed to grow
+                if (maxSize &gt; 0 &amp;&amp; allObjects.Count &gt;= maxSize)
+                {
+                    Debug.LogWarning(
+                        $"ObjectPool&lt;{typeof(T).Name}&gt;: " +
+                        $"Max size ({maxSize}) reached. Cannot grow further."
+                    );
+                    return null;
+                }
+
+                Debug.Log(
+                    $"ObjectPool&lt;{typeof(T).Name}&gt;: " +
+                    $"Pool empty, creating new instance. " +
+                    $"Consider increasing initial size. " +
+                    $"(Total: {allObjects.Count + 1})"
+                );
+
+                instance = CreateInstance();
+            }
+            else
+            {
+                // Pool is empty and not allowed to grow
+                Debug.LogWarning(
+                    $"ObjectPool&lt;{typeof(T).Name}&gt;: " +
+                    $"Pool exhausted (size: {allObjects.Count}). " +
+                    $"Returning null."
+                );
+                return null;
+            }
+
+            // Activate and initialize the object
+            instance.gameObject.SetActive(true);
+            instance.OnSpawn();
+
+            return instance;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns an object to the pool for future reuse.
+        /// The object is deactivated and its OnDespawn method is called.
+        /// &lt;/summary&gt;
+        /// &lt;param name="instance"&gt;The object to return.&lt;/param&gt;
+        public void Return(T instance)
+        {
+            if (instance == null)
+            {
+                Debug.LogWarning(
+                    $"ObjectPool&lt;{typeof(T).Name}&gt;: " +
+                    $"Tried to return a null object."
+                );
+                return;
+            }
+
+            // Clean up and deactivate
+            instance.OnDespawn();
+            instance.gameObject.SetActive(false);
+            instance.transform.SetParent(parentContainer);
+
+            availableObjects.Enqueue(instance);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns ALL active objects to the pool.
+        /// Useful when resetting the game (e.g., on game over).
+        /// &lt;/summary&gt;
+        public void ReturnAll()
+        {
+            foreach (T obj in allObjects)
+            {
+                if (obj != null &amp;&amp; obj.gameObject.activeInHierarchy)
+                {
+                    Return(obj);
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Destroys all objects in the pool and clears internal lists.
+        /// Call this only when you're completely done with the pool
+        /// (e.g., scene unload).
+        /// &lt;/summary&gt;
+        public void Dispose()
+        {
+            foreach (T obj in allObjects)
+            {
+                if (obj != null)
+                {
+                    Object.Destroy(obj.gameObject);
+                }
+            }
+
+            allObjects.Clear();
+            availableObjects.Clear();
+        }
+
+        // ---- Private Helpers ----
+
+        /// &lt;summary&gt;
+        /// Creates a single new instance, deactivates it, and tracks it.
+        /// &lt;/summary&gt;
+        private T CreateInstance()
+        {
+            T instance = Object.Instantiate(prefab, parentContainer);
+            instance.gameObject.SetActive(false);
+            instance.name = $"{prefab.name}_pooled_{allObjects.Count}";
+            allObjects.Add(instance);
+            return instance;
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's examine the key design decisions:</p>
+
+      <h3>Why a Queue?</h3>
+      <p>We use a <code>Queue&lt;T&gt;</code> (first-in, first-out) for available objects rather than a <code>Stack</code> or <code>List</code>. A queue ensures that objects are rotated evenly &mdash; the object that's been sitting in the pool the longest gets used next. This prevents a situation where the same one or two objects get reused rapidly while others never get touched. Even distribution means more consistent memory behavior.</p>
+
+      <h3>Why Track allObjects Separately?</h3>
+      <p>The <code>allObjects</code> list tracks every object the pool has ever created, including ones currently in use. This is essential for <code>ReturnAll()</code> (which needs to find and return active objects) and <code>Dispose()</code> (which needs to destroy everything). The queue only contains available objects, so it can't do these operations alone.</p>
+
+      <h3>Grow vs. Cap</h3>
+      <p>The <code>canGrow</code> parameter controls what happens when the pool runs out of available objects:</p>
+      <ul>
+        <li><strong>Grow mode (<code>canGrow = true</code>)</strong> &mdash; Creates a new object on demand. This is safer (the game never fails to spawn something) but logs a warning so you know your initial size was too small. Use this during development.</li>
+        <li><strong>Cap mode (<code>canGrow = false</code>)</strong> &mdash; Returns null when exhausted. This is useful for effects like particles where having a hard limit is acceptable &mdash; if all particles are in use, it's fine to skip spawning one more.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">Watch Those Pool Growth Warnings</div>
+        <p>If you see "Pool empty, creating new instance" in the console, it means your initial pool size is too small. Each time the pool grows, it calls <code>Instantiate()</code>, which is exactly what we're trying to avoid. Increase the initial size until the warnings stop. A good rule of thumb: your initial size should be the maximum number of that object type that can be visible on screen at once, plus a small buffer.</p>
+      </div>
+
+      <!-- Section: PoolManager -->
+      <h2>The PoolManager: Central Pool Registry</h2>
+      <p>In our game, we'll have pools for chunks, obstacles, coins, particles, and more. Rather than each system creating and managing its own pools, we create a <strong>central manager</strong> that holds all pools and provides a single access point.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">PoolManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Configuration for a single pool, set in the Inspector.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public class PoolConfig
+    {
+        [Tooltip("A unique identifier for this pool (e.g., 'Coin', 'Obstacle_Low').")]
+        public string poolId;
+
+        [Tooltip("The prefab to pool. Must have a component implementing IPoolable.")]
+        public GameObject prefab;
+
+        [Tooltip("How many instances to pre-create at startup.")]
+        [Range(1, 200)]
+        public int initialSize = 10;
+
+        [Tooltip("Maximum pool size. 0 = unlimited.")]
+        public int maxSize = 0;
+
+        [Tooltip("If true, the pool creates new objects when empty. " +
+                 "If false, it returns null.")]
+        public bool canGrow = true;
+    }
+
+    /// &lt;summary&gt;
+    /// Central manager for all object pools in the game.
+    /// Attach this to a persistent GameObject in the scene.
+    ///
+    /// Usage:
+    ///   GameObject coin = PoolManager.Instance.Get("Coin");
+    ///   PoolManager.Instance.Return("Coin", coin);
+    /// &lt;/summary&gt;
+    public class PoolManager : MonoBehaviour
+    {
+        // ---- Singleton ----
+        private static PoolManager instance;
+        public static PoolManager Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    Debug.LogError(
+                        "PoolManager: No instance found in scene! " +
+                        "Add PoolManager to a GameObject."
+                    );
+                }
+                return instance;
+            }
+        }
+
+        [Header("Pool Configurations")]
+        [Tooltip("Define all pools here. Each entry creates one pool at startup.")]
+        [SerializeField] private PoolConfig[] poolConfigs;
+
+        // Internal storage: poolId -> pool of GameObjects
+        private Dictionary&lt;string, Queue&lt;GameObject&gt;&gt; pools;
+        private Dictionary&lt;string, PoolConfig&gt; configLookup;
+        private Dictionary&lt;string, Transform&gt; poolContainers;
+        private Dictionary&lt;string, List&lt;GameObject&gt;&gt; allTracked;
+
+        // ---- Lifecycle ----
+
+        private void Awake()
+        {
+            // Singleton enforcement
+            if (instance != null &amp;&amp; instance != this)
+            {
+                Debug.LogWarning("PoolManager: Duplicate instance destroyed.");
+                Destroy(gameObject);
+                return;
+            }
+            instance = this;
+
+            InitializePools();
+        }
+
+        private void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
+        }
+
+        // ---- Public API ----
+
+        /// &lt;summary&gt;
+        /// Gets an object from the named pool.
+        /// The object is activated and its IPoolable.OnSpawn() is called.
+        /// &lt;/summary&gt;
+        /// &lt;param name="poolId"&gt;The pool identifier (must match a PoolConfig).&lt;/param&gt;
+        /// &lt;returns&gt;An active GameObject, or null if the pool is exhausted.&lt;/returns&gt;
+        public GameObject Get(string poolId)
+        {
+            if (!pools.ContainsKey(poolId))
+            {
+                Debug.LogError($"PoolManager: No pool with id '{poolId}' exists!");
+                return null;
+            }
+
+            Queue&lt;GameObject&gt; pool = pools[poolId];
+            GameObject obj;
+
+            if (pool.Count &gt; 0)
+            {
+                obj = pool.Dequeue();
+            }
+            else
+            {
+                PoolConfig config = configLookup[poolId];
+                if (config.canGrow)
+                {
+                    if (config.maxSize &gt; 0 &amp;&amp;
+                        allTracked[poolId].Count &gt;= config.maxSize)
+                    {
+                        Debug.LogWarning(
+                            $"PoolManager: Pool '{poolId}' at max size " +
+                            $"({config.maxSize}). Cannot grow."
+                        );
+                        return null;
+                    }
+
+                    obj = CreateInstance(poolId, config);
+                    Debug.Log(
+                        $"PoolManager: Pool '{poolId}' grew to " +
+                        $"{allTracked[poolId].Count} instances."
+                    );
+                }
+                else
+                {
+                    Debug.LogWarning(
+                        $"PoolManager: Pool '{poolId}' exhausted."
+                    );
+                    return null;
+                }
+            }
+
+            obj.SetActive(true);
+
+            // Call OnSpawn on all IPoolable components
+            IPoolable[] poolables = obj.GetComponents&lt;IPoolable&gt;();
+            foreach (IPoolable poolable in poolables)
+            {
+                poolable.OnSpawn();
+            }
+
+            return obj;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns an object to the named pool.
+        /// The object is deactivated and its IPoolable.OnDespawn() is called.
+        /// &lt;/summary&gt;
+        /// &lt;param name="poolId"&gt;The pool identifier.&lt;/param&gt;
+        /// &lt;param name="obj"&gt;The GameObject to return.&lt;/param&gt;
+        public void Return(string poolId, GameObject obj)
+        {
+            if (obj == null)
+            {
+                Debug.LogWarning(
+                    $"PoolManager: Tried to return null to pool '{poolId}'."
+                );
+                return;
+            }
+
+            if (!pools.ContainsKey(poolId))
+            {
+                Debug.LogError(
+                    $"PoolManager: No pool with id '{poolId}' exists! " +
+                    $"Destroying object instead."
+                );
+                Destroy(obj);
+                return;
+            }
+
+            // Call OnDespawn on all IPoolable components
+            IPoolable[] poolables = obj.GetComponents&lt;IPoolable&gt;();
+            foreach (IPoolable poolable in poolables)
+            {
+                poolable.OnDespawn();
+            }
+
+            obj.SetActive(false);
+            obj.transform.SetParent(poolContainers[poolId]);
+            pools[poolId].Enqueue(obj);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns all active objects across all pools.
+        /// Call this on game reset / game over.
+        /// &lt;/summary&gt;
+        public void ReturnAll()
+        {
+            foreach (string poolId in pools.Keys)
+            {
+                ReturnAll(poolId);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Returns all active objects in a specific pool.
+        /// &lt;/summary&gt;
+        /// &lt;param name="poolId"&gt;The pool to clear.&lt;/param&gt;
+        public void ReturnAll(string poolId)
+        {
+            if (!allTracked.ContainsKey(poolId)) return;
+
+            // Iterate over a copy to avoid modification during iteration
+            List&lt;GameObject&gt; tracked = allTracked[poolId];
+            for (int i = tracked.Count - 1; i &gt;= 0; i--)
+            {
+                GameObject obj = tracked[i];
+                if (obj != null &amp;&amp; obj.activeInHierarchy)
+                {
+                    Return(poolId, obj);
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Returns pool statistics for debugging.
+        /// &lt;/summary&gt;
+        /// &lt;param name="poolId"&gt;The pool to query.&lt;/param&gt;
+        /// &lt;returns&gt;A formatted string with pool stats.&lt;/returns&gt;
+        public string GetPoolStats(string poolId)
+        {
+            if (!pools.ContainsKey(poolId))
+                return $"Pool '{poolId}' not found.";
+
+            int total = allTracked[poolId].Count;
+            int available = pools[poolId].Count;
+            int active = total - available;
+
+            return $"Pool '{poolId}': {active} active, " +
+                   $"{available} available, {total} total";
+        }
+
+        // ---- Private Helpers ----
+
+        private void InitializePools()
+        {
+            pools = new Dictionary&lt;string, Queue&lt;GameObject&gt;&gt;();
+            configLookup = new Dictionary&lt;string, PoolConfig&gt;();
+            poolContainers = new Dictionary&lt;string, Transform&gt;();
+            allTracked = new Dictionary&lt;string, List&lt;GameObject&gt;&gt;();
+
+            if (poolConfigs == null || poolConfigs.Length == 0)
+            {
+                Debug.LogWarning("PoolManager: No pool configs defined!");
+                return;
+            }
+
+            foreach (PoolConfig config in poolConfigs)
+            {
+                if (string.IsNullOrEmpty(config.poolId))
+                {
+                    Debug.LogError("PoolManager: A pool config has an empty ID!");
+                    continue;
+                }
+
+                if (config.prefab == null)
+                {
+                    Debug.LogError(
+                        $"PoolManager: Pool '{config.poolId}' has no prefab!"
+                    );
+                    continue;
+                }
+
+                if (pools.ContainsKey(config.poolId))
+                {
+                    Debug.LogError(
+                        $"PoolManager: Duplicate pool ID '{config.poolId}'!"
+                    );
+                    continue;
+                }
+
+                // Create a container GameObject to keep the Hierarchy organized
+                GameObject container = new GameObject($"Pool_{config.poolId}");
+                container.transform.SetParent(transform);
+                poolContainers[config.poolId] = container.transform;
+
+                // Initialize the queue and tracking list
+                pools[config.poolId] = new Queue&lt;GameObject&gt;(config.initialSize);
+                configLookup[config.poolId] = config;
+                allTracked[config.poolId] = new List&lt;GameObject&gt;(config.initialSize);
+
+                // Warm up: pre-create objects
+                for (int i = 0; i &lt; config.initialSize; i++)
+                {
+                    CreateInstance(config.poolId, config);
+                }
+
+                Debug.Log(
+                    $"PoolManager: Initialized pool '{config.poolId}' " +
+                    $"with {config.initialSize} instances."
+                );
+            }
+        }
+
+        private GameObject CreateInstance(string poolId, PoolConfig config)
+        {
+            GameObject obj = Instantiate(config.prefab, poolContainers[poolId]);
+            obj.SetActive(false);
+            obj.name = $"{config.prefab.name}_{allTracked[poolId].Count}";
+            allTracked[poolId].Add(obj);
+            pools[poolId].Enqueue(obj);
+            return obj;
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's walk through the important pieces:</p>
+
+      <h3>The PoolConfig Class</h3>
+      <p>The <code>[System.Serializable]</code> attribute makes <code>PoolConfig</code> show up in the Inspector as a configurable entry. Each config defines one pool: a unique ID, the prefab, initial size, max size, and growth behavior. You configure all your pools in one place on the PoolManager component.</p>
+
+      <h3>The Singleton Pattern</h3>
+      <p>The PoolManager uses the singleton pattern so any script can access it via <code>PoolManager.Instance</code> without needing a reference. We enforce single-instance by destroying duplicates in <code>Awake()</code>.</p>
+
+      <h3>Pool Containers</h3>
+      <p>Each pool gets its own child GameObject (e.g., "Pool_Coin", "Pool_Obstacle_Low") to keep the Hierarchy window organized. Without containers, you'd have hundreds of loose objects cluttering the Hierarchy, making it impossible to find anything during debugging.</p>
+
+      <h3>The Get/Return API</h3>
+      <p>The API is simple: <code>Get("Coin")</code> gives you a coin, <code>Return("Coin", coinObj)</code> puts it back. The manager handles activation, deactivation, and calling the <code>IPoolable</code> methods automatically.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">Setting Up the PoolManager in Your Scene</div>
+        <p>Create an empty GameObject called "PoolManager" in your scene. Add the PoolManager component. In the Inspector, set the Pool Configs array size and fill in each entry. For our runner, start with pools for: "Chunk_Straight" (initial: 5), "Chunk_Dense" (initial: 3), "Coin" (initial: 30), "Obstacle_Low" (initial: 10), "Obstacle_High" (initial: 10). You'll add more pools as we create more object types in later chapters.</p>
+      </div>
+
+      <!-- Section: Making Chunks Poolable -->
+      <h2>Making Our Chunks Poolable</h2>
+      <p>Let's update the <code>ChunkData</code> class from Chapter 11 to implement <code>IPoolable</code> so chunks can be managed by the pool.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ChunkData.cs (updated)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.World
+{
+    /// &lt;summary&gt;
+    /// Holds all metadata for a single world chunk.
+    /// Now implements IPoolable so it can be managed by the object pool.
+    /// &lt;/summary&gt;
+    public class ChunkData : MonoBehaviour, InfiniteRunner.Core.IPoolable
+    {
+        [Header("Chunk Dimensions")]
+        [SerializeField] private float chunkLength = 20f;
+
+        [Header("Snap Points")]
+        [SerializeField] private Transform snapPointStart;
+        [SerializeField] private Transform snapPointEnd;
+
+        [Header("Spawn Points")]
+        [SerializeField] private Transform[] obstacleSpawnPoints;
+        [SerializeField] private Transform[] collectibleSpawnPoints;
+
+        // Track which objects were spawned ON this chunk so we can return them
+        private readonly System.Collections.Generic.List&lt;GameObject&gt;
+            spawnedObjects = new System.Collections.Generic.List&lt;GameObject&gt;();
+
+        // ---- Public Properties (unchanged from Chapter 11) ----
+        public float ChunkLength =&gt; chunkLength;
+        public Vector3 StartPosition =&gt; snapPointStart.position;
+        public Vector3 EndPosition =&gt; snapPointEnd.position;
+        public Transform[] ObstacleSpawnPoints =&gt; obstacleSpawnPoints;
+        public Transform[] CollectibleSpawnPoints =&gt; collectibleSpawnPoints;
+
+        // ---- IPoolable Implementation ----
+
+        /// &lt;summary&gt;
+        /// Called when this chunk is taken from the pool and placed in the world.
+        /// &lt;/summary&gt;
+        public void OnSpawn()
+        {
+            // The chunk is freshly activated.
+            // Obstacles and collectibles will be spawned separately by the
+            // WorldGenerator, which calls RegisterSpawnedObject for each one.
+        }
+
+        /// &lt;summary&gt;
+        /// Called when this chunk is returned to the pool.
+        /// Returns all objects that were spawned on this chunk back to their pools.
+        /// &lt;/summary&gt;
+        public void OnDespawn()
+        {
+            // Return all spawned objects (obstacles, collectibles) to their pools
+            foreach (GameObject obj in spawnedObjects)
+            {
+                if (obj != null &amp;&amp; obj.activeInHierarchy)
+                {
+                    // Try to determine the pool ID from the object's name
+                    // The PoolManager names objects like "PrefabName_0"
+                    string poolId = GetPoolIdFromObject(obj);
+                    if (!string.IsNullOrEmpty(poolId))
+                    {
+                        InfiniteRunner.Core.PoolManager.Instance.Return(poolId, obj);
+                    }
+                }
+            }
+            spawnedObjects.Clear();
+
+            // Reset transform
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+        }
+
+        // ---- Chunk-Specific Methods ----
+
+        /// &lt;summary&gt;
+        /// Register an object (obstacle, collectible) as belonging to this chunk.
+        /// When the chunk is despawned, all registered objects are returned to pools.
+        /// &lt;/summary&gt;
+        public void RegisterSpawnedObject(GameObject obj)
+        {
+            if (obj != null)
+            {
+                spawnedObjects.Add(obj);
+            }
+        }
+
+        private string GetPoolIdFromObject(GameObject obj)
+        {
+            // Objects are named "PrefabName_N" by the pool manager.
+            // The pool ID matches the prefab name.
+            string name = obj.name;
+            int underscoreIndex = name.LastIndexOf('_');
+            if (underscoreIndex &gt; 0)
+            {
+                return name.Substring(0, underscoreIndex);
+            }
+            return name;
+        }
+
+        // ---- Validation &amp; Gizmos (unchanged from Chapter 11) ----
+        private void OnValidate()
+        {
+            if (snapPointStart != null &amp;&amp; snapPointEnd != null)
+            {
+                float calculatedLength = snapPointEnd.localPosition.z
+                                       - snapPointStart.localPosition.z;
+                if (calculatedLength &gt; 0f)
+                {
+                    chunkLength = calculatedLength;
+                }
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (obstacleSpawnPoints != null)
+            {
+                Gizmos.color = Color.red;
+                foreach (Transform point in obstacleSpawnPoints)
+                {
+                    if (point != null)
+                    {
+                        Gizmos.DrawWireSphere(point.position, 0.3f);
+                    }
+                }
+            }
+
+            if (collectibleSpawnPoints != null)
+            {
+                Gizmos.color = Color.yellow;
+                foreach (Transform point in collectibleSpawnPoints)
+                {
+                    if (point != null)
+                    {
+                        Gizmos.DrawWireSphere(point.position, 0.2f);
+                    }
+                }
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>The key addition is the <code>spawnedObjects</code> list. When the World Generator spawns obstacles and coins on a chunk, it calls <code>RegisterSpawnedObject()</code> to tell the chunk "this obstacle belongs to you." When the chunk is despawned, it automatically returns all those objects to their respective pools. This ensures nothing gets orphaned.</p>
+
+      <!-- Section: Pool Warm-up -->
+      <h2>Pool Warm-Up: Pre-filling at Game Start</h2>
+      <p>The warm-up phase happens in <code>InitializePools()</code> when the PoolManager starts. All <code>Instantiate()</code> calls happen during the loading screen, before gameplay begins. This means:</p>
+      <ul>
+        <li>Zero allocations during gameplay (assuming pools are big enough).</li>
+        <li>A slightly longer load time (usually under 1 second for our game).</li>
+        <li>Smooth, consistent frame rates once playing.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">How to Size Your Pools</div>
+        <p>Here's a practical formula for initial pool sizes:</p>
+        <ul>
+          <li><strong>Chunks:</strong> Number of visible chunks at once + 2 buffer. If 5 chunks are visible, pool size = 7.</li>
+          <li><strong>Obstacles:</strong> Max obstacles per chunk x visible chunks + buffer. If 5 obstacles per chunk and 5 visible chunks, pool size = 30.</li>
+          <li><strong>Coins:</strong> Max coins per chunk x visible chunks + buffer. If 10 coins per chunk, pool size = 60.</li>
+        </ul>
+        <p>It's better to over-allocate slightly than to trigger runtime growth. A few extra inactive GameObjects cost almost nothing in memory.</p>
+      </div>
+
+      <!-- Section: Returning to Pool -->
+      <h2>Returning Objects to the Pool</h2>
+      <p>Objects get returned to the pool in several situations:</p>
+      <ul>
+        <li><strong>Chunk passes behind the player</strong> &mdash; The WorldGenerator detects that a chunk is far enough behind the player and returns it (and all its spawned objects) to the pool.</li>
+        <li><strong>Coin is collected</strong> &mdash; The player picks up a coin, so it's returned to the pool immediately.</li>
+        <li><strong>Game over</strong> &mdash; All active objects across all pools are returned via <code>PoolManager.Instance.ReturnAll()</code>.</li>
+        <li><strong>Game restart</strong> &mdash; Same as game over &mdash; return everything and start fresh.</li>
+      </ul>
+
+      <p>Here's an example of how a collectible coin script would use the pool:</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Coin.cs (preview)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// A collectible coin that can be pooled and reused.
+    /// Full implementation in Chapter 16.
+    /// &lt;/summary&gt;
+    public class Coin : MonoBehaviour, IPoolable
+    {
+        [SerializeField] private float rotationSpeed = 90f;
+        private Collider coinCollider;
+
+        private void Awake()
+        {
+            // Awake runs ONCE when the object is first created (during warm-up).
+            // Cache component references here.
+            coinCollider = GetComponent&lt;Collider&gt;();
+        }
+
+        public void OnSpawn()
+        {
+            // Runs EVERY TIME the coin is taken from the pool.
+            // Reset everything to default state.
+            coinCollider.enabled = true;
+            transform.rotation = Quaternion.identity;
+        }
+
+        public void OnDespawn()
+        {
+            // Runs EVERY TIME the coin is returned to the pool.
+            // Clean up any active state.
+            coinCollider.enabled = false;
+        }
+
+        private void Update()
+        {
+            // Simple spin animation
+            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                // Player collected this coin
+                // Fire an event (Chapter 7's event system)
+                // GameEvents.OnCoinCollected?.Invoke();
+
+                // Return to pool instead of Destroy
+                PoolManager.Instance.Return("Coin", gameObject);
+            }
+        }
+    }
+}</code></pre></div>
+
+      <div class="callout warning">
+        <div class="callout-title">Never Call Destroy on Pooled Objects</div>
+        <p>This is the most important rule of object pooling: <strong>never, ever call <code>Destroy()</code> on a pooled object</strong>. If you destroy it, the pool still has a reference to it, and the next time it tries to reuse that slot, it'll get a null reference. Always use <code>PoolManager.Instance.Return()</code> instead. To enforce this, you could add a component that overrides <code>OnDestroy()</code> and logs an error if it's called on a pooled object.</p>
+      </div>
+
+      <!-- Section: Debug Visualization -->
+      <h2>Debug Visualization</h2>
+      <p>During development, it's very helpful to see how your pools are performing. Let's add a simple debug overlay that shows pool stats on screen.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">PoolDebugOverlay.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Displays pool statistics as an on-screen overlay during development.
+    /// Attach to any GameObject. Remove or disable before shipping.
+    /// &lt;/summary&gt;
+    public class PoolDebugOverlay : MonoBehaviour
+    {
+        [SerializeField] private bool showOverlay = true;
+        [SerializeField] private KeyCode toggleKey = KeyCode.F3;
+
+        [Tooltip("Pool IDs to display. Leave empty to show all.")]
+        [SerializeField] private string[] poolIdsToShow;
+
+        private GUIStyle labelStyle;
+        private GUIStyle headerStyle;
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(toggleKey))
+            {
+                showOverlay = !showOverlay;
+            }
+        }
+
+        private void OnGUI()
+        {
+            if (!showOverlay || PoolManager.Instance == null) return;
+
+            // Initialize styles on first use
+            if (labelStyle == null)
+            {
+                labelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 14,
+                    normal = { textColor = Color.white }
+                };
+
+                headerStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 16,
+                    fontStyle = FontStyle.Bold,
+                    normal = { textColor = Color.cyan }
+                };
+            }
+
+            float x = 10f;
+            float y = 10f;
+            float lineHeight = 20f;
+
+            GUI.Label(new Rect(x, y, 400, lineHeight),
+                "Pool Stats (F3 to toggle)", headerStyle);
+            y += lineHeight + 5f;
+
+            string[] ids = poolIdsToShow != null &amp;&amp; poolIdsToShow.Length &gt; 0
+                ? poolIdsToShow
+                : new string[] {
+                    "Chunk_Straight", "Chunk_Dense", "Chunk_Narrow",
+                    "Chunk_Safe", "Coin", "Obstacle_Low", "Obstacle_High"
+                  };
+
+            foreach (string poolId in ids)
+            {
+                string stats = PoolManager.Instance.GetPoolStats(poolId);
+                GUI.Label(new Rect(x, y, 500, lineHeight), stats, labelStyle);
+                y += lineHeight;
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>Press <strong>F3</strong> at any time during play to toggle the overlay. You'll see each pool's active, available, and total counts. This is invaluable for tuning pool sizes: play the game for a while, watch the numbers, and adjust your initial sizes until you never see "0 available."</p>
+
+      <!-- Section: Summary -->
+      <h2>What We Built</h2>
+      <p>Object pooling is one of the most impactful optimizations you can make in a game with lots of spawning and despawning. Here's what we now have:</p>
+      <ul>
+        <li><strong>IPoolable</strong> &mdash; A simple interface with <code>OnSpawn()</code> and <code>OnDespawn()</code> that any poolable object must implement.</li>
+        <li><strong>ObjectPool&lt;T&gt;</strong> &mdash; A generic, reusable pool class with warm-up, get/return, growth control, and return-all functionality.</li>
+        <li><strong>PoolManager</strong> &mdash; A central singleton that manages all pools, configured entirely through the Inspector.</li>
+        <li><strong>Updated ChunkData</strong> &mdash; Chunks now implement <code>IPoolable</code> and track their spawned objects for clean despawning.</li>
+        <li><strong>PoolDebugOverlay</strong> &mdash; An on-screen debug display for monitoring pool health.</li>
+      </ul>
+      <p>In the next chapter, we'll put the chunk system and object pooling together to build the <strong>World Generator</strong> &mdash; the system that spawns chunks ahead of the player and recycles them as the player runs forward.</p>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Object pooling is done. Let's commit to our feature branch.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Implement generic object pooling system"</code></pre>
+        </div>
+        <p>Notice we're on the <code>feature/world-generation</code> branch. You can verify with <code>git branch</code> — the current branch has an asterisk (*) next to it. All commits we make here are separate from <code>main</code>.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="11-chunk-system.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Chunk System</span></a>
+        <a href="13-world-generation.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">World Generation</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

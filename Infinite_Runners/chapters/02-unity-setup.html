@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Installing Unity & Project Setup - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link active"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 2</span>
+        <h1>Installing Unity &amp; Project Setup</h1>
+        <p class="chapter-desc">Download Unity Hub, install the right Unity version, set up your code editor, and create the project that will become our infinite runner.</p>
+      </div>
+
+      <!-- Section: Unity Hub -->
+      <h2>Step 1: Download and Install Unity Hub</h2>
+      <p><strong>Unity Hub</strong> is a small application that manages your Unity installations and projects. Think of it as a launcher &mdash; you don't open Unity directly; you open Unity Hub, and it opens the correct Unity version for your project. This is important because you might eventually have multiple Unity versions installed for different projects.</p>
+
+      <ol class="steps">
+        <li>Open your web browser and go to <strong>https://unity.com/download</strong>.</li>
+        <li>Click the <strong>"Download Unity Hub"</strong> button. The website will automatically detect your operating system (Windows, macOS, or Linux) and give you the correct installer.</li>
+        <li>Run the downloaded installer:
+          <ul>
+            <li><strong>Windows:</strong> Double-click the <code>.exe</code> file. Click "I Agree" on the license agreement, then "Install." It will install to <code>C:\Program Files\Unity Hub</code> by default.</li>
+            <li><strong>macOS:</strong> Open the <code>.dmg</code> file and drag Unity Hub to your Applications folder.</li>
+            <li><strong>Linux:</strong> Follow the AppImage or .deb instructions on the download page.</li>
+          </ul>
+        </li>
+        <li>Launch Unity Hub once the installation is complete.</li>
+        <li>You'll be asked to <strong>sign in or create a Unity account</strong>. This is required (even for the free tier). Click "Create account" if you don't have one, or sign in with your existing credentials.</li>
+        <li>After signing in, Unity Hub will ask you to <strong>activate a license</strong>. Choose <strong>"Get a free personal license."</strong> The Personal license is completely free and lets you use Unity with no restrictions as long as your revenue or funding is under $100K/year. For learning, this is exactly what you need.</li>
+      </ol>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; What Is Unity Hub, Really?</div>
+        <p>Unity Hub does three things: (1) it lets you install and manage multiple Unity editor versions side by side, (2) it stores your list of projects so you can open any of them with one click, and (3) it handles license activation. You'll always start here when working with Unity. If you ever can't find your project, open Unity Hub and it will be listed under the "Projects" tab.</p>
+      </div>
+
+      <!-- Section: Unity Version -->
+      <h2>Step 2: Install the Right Unity Version</h2>
+      <p>Unity releases new versions frequently. There are three types of releases:</p>
+      <ul>
+        <li><strong>LTS (Long-Term Support)</strong> &mdash; These are the most stable. Unity guarantees bug fixes and security patches for two years. <strong>This is what we want.</strong></li>
+        <li><strong>Tech Stream</strong> &mdash; These have the latest features but may have more bugs. Good for experimentation, not for projects you want to finish.</li>
+        <li><strong>Alpha/Beta</strong> &mdash; Pre-release versions. Never use these for real projects.</li>
+      </ul>
+
+      <p>For this course, we recommend <strong>Unity 6 LTS</strong> (also known as Unity 6000.0 LTS). If that's not available yet when you're reading this, use <strong>Unity 2022 LTS</strong> instead. Both will work perfectly with everything in this tutorial.</p>
+
+      <ol class="steps">
+        <li>In Unity Hub, click the <strong>"Installs"</strong> tab in the left sidebar.</li>
+        <li>Click the <strong>"Install Editor"</strong> button in the top-right corner.</li>
+        <li>You'll see a list of available Unity versions. Look for the one labeled <strong>"LTS"</strong> with a green badge. This is the version you want. Click <strong>"Install"</strong> next to it.</li>
+        <li>A dialog will ask which <strong>modules</strong> to install alongside the editor. Modules add support for building to specific platforms. For now, select:
+          <ul>
+            <li><strong>Microsoft Visual Studio Community</strong> (Windows only) &mdash; This is our code editor. If you already have Visual Studio or prefer VS Code, you can skip this.</li>
+            <li><strong>WebGL Build Support</strong> &mdash; Optional but useful if you want to publish your game to the web later.</li>
+            <li><strong>Android Build Support</strong> &mdash; Optional, only if you want to build for Android phones.</li>
+            <li><strong>iOS Build Support</strong> &mdash; Optional, only available on macOS, for building iPhone/iPad games.</li>
+          </ul>
+        </li>
+        <li>Click <strong>"Install"</strong> and wait. This download is large (several gigabytes). It may take 15&ndash;60 minutes depending on your internet speed. Go get a coffee.</li>
+      </ol>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Don't Skip Visual Studio (Windows Users)</div>
+        <p>If you're on Windows and don't already have a C# code editor, make sure to install Visual Studio Community when prompted. Unity and Visual Studio are tightly integrated &mdash; double-clicking a script in Unity will open it directly in Visual Studio at the right line. You can use VS Code instead (instructions below), but Visual Studio provides the smoothest experience for beginners on Windows.</p>
+      </div>
+
+      <!-- Section: Code Editor -->
+      <h2>Step 3: Set Up Your Code Editor</h2>
+      <p>You'll write all your C# code in a <strong>code editor</strong>, not inside Unity itself. Unity has a tiny built-in text area, but it's not meant for real development. You need a proper editor with syntax highlighting, autocompletion, and error detection.</p>
+
+      <h3>Option A: Visual Studio (Recommended for Windows)</h3>
+      <p>If you installed Visual Studio Community through Unity Hub in the previous step, you're already set. Visual Studio will be configured automatically to work with Unity. You can verify this by going to <strong>Edit &rarr; Preferences &rarr; External Tools</strong> in Unity and checking that "External Script Editor" is set to Visual Studio.</p>
+
+      <h3>Option B: Visual Studio Code (All Platforms)</h3>
+      <p>VS Code is a lightweight, free code editor by Microsoft that works on Windows, macOS, and Linux. If you prefer it over Visual Studio (or you're on Mac/Linux), follow these steps:</p>
+      <ol class="steps">
+        <li>Download VS Code from <strong>https://code.visualstudio.com</strong> and install it.</li>
+        <li>Open VS Code and install the <strong>C# extension</strong>:
+          <ul>
+            <li>Click the Extensions icon in the left sidebar (it looks like four squares).</li>
+            <li>Search for <strong>"C#"</strong> and install the one by Microsoft (called "C# Dev Kit").</li>
+          </ul>
+        </li>
+        <li>Also install the <strong>"Unity"</strong> extension by Microsoft for better Unity integration.</li>
+        <li>Back in Unity, go to <strong>Edit &rarr; Preferences &rarr; External Tools</strong> and set "External Script Editor" to <strong>Visual Studio Code</strong>.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Which Editor Should You Choose?</div>
+        <p><strong>Windows users:</strong> Start with Visual Studio Community. It has the best out-of-the-box Unity support, including debugging, IntelliSense (code autocompletion), and integrated help. <strong>Mac/Linux users:</strong> Use VS Code with the C# Dev Kit extension. It's lighter and cross-platform. You can always switch later &mdash; your code files are just text files that any editor can open.</p>
+      </div>
+
+      <!-- Section: Create Project -->
+      <h2>Step 4: Create a New 3D (URP) Project</h2>
+      <p>Now for the exciting part &mdash; creating the actual project that will become our infinite runner.</p>
+
+      <ol class="steps">
+        <li>In Unity Hub, click the <strong>"Projects"</strong> tab in the left sidebar.</li>
+        <li>Click the <strong>"New project"</strong> button in the top-right corner.</li>
+        <li>You'll see a list of project templates. Look for and select <strong>"3D (URP)"</strong> or <strong>"Universal 3D"</strong>. It may be labeled slightly differently depending on your Unity version, but it will mention "URP" or "Universal Render Pipeline."</li>
+        <li>In the <strong>"Project name"</strong> field, type: <code>InfiniteRunner</code>. No spaces &mdash; this keeps file paths clean and avoids potential issues on some platforms.</li>
+        <li>Choose a <strong>location</strong> for your project. Pick somewhere easy to find, like <code>C:\Unity Projects\</code> on Windows or <code>~/Unity Projects/</code> on Mac. Avoid paths with special characters or very deep nesting.</li>
+        <li>Make sure <strong>"Connect to Unity Cloud"</strong> is unchecked (we don't need cloud services for this tutorial).</li>
+        <li>Click <strong>"Create project"</strong> and wait. Unity will generate the project structure, import default packages, and compile everything. This takes 2&ndash;5 minutes on first launch.</li>
+      </ol>
+
+      <div class="callout danger">
+        <div class="callout-title">&#9940; Do NOT Choose "3D (Built-in)" or "3D Core"</div>
+        <p>Unity offers multiple 3D templates. The "3D" or "3D Core" template uses the older <strong>Built-in Render Pipeline</strong>, which is legacy. We specifically want <strong>3D (URP)</strong> &mdash; the Universal Render Pipeline. If you create a project with the wrong pipeline, you'll need to start over or go through a painful conversion process. Double-check before clicking "Create project."</p>
+      </div>
+
+      <!-- Section: What is URP -->
+      <h2>What Is URP and Why Do We Use It?</h2>
+      <p>URP stands for <strong>Universal Render Pipeline</strong>. A render pipeline is the system that decides how Unity draws everything on screen &mdash; how it handles lighting, shadows, post-processing effects, and materials. Unity has three render pipelines:</p>
+
+      <ul>
+        <li><strong>Built-in Render Pipeline</strong> &mdash; The original, legacy pipeline. Still works but hasn't received major updates in years. Not recommended for new projects.</li>
+        <li><strong>URP (Universal Render Pipeline)</strong> &mdash; The modern, versatile pipeline. It's optimized for performance across all platforms (mobile, PC, console, VR). It has a good balance of visual quality and speed. <strong>This is what we use.</strong></li>
+        <li><strong>HDRP (High Definition Render Pipeline)</strong> &mdash; Designed for high-end PC and console games with photorealistic graphics. It requires powerful hardware and is overkill for a mobile-style runner.</li>
+      </ul>
+
+      <p>We choose URP because:</p>
+      <ul>
+        <li>It runs well on <strong>every platform</strong>, from low-end phones to gaming PCs.</li>
+        <li>It supports modern features like <strong>Shader Graph</strong> (visual shader editor) and <strong>2D lights</strong>.</li>
+        <li>It's the <strong>recommended pipeline</strong> for most new Unity projects.</li>
+        <li>Almost all tutorials and asset store packages support URP.</li>
+        <li>For an infinite runner that might target mobile, URP's performance optimizations matter.</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; You Can Always Change Your Mind (But It's Painful)</div>
+        <p>Technically, you can convert a project from one render pipeline to another, but it requires changing all your materials and shaders. It's a tedious process. That's why we pick URP from the start and stick with it. Starting with the right pipeline saves you hours of work later.</p>
+      </div>
+
+      <!-- Section: First Launch -->
+      <h2>Step 5: First Time Opening Unity</h2>
+      <p>After Unity finishes creating the project, the editor will open. You'll see a lot of panels, buttons, and menus. Don't panic &mdash; we'll explore every one of them in detail in the next chapter. For now, here's a quick orientation so you can confirm everything is working:</p>
+
+      <p>You should see these main areas:</p>
+      <ul>
+        <li><strong>A large 3D viewport in the center</strong> &mdash; This is the Scene View, where you'll design and build your game world.</li>
+        <li><strong>A panel on the left with "Main Camera" and "Directional Light"</strong> &mdash; This is the Hierarchy, listing every object in your scene.</li>
+        <li><strong>A panel on the right with properties and numbers</strong> &mdash; This is the Inspector, showing details about whatever object you have selected.</li>
+        <li><strong>A panel at the bottom with folders and files</strong> &mdash; This is the Project window, showing all files in your project.</li>
+      </ul>
+
+      <p>If you see all of these, your installation is working correctly. If Unity looks different or a panel is missing, don't worry &mdash; you can reset the layout by going to <strong>Window &rarr; Layouts &rarr; Default</strong> from the menu bar at the top.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; The Default Scene</div>
+        <p>Every new URP project starts with a scene called <strong>SampleScene</strong>. It contains two objects: a <strong>Main Camera</strong> (which is the player's eyes) and a <strong>Directional Light</strong> (which simulates sunlight). This is the blank canvas we'll build our game on.</p>
+      </div>
+
+      <!-- Section: Create and Save Scene -->
+      <h2>Step 6: Create Your First Scene and Save It</h2>
+      <p>The default "SampleScene" works, but we want to start clean with our own scene that has a meaningful name. Here's how to create and save a scene:</p>
+
+      <ol class="steps">
+        <li>First, let's create a folder for our scenes. In the <strong>Project window</strong> at the bottom, right-click on the <strong>"Assets"</strong> folder and choose <strong>Create &rarr; Folder</strong>. Name it <code>Scenes</code>.</li>
+        <li>Now create a new scene: Go to <strong>File &rarr; New Scene</strong> from the top menu bar.</li>
+        <li>A dialog may appear asking which template to use. Choose <strong>"Basic (URP)"</strong> or simply the default option. Click "Create."</li>
+        <li>Save the scene immediately: Go to <strong>File &rarr; Save As</strong> (or press <strong>Ctrl+Shift+S</strong> on Windows, <strong>Cmd+Shift+S</strong> on Mac).</li>
+        <li>Navigate to the <code>Assets/Scenes</code> folder you just created.</li>
+        <li>Name the scene <code>GameScene</code> and click <strong>Save</strong>.</li>
+      </ol>
+
+      <p>You should now see <code>GameScene</code> in your Project window under <code>Assets/Scenes/</code>. The scene file has a <code>.unity</code> extension. This is the main scene where our infinite runner will live.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Save Early, Save Often</div>
+        <p>Unity does <strong>not</strong> auto-save your scene. If Unity crashes (rare but it happens) or you accidentally close without saving, you'll lose any unsaved changes. Get in the habit of pressing <strong>Ctrl+S</strong> (or <strong>Cmd+S</strong>) frequently. Do it every time you make a meaningful change. Your future self will thank you.</p>
+      </div>
+
+      <!-- Section: Verify Project Structure -->
+      <h2>Step 7: Verify Your Project Structure</h2>
+      <p>Let's take a look at what Unity created for us. In the Project window, you should see this folder structure inside <code>Assets</code>:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Project Window</span><span class="lang-badge">Folder Structure</span></div>
+        <pre><code>Assets/
+  Scenes/
+    GameScene.unity       &larr; Our game scene
+  Settings/               &larr; URP rendering settings (auto-generated)
+    URP-HighFidelity.asset
+    URP-Balanced.asset
+    URP-Performant.asset
+    ...</code></pre>
+      </div>
+
+      <p>The <code>Settings</code> folder was created automatically by the URP template. It contains render pipeline configuration assets that control how Unity renders graphics. We'll rarely touch these directly, but they're important &mdash; they're why our project uses URP instead of the built-in pipeline.</p>
+
+      <p>In the next chapter (Project Architecture), we'll create a proper folder structure with folders for Scripts, Prefabs, Materials, and more. For now, having just <code>Scenes/</code> is perfect.</p>
+
+      <!-- Section: Quick Test -->
+      <h2>Step 8: Test That Everything Works</h2>
+      <p>Let's do a quick sanity check to confirm Unity is running properly and your code editor is connected.</p>
+
+      <ol class="steps">
+        <li>In Unity, press the <strong>Play button</strong> at the top center of the editor (the triangle icon). The Game View will appear showing what the camera sees. Right now that's just a blank sky and ground. Press Play again to stop.</li>
+        <li>Now let's test the code editor connection. In the Project window, right-click on the <code>Assets</code> folder and choose <strong>Create &rarr; C# Script</strong>. Name it <code>TestScript</code>.</li>
+        <li><strong>Double-click</strong> the <code>TestScript</code> file. Your code editor (Visual Studio or VS Code) should open automatically with the script file.</li>
+        <li>You should see this default code:</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">TestScript.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class TestScript : MonoBehaviour
+{
+    // Start is called once before the first execution
+    // of Update after the MonoBehaviour is created
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+}</code></pre>
+      </div>
+
+      <p>If your code editor opened and you can see this code, everything is connected correctly. Let's add one line to confirm that scripts can actually run in our game. Modify the <code>Start</code> method like this:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">TestScript.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">void Start()
+{
+    Debug.Log("Hello from Infinite Runner! Unity is working.");
+}</code></pre>
+      </div>
+
+      <p><code>Debug.Log()</code> prints a message to Unity's Console panel. It's the game developer's equivalent of <code>print()</code> &mdash; you'll use it constantly for debugging.</p>
+
+      <ol class="steps">
+        <li><strong>Save</strong> the script in your code editor (<strong>Ctrl+S</strong>).</li>
+        <li>Switch back to Unity. You'll notice Unity briefly "compiles" &mdash; a small spinner appears in the bottom-right corner. This happens every time you save a script. Unity is compiling your C# code.</li>
+        <li>Now we need to attach the script to a GameObject. In the Hierarchy, click on <strong>"Main Camera"</strong> to select it.</li>
+        <li>In the Inspector panel on the right, scroll down and click <strong>"Add Component."</strong></li>
+        <li>Type <code>TestScript</code> in the search box and click on it to add it.</li>
+        <li>Press <strong>Play</strong>. Look at the <strong>Console panel</strong> at the bottom of the editor (if you don't see it, go to <strong>Window &rarr; General &rarr; Console</strong>).</li>
+        <li>You should see the message: <strong>"Hello from Infinite Runner! Unity is working."</strong></li>
+      </ol>
+
+      <p>If you see that message, congratulations &mdash; your development environment is fully set up and working. You can now write code, attach it to objects, and run it in the game.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Clean Up the Test Script</div>
+        <p>Now that we've confirmed everything works, delete the test script. In the Project window, right-click <code>TestScript</code> and choose <strong>Delete</strong>. Unity will also automatically remove it from the Main Camera's components. We'll create our real scripts starting in the C# chapter. Always keep your project clean &mdash; don't leave test files lying around.</p>
+      </div>
+
+      <!-- Section: Summary -->
+      <h2>Chapter Summary</h2>
+      <p>Here's what we accomplished in this chapter:</p>
+      <ul>
+        <li>Installed <strong>Unity Hub</strong> and activated a free Personal license.</li>
+        <li>Installed the <strong>Unity 6 LTS</strong> (or 2022 LTS) editor with necessary modules.</li>
+        <li>Set up <strong>Visual Studio</strong> or <strong>VS Code</strong> as our code editor with C# support.</li>
+        <li>Created a new <strong>3D (URP)</strong> project called <code>InfiniteRunner</code>.</li>
+        <li>Learned what <strong>URP</strong> is and why it's the right choice for our game.</li>
+        <li>Created and saved our <strong>GameScene</strong> in a <code>Scenes</code> folder.</li>
+        <li>Verified that scripts compile and run correctly with a <code>Debug.Log()</code> test.</li>
+      </ul>
+
+      <p>Your development environment is ready. In the next chapter, we'll take a thorough tour of the Unity editor so you understand exactly what every panel, button, and menu does before we start building.</p>
+
+      <div class="chapter-nav">
+        <a href="01-welcome.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Welcome</span></a>
+        <a href="03-editor-tour.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Editor Tour</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

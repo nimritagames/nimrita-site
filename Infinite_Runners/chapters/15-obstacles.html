@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obstacle System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link active"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 15</span>
+        <h1>Obstacle System</h1>
+        <p class="chapter-desc">Design and implement multiple obstacle types that challenge the player with different evasion mechanics &mdash; jumping, sliding, and lane switching &mdash; with fair patterns that are always beatable.</p>
+      </div>
+
+      <!-- Section: Obstacle Types -->
+      <h2>Obstacle Types for a 3-Lane Runner</h2>
+      <p>Obstacles are what make an infinite runner a <em>game</em> rather than just a screensaver. Each obstacle type should require a different player response, so the player is constantly making split-second decisions. For our 3-lane runner, we need five fundamental obstacle types:</p>
+
+      <h3>1. Low Barrier (Jump Over)</h3>
+      <p>A short obstacle that sits on the ground, blocking a single lane. The player must <strong>jump</strong> to clear it, or switch to an adjacent lane. Think of a short wall, a crate, or a fallen log. The collider is short (about 0.5 units tall) so the player's jump arc clears it easily.</p>
+
+      <h3>2. High Barrier (Slide Under)</h3>
+      <p>A tall obstacle with a gap at the bottom, blocking a single lane. The player must <strong>slide</strong> to pass underneath it, or switch lanes. Think of a horizontal bar, a hanging sign, or a low bridge. The collider starts about 0.5 units above the ground so the player's slide pose fits underneath.</p>
+
+      <h3>3. Full-Width Barrier (Force Lane Change)</h3>
+      <p>An obstacle that spans a single lane entirely &mdash; too tall to jump and too low to slide. The <strong>only option</strong> is to switch to a different lane. This creates urgency: the player must react before reaching it. These are the most dangerous single-lane obstacles because jumping and sliding won't help.</p>
+
+      <h3>4. Moving Obstacle (Lane Changer)</h3>
+      <p>An obstacle that <strong>moves sideways between lanes</strong>. It might start in the left lane and slide to the center, or oscillate between left and right. The player must time their lane switch to dodge it. These add a dynamic element that static obstacles lack.</p>
+
+      <h3>5. Ramp (Launch Into Air)</h3>
+      <p>A sloped surface that launches the player into the air when they hit it. While airborne, the player passes over ground-level obstacles. Ramps add variety to the gameplay rhythm and create exciting moments of flight. They're not deadly &mdash; they're opportunities.</p>
+
+      <div class="callout info">
+        <div class="callout-title">Why These Specific Five Types?</div>
+        <p>Each type tests a different player skill: Low Barrier tests jumping reflexes. High Barrier tests sliding reflexes. Full-Width tests lane-switching reflexes. Moving obstacles test timing and prediction. Ramps add variety and reward aggressive play (running into them intentionally). Together, they create a rich decision space from simple mechanics. Games like Subway Surfers use exactly these types and achieve billions of downloads with them.</p>
+      </div>
+
+      <!-- Section: ObstacleType Enum -->
+      <h2>The ObstacleType Enum</h2>
+      <p>Before writing any complex code, let's define our obstacle types in a clean enum. This gives us type safety and makes the code self-documenting.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ObstacleType.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Defines the types of obstacles in the game.
+    /// Each type requires a different player response to avoid.
+    /// &lt;/summary&gt;
+    public enum ObstacleType
+    {
+        /// &lt;summary&gt;Short obstacle on the ground. Jump to clear.&lt;/summary&gt;
+        LowBarrier,
+
+        /// &lt;summary&gt;Tall obstacle with gap underneath. Slide to pass.&lt;/summary&gt;
+        HighBarrier,
+
+        /// &lt;summary&gt;Full-height obstacle. Must change lanes to avoid.&lt;/summary&gt;
+        FullWidthBarrier,
+
+        /// &lt;summary&gt;Obstacle that moves between lanes over time.&lt;/summary&gt;
+        MovingObstacle,
+
+        /// &lt;summary&gt;Ramp that launches player into the air. Not deadly.&lt;/summary&gt;
+        Ramp
+    }
+}</code></pre></div>
+
+      <!-- Section: Obstacle Base Class -->
+      <h2>The Obstacle Base Class</h2>
+      <p>All obstacle types share common behavior: they can be pooled, they detect collisions with the player, and they have a visual appearance. We define this shared behavior in a base class that individual obstacle types extend.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Obstacle.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Base class for all obstacle types. Handles pooling, collision detection,
+    /// and visual setup. Specific obstacle behaviors (like moving) are
+    /// implemented in derived classes.
+    ///
+    /// Attach this (or a derived class) to every obstacle prefab.
+    /// The prefab must have a Collider set to "Is Trigger."
+    /// &lt;/summary&gt;
+    [RequireComponent(typeof(Collider))]
+    public class Obstacle : MonoBehaviour, IPoolable
+    {
+        [Header("Obstacle Settings")]
+        [Tooltip("What type of obstacle this is. Determines player response.")]
+        [SerializeField] private ObstacleType obstacleType = ObstacleType.LowBarrier;
+
+        [Tooltip("If true, hitting this obstacle kills the player. " +
+                 "If false, it has a special effect (like a ramp).")]
+        [SerializeField] private bool isLethal = true;
+
+        [Header("Visual Variety")]
+        [Tooltip("Optional: Array of materials to randomly pick from on spawn. " +
+                 "Leave empty to keep the default material.")]
+        [SerializeField] private Material[] materialVariants;
+
+        [Tooltip("Optional: The renderer to apply material variants to.")]
+        [SerializeField] private MeshRenderer meshRenderer;
+
+        // ---- Cached Components ----
+        private Collider obstacleCollider;
+
+        // ---- Public Properties ----
+
+        /// &lt;summary&gt;The type of this obstacle.&lt;/summary&gt;
+        public ObstacleType Type =&gt; obstacleType;
+
+        /// &lt;summary&gt;Whether hitting this obstacle ends the game.&lt;/summary&gt;
+        public bool IsLethal =&gt; isLethal;
+
+        // ---- Lifecycle ----
+
+        protected virtual void Awake()
+        {
+            // Cache the collider. This runs once when the object is first
+            // created (during pool warm-up), NOT on every reuse.
+            obstacleCollider = GetComponent&lt;Collider&gt;();
+
+            if (meshRenderer == null)
+            {
+                meshRenderer = GetComponentInChildren&lt;MeshRenderer&gt;();
+            }
+
+            // Ensure the collider is set as a trigger
+            if (obstacleCollider != null &amp;&amp; !obstacleCollider.isTrigger)
+            {
+                Debug.LogWarning(
+                    $"Obstacle '{name}': Collider is not set to Trigger! " +
+                    $"Setting it now. Please fix in prefab.",
+                    this
+                );
+                obstacleCollider.isTrigger = true;
+            }
+        }
+
+        // ---- IPoolable Implementation ----
+
+        /// &lt;summary&gt;
+        /// Called when taken from the pool. Resets the obstacle to its
+        /// default state so it's ready for a new life in the world.
+        /// &lt;/summary&gt;
+        public virtual void OnSpawn()
+        {
+            // Re-enable the collider (it's disabled on despawn)
+            if (obstacleCollider != null)
+            {
+                obstacleCollider.enabled = true;
+            }
+
+            // Apply a random material variant for visual variety
+            ApplyRandomMaterial();
+        }
+
+        /// &lt;summary&gt;
+        /// Called when returned to the pool. Cleans up any active state.
+        /// &lt;/summary&gt;
+        public virtual void OnDespawn()
+        {
+            // Disable the collider so it can't accidentally trigger
+            // while sitting in the pool
+            if (obstacleCollider != null)
+            {
+                obstacleCollider.enabled = false;
+            }
+
+            // Reset transform (position will be set by the spawner)
+            transform.localRotation = Quaternion.identity;
+            transform.localScale = Vector3.one;
+        }
+
+        // ---- Collision Detection ----
+
+        /// &lt;summary&gt;
+        /// Called by Unity's physics engine when another collider enters
+        /// this obstacle's trigger volume.
+        /// &lt;/summary&gt;
+        protected virtual void OnTriggerEnter(Collider other)
+        {
+            // Only react to the player
+            if (!other.CompareTag("Player")) return;
+
+            if (isLethal)
+            {
+                HandleLethalCollision(other);
+            }
+            else
+            {
+                HandleNonLethalCollision(other);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Handles a lethal collision (player hit a deadly obstacle).
+        /// Notifies the GameManager that the player has died.
+        /// &lt;/summary&gt;
+        protected virtual void HandleLethalCollision(Collider playerCollider)
+        {
+            Debug.Log($"Player hit lethal obstacle: {name} ({obstacleType})");
+
+            // Disable collider to prevent multiple collision events
+            if (obstacleCollider != null)
+            {
+                obstacleCollider.enabled = false;
+            }
+
+            // Notify the game that the player died.
+            // Using the event system from Chapter 7:
+            // GameEvents.OnPlayerDeath?.Invoke();
+
+            // For now, we'll use a direct approach until the event system
+            // is fully connected. Replace this with event invocation.
+            GameManager gameManager = FindFirstObjectByType&lt;GameManager&gt;();
+            if (gameManager != null)
+            {
+                gameManager.OnPlayerDied();
+            }
+            else
+            {
+                Debug.LogWarning(
+                    "Obstacle: No GameManager found to report player death!"
+                );
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Handles a non-lethal collision (like hitting a ramp).
+        /// Override in derived classes for specific behavior.
+        /// &lt;/summary&gt;
+        protected virtual void HandleNonLethalCollision(Collider playerCollider)
+        {
+            Debug.Log($"Player hit non-lethal obstacle: {name} ({obstacleType})");
+            // Derived classes override this for specific effects
+        }
+
+        // ---- Visual Variety ----
+
+        /// &lt;summary&gt;
+        /// Applies a random material from the variants array to add
+        /// visual variety. Each time this obstacle spawns, it might
+        /// look slightly different (different color, texture, etc).
+        /// &lt;/summary&gt;
+        private void ApplyRandomMaterial()
+        {
+            if (materialVariants == null || materialVariants.Length == 0) return;
+            if (meshRenderer == null) return;
+
+            int index = Random.Range(0, materialVariants.Length);
+            meshRenderer.material = materialVariants[index];
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's examine the important design decisions:</p>
+
+      <h3>RequireComponent</h3>
+      <p>The <code>[RequireComponent(typeof(Collider))]</code> attribute ensures Unity automatically adds a Collider when you add the Obstacle script. This prevents the "forgot to add a collider" bug that would make obstacles invisible to the player.</p>
+
+      <h3>Virtual Methods</h3>
+      <p>Notice that <code>OnSpawn</code>, <code>OnDespawn</code>, <code>OnTriggerEnter</code>, and the collision handlers are all marked <code>virtual</code>. This means derived classes (like <code>MovingObstacle</code>) can <code>override</code> them to add specialized behavior while still calling the base implementation with <code>base.OnSpawn()</code>.</p>
+
+      <h3>Is Trigger, Not Collider</h3>
+      <p>We use <strong>trigger colliders</strong> (not regular physics colliders) for obstacles. Triggers detect overlaps without physically blocking movement. The player's CharacterController handles physics; obstacles just detect when the player touches them. This prevents weird physics interactions where obstacles push the player around.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">The Player Must Be Tagged "Player"</div>
+        <p>Our collision detection uses <code>CompareTag("Player")</code> to ensure we only react to the player, not to other obstacles or collectibles. Make sure your player GameObject has the "Player" tag set. Go to the player in the Inspector, click the Tag dropdown at the top, and select "Player." If it's not there, Unity includes it by default &mdash; just make sure it's selected.</p>
+      </div>
+
+      <!-- Section: Collider Setups -->
+      <h2>Collider Setups for Each Obstacle Type</h2>
+      <p>Each obstacle type needs a collider shaped specifically for its evasion mechanic. Getting these right is essential for fair gameplay.</p>
+
+      <h3>Low Barrier</h3>
+      <p>Collider: <strong>Box Collider</strong></p>
+      <ul>
+        <li>Size: (1.5, 0.5, 0.5) &mdash; Slightly less than lane width, short, thin</li>
+        <li>Center: (0, 0.25, 0) &mdash; Sits on the ground</li>
+        <li>The player's jump raises them above Y = 0.5, so they clear the collider</li>
+      </ul>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Low Barrier Collider Setup</span><span class="lang-badge">Unity</span></div><pre><code>Box Collider:
+  Is Trigger: checked
+  Center: (0, 0.25, 0)
+  Size: (1.5, 0.5, 0.5)
+
+Visual Mesh (child object):
+  Cube scaled to (1.5, 0.5, 0.5)
+  Position: (0, 0.25, 0)</code></pre></div>
+
+      <h3>High Barrier</h3>
+      <p>Collider: <strong>Box Collider</strong></p>
+      <ul>
+        <li>Size: (1.5, 1.5, 0.5) &mdash; Tall, spanning most of the player's height</li>
+        <li>Center: (0, 1.25, 0) &mdash; Raised up, leaving a gap at the bottom</li>
+        <li>The player's slide reduces their height below Y = 0.5, so they fit under the collider</li>
+      </ul>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">High Barrier Collider Setup</span><span class="lang-badge">Unity</span></div><pre><code>Box Collider:
+  Is Trigger: checked
+  Center: (0, 1.25, 0)
+  Size: (1.5, 1.5, 0.5)
+
+Visual: Two vertical posts with a horizontal bar on top
+  Post_Left:  Position (-0.6, 1.0, 0), Scale (0.2, 2.0, 0.2)
+  Post_Right: Position (0.6, 1.0, 0),  Scale (0.2, 2.0, 0.2)
+  Bar:        Position (0, 1.25, 0),    Scale (1.5, 0.15, 0.3)</code></pre></div>
+
+      <h3>Full-Width Barrier</h3>
+      <p>Collider: <strong>Box Collider</strong></p>
+      <ul>
+        <li>Size: (1.5, 2.0, 0.5) &mdash; Spans the full player height</li>
+        <li>Center: (0, 1.0, 0) &mdash; Starts at ground, extends above jump height</li>
+        <li>Cannot be jumped or slid under &mdash; player MUST change lanes</li>
+      </ul>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Full-Width Barrier Collider Setup</span><span class="lang-badge">Unity</span></div><pre><code>Box Collider:
+  Is Trigger: checked
+  Center: (0, 1.0, 0)
+  Size: (1.5, 2.0, 0.5)
+
+Visual: Solid wall or tall crate
+  Cube: Position (0, 1.0, 0), Scale (1.5, 2.0, 0.5)</code></pre></div>
+
+      <h3>Moving Obstacle</h3>
+      <p>Same collider as Full-Width Barrier, but with an additional script for movement. We'll implement this as a derived class below.</p>
+
+      <h3>Ramp</h3>
+      <p>Collider: <strong>Mesh Collider</strong> or <strong>Box Collider</strong> (angled)</p>
+      <ul>
+        <li>A sloped surface. The collider matches the visible ramp mesh.</li>
+        <li>Not a trigger &mdash; the ramp uses a regular collider so the player physically runs up it.</li>
+        <li>A separate trigger at the base detects the player and applies an upward force.</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-title">Test Your Colliders Visually</div>
+        <p>In the Unity editor, select an obstacle and look at the Scene view. Colliders are drawn as green wireframes. Make sure the collider covers exactly the area that should be deadly. If the collider is too big, the player will die unfairly. If too small, they'll pass through obstacles. Use Play mode and watch the player interact with obstacles to fine-tune sizes.</p>
+      </div>
+
+      <!-- Section: Moving Obstacle Derived Class -->
+      <h2>Moving Obstacle: A Derived Class</h2>
+      <p>The moving obstacle is interesting because it has behavior beyond just sitting in a lane. It moves sideways between lanes over time. We implement this as a class that extends <code>Obstacle</code>.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">MovingObstacle.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// An obstacle that moves sideways between lanes.
+    /// Extends the base Obstacle class with movement behavior.
+    /// &lt;/summary&gt;
+    public class MovingObstacle : Obstacle
+    {
+        [Header("Movement Settings")]
+        [Tooltip("How fast the obstacle moves between lanes (units per second).")]
+        [SerializeField] private float moveSpeed = 3f;
+
+        [Tooltip("The X positions this obstacle oscillates between.")]
+        [SerializeField] private float leftBound = -2f;
+        [SerializeField] private float rightBound = 2f;
+
+        [Tooltip("If true, starts moving right. If false, starts moving left.")]
+        [SerializeField] private bool startMovingRight = true;
+
+        // Internal state
+        private int moveDirection;
+        private float currentX;
+
+        // ---- IPoolable Overrides ----
+
+        public override void OnSpawn()
+        {
+            base.OnSpawn(); // Call base to re-enable collider, apply material
+
+            // Randomize starting direction for variety
+            moveDirection = startMovingRight ? 1 : -1;
+
+            // Start at the spawn point's X position
+            currentX = transform.position.x;
+        }
+
+        public override void OnDespawn()
+        {
+            base.OnDespawn(); // Call base to disable collider
+        }
+
+        // ---- Movement ----
+
+        private void Update()
+        {
+            // Move sideways
+            currentX += moveDirection * moveSpeed * Time.deltaTime;
+
+            // Bounce off bounds
+            if (currentX &gt;= rightBound)
+            {
+                currentX = rightBound;
+                moveDirection = -1;
+            }
+            else if (currentX &lt;= leftBound)
+            {
+                currentX = leftBound;
+                moveDirection = 1;
+            }
+
+            // Apply new position (keep Y and Z from current position)
+            Vector3 pos = transform.position;
+            pos.x = currentX;
+            transform.position = pos;
+        }
+    }
+}</code></pre></div>
+
+      <p>The moving obstacle starts at whatever lane it was spawned in and oscillates left and right between the lane boundaries. The player needs to time their lane switch to dodge it. Notice how it calls <code>base.OnSpawn()</code> and <code>base.OnDespawn()</code> to maintain the pooling behavior from the parent class.</p>
+
+      <!-- Section: Ramp Obstacle -->
+      <h2>Ramp Obstacle</h2>
+      <p>The ramp is unique because it's not lethal &mdash; instead, it launches the player into the air.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">RampObstacle.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// A ramp that launches the player into the air when they run over it.
+    /// Not lethal - it's an opportunity, not a threat.
+    /// &lt;/summary&gt;
+    public class RampObstacle : Obstacle
+    {
+        [Header("Ramp Settings")]
+        [Tooltip("Upward force applied to the player when hitting the ramp.")]
+        [SerializeField] private float launchForce = 15f;
+
+        [Tooltip("Forward boost applied in addition to upward force.")]
+        [SerializeField] private float forwardBoost = 5f;
+
+        /// &lt;summary&gt;
+        /// Override non-lethal collision to launch the player upward.
+        /// &lt;/summary&gt;
+        protected override void HandleNonLethalCollision(Collider playerCollider)
+        {
+            base.HandleNonLethalCollision(playerCollider);
+
+            Debug.Log($"Ramp hit! Launching player with force {launchForce}");
+
+            // Apply launch force to the player.
+            // The PlayerController (Chapter 9) should have a public method
+            // for applying external forces:
+            // PlayerController pc = playerCollider.GetComponent&lt;PlayerController&gt;();
+            // if (pc != null)
+            // {
+            //     pc.ApplyLaunchForce(launchForce, forwardBoost);
+            // }
+
+            // Alternative: use the event system
+            // GameEvents.OnRampHit?.Invoke(launchForce, forwardBoost);
+        }
+    }
+}</code></pre></div>
+
+      <!-- Section: ObstacleSpawner -->
+      <h2>The ObstacleSpawner</h2>
+      <p>The <code>ObstacleSpawner</code> is the system that reads a chunk's spawn points and decides which obstacles to place and where. It integrates with the WorldGenerator (Chapter 13) &mdash; every time a chunk is spawned, the ObstacleSpawner populates it.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">ObstacleSpawner.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System.Collections.Generic;
+using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.World;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Configuration for an obstacle variant, linking a type to a pool ID.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public class ObstacleVariant
+    {
+        [Tooltip("What type of obstacle this is.")]
+        public ObstacleType type;
+
+        [Tooltip("The pool ID in the PoolManager for this obstacle.")]
+        public string poolId;
+
+        [Tooltip("Relative spawn weight. Higher = more common.")]
+        [Range(1, 100)]
+        public int weight = 10;
+
+        [Tooltip("Minimum difficulty level before this variant can appear.")]
+        [Range(0, 10)]
+        public int minimumDifficulty = 0;
+    }
+
+    /// &lt;summary&gt;
+    /// Handles spawning obstacles on chunk spawn points.
+    /// Ensures fair patterns (never blocks all lanes) and respects difficulty.
+    ///
+    /// Used by the WorldGenerator when a new chunk is activated.
+    /// &lt;/summary&gt;
+    public class ObstacleSpawner : MonoBehaviour
+    {
+        [Header("Obstacle Variants")]
+        [Tooltip("All obstacle types available for spawning.")]
+        [SerializeField] private ObstacleVariant[] obstacleVariants;
+
+        [Header("Spawn Rules")]
+        [Tooltip("Maximum obstacles per row (same Z position). " +
+                 "Set to 2 for a 3-lane runner to always leave one lane open.")]
+        [Range(1, 3)]
+        [SerializeField] private int maxObstaclesPerRow = 2;
+
+        [Tooltip("Minimum Z distance between obstacle rows on a single chunk.")]
+        [SerializeField] private float minimumRowSpacing = 3f;
+
+        [Header("Difficulty")]
+        [Tooltip("Current difficulty level. Affects which obstacles appear.")]
+        [SerializeField] private int currentDifficulty = 0;
+
+        // Lane positions (must match your chunk spawn points)
+        private const float LANE_LEFT = -2f;
+        private const float LANE_CENTER = 0f;
+        private const float LANE_RIGHT = 2f;
+        private const float LANE_TOLERANCE = 0.5f;
+
+        // ---- Public API ----
+
+        /// &lt;summary&gt;
+        /// Spawns obstacles on a chunk's obstacle spawn points.
+        /// Ensures fair patterns: never blocks all 3 lanes in the same row.
+        /// &lt;/summary&gt;
+        /// &lt;param name="chunkData"&gt;The chunk to populate.&lt;/param&gt;
+        /// &lt;param name="maxCount"&gt;Maximum obstacles to spawn on this chunk.&lt;/param&gt;
+        public void SpawnObstacles(ChunkData chunkData, int maxCount)
+        {
+            Transform[] spawnPoints = chunkData.ObstacleSpawnPoints;
+            if (spawnPoints == null || spawnPoints.Length == 0) return;
+            if (maxCount &lt;= 0) return;
+
+            // Group spawn points by their Z position (rows)
+            Dictionary&lt;float, List&lt;Transform&gt;&gt; rows = GroupByRow(spawnPoints);
+
+            int spawned = 0;
+
+            foreach (KeyValuePair&lt;float, List&lt;Transform&gt;&gt; row in rows)
+            {
+                if (spawned &gt;= maxCount) break;
+
+                List&lt;Transform&gt; rowPoints = row.Value;
+
+                // Decide how many obstacles in this row (respect max per row)
+                int countInRow = Random.Range(0, maxObstaclesPerRow + 1);
+                countInRow = Mathf.Min(countInRow, rowPoints.Count);
+                countInRow = Mathf.Min(countInRow, maxCount - spawned);
+
+                if (countInRow == 0) continue;
+
+                // Validate: don't block all lanes
+                if (countInRow &gt;= 3)
+                {
+                    countInRow = 2; // Force at least one lane open
+                }
+
+                // Pick random spawn points in this row
+                ShuffleList(rowPoints);
+
+                // Track which lanes are used in this row for pattern validation
+                List&lt;int&gt; usedLanes = new List&lt;int&gt;();
+
+                for (int i = 0; i &lt; countInRow; i++)
+                {
+                    Transform point = rowPoints[i];
+                    int lane = GetLaneIndex(point.position.x);
+
+                    // Pattern validation: skip if this would block all lanes
+                    usedLanes.Add(lane);
+                    if (!IsPatternValid(usedLanes))
+                    {
+                        usedLanes.RemoveAt(usedLanes.Count - 1);
+                        continue;
+                    }
+
+                    // Pick an obstacle variant
+                    ObstacleVariant variant = GetWeightedRandomVariant();
+                    if (variant == null) continue;
+
+                    // Spawn from pool
+                    GameObject obstacleObj =
+                        PoolManager.Instance.Get(variant.poolId);
+                    if (obstacleObj == null) continue;
+
+                    // Position the obstacle
+                    obstacleObj.transform.position = point.position;
+                    obstacleObj.transform.rotation = point.rotation;
+
+                    // Register with chunk for automatic cleanup
+                    chunkData.RegisterSpawnedObject(obstacleObj);
+
+                    spawned++;
+                }
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Update the current difficulty level.
+        /// Called by the difficulty system (Chapter 18).
+        /// &lt;/summary&gt;
+        public void SetDifficulty(int difficulty)
+        {
+            currentDifficulty = Mathf.Clamp(difficulty, 0, 10);
+        }
+
+        // ---- Pattern Validation ----
+
+        /// &lt;summary&gt;
+        /// Checks if a set of used lanes in a row creates a fair pattern.
+        /// Returns false if all 3 lanes are blocked (unbeatable).
+        /// &lt;/summary&gt;
+        private bool IsPatternValid(List&lt;int&gt; usedLanes)
+        {
+            // In a 3-lane runner, the player MUST have at least one open lane
+            if (usedLanes.Count &gt;= 3)
+            {
+                // Check if all three lanes are covered
+                bool hasLeft = usedLanes.Contains(-1);
+                bool hasCenter = usedLanes.Contains(0);
+                bool hasRight = usedLanes.Contains(1);
+
+                if (hasLeft &amp;&amp; hasCenter &amp;&amp; hasRight)
+                {
+                    return false; // All lanes blocked - unfair!
+                }
+            }
+
+            return true;
+        }
+
+        /// &lt;summary&gt;
+        /// Converts an X position to a lane index (-1, 0, or 1).
+        /// Uses tolerance to handle floating point imprecision.
+        /// &lt;/summary&gt;
+        private int GetLaneIndex(float xPosition)
+        {
+            if (Mathf.Abs(xPosition - LANE_LEFT) &lt; LANE_TOLERANCE)
+                return -1;
+            if (Mathf.Abs(xPosition - LANE_CENTER) &lt; LANE_TOLERANCE)
+                return 0;
+            if (Mathf.Abs(xPosition - LANE_RIGHT) &lt; LANE_TOLERANCE)
+                return 1;
+
+            Debug.LogWarning(
+                $"ObstacleSpawner: Spawn point at X={xPosition} " +
+                $"doesn't match any lane!"
+            );
+            return 0; // Default to center
+        }
+
+        // ---- Weighted Selection ----
+
+        /// &lt;summary&gt;
+        /// Picks a random obstacle variant using weighted selection,
+        /// filtered by current difficulty.
+        /// &lt;/summary&gt;
+        private ObstacleVariant GetWeightedRandomVariant()
+        {
+            // Filter by difficulty
+            List&lt;ObstacleVariant&gt; available = new List&lt;ObstacleVariant&gt;();
+            int totalWeight = 0;
+
+            foreach (ObstacleVariant variant in obstacleVariants)
+            {
+                if (variant.minimumDifficulty &lt;= currentDifficulty)
+                {
+                    available.Add(variant);
+                    totalWeight += variant.weight;
+                }
+            }
+
+            if (available.Count == 0)
+            {
+                Debug.LogWarning(
+                    "ObstacleSpawner: No variants available at difficulty " +
+                    currentDifficulty
+                );
+                return null;
+            }
+
+            // Weighted random pick
+            int randomValue = Random.Range(0, totalWeight);
+            int cumulative = 0;
+
+            foreach (ObstacleVariant variant in available)
+            {
+                cumulative += variant.weight;
+                if (randomValue &lt; cumulative)
+                {
+                    return variant;
+                }
+            }
+
+            return available[available.Count - 1];
+        }
+
+        // ---- Utility ----
+
+        /// &lt;summary&gt;
+        /// Groups spawn points by their Z position (rounded to minimumRowSpacing).
+        /// Points at similar Z positions are in the same "row."
+        /// &lt;/summary&gt;
+        private Dictionary&lt;float, List&lt;Transform&gt;&gt; GroupByRow(Transform[] points)
+        {
+            Dictionary&lt;float, List&lt;Transform&gt;&gt; rows =
+                new Dictionary&lt;float, List&lt;Transform&gt;&gt;();
+
+            foreach (Transform point in points)
+            {
+                if (point == null) continue;
+
+                // Round Z to nearest row spacing to group nearby points
+                float rowZ = Mathf.Round(
+                    point.position.z / minimumRowSpacing
+                ) * minimumRowSpacing;
+
+                if (!rows.ContainsKey(rowZ))
+                {
+                    rows[rowZ] = new List&lt;Transform&gt;();
+                }
+
+                rows[rowZ].Add(point);
+            }
+
+            return rows;
+        }
+
+        /// &lt;summary&gt;
+        /// Fisher-Yates shuffle for a list of Transforms.
+        /// &lt;/summary&gt;
+        private void ShuffleList(List&lt;Transform&gt; list)
+        {
+            for (int i = list.Count - 1; i &gt; 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                Transform temp = list[i];
+                list[i] = list[j];
+                list[j] = temp;
+            }
+        }
+    }
+}</code></pre></div>
+
+      <p>Let's break down the most important parts of the ObstacleSpawner:</p>
+
+      <h3>Row-Based Spawning</h3>
+      <p>Spawn points at the same Z position (or close to it) are grouped into "rows." Each row represents a cross-section of the road that the player reaches at the same time. By thinking in rows, we can apply the most critical rule: <strong>never block all three lanes in the same row</strong>.</p>
+
+      <h3>Pattern Validation</h3>
+      <p>The <code>IsPatternValid</code> method enforces fairness. Before placing each obstacle, we check if it would create an impossible pattern. If the left and center lanes already have obstacles, we won't place one in the right lane &mdash; that would give the player zero escape routes. This is absolutely essential. Players will tolerate dying to hard obstacles, but they won't tolerate dying to <em>impossible</em> ones.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">Never Block All Three Lanes</div>
+        <p>This is the single most important rule of obstacle placement in a 3-lane runner. If all three lanes are blocked at the same Z position with no way to jump or slide past, the player WILL die, and there was NOTHING they could do about it. This feels terrible and destroys player trust. Our pattern validation ensures this never happens. Always leave at least one safe lane or one obstacle that can be jumped/slid under.</p>
+      </div>
+
+      <h3>Difficulty Filtering</h3>
+      <p>Like our chunk system, obstacle variants have a <code>minimumDifficulty</code>. At the start of the game, only basic obstacles appear. As the player survives longer and difficulty increases, moving obstacles and tighter patterns become possible. This creates a natural learning curve.</p>
+
+      <!-- Section: Obstacle Patterns -->
+      <h2>Obstacle Patterns: Combinations That Are Fair</h2>
+      <p>Beyond the basic rule of "never block all lanes," good obstacle design uses <strong>patterns</strong> &mdash; specific combinations that test different skills. Here are some examples:</p>
+
+      <h3>The Zigzag</h3>
+      <p>Obstacles alternate between left and right lanes across consecutive rows, forcing the player to zigzag through them.</p>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Pattern: Zigzag</span><span class="lang-badge">Layout</span></div><pre><code>Row 1:  [X] [ ] [ ]   (obstacle in left lane)
+Row 2:  [ ] [ ] [X]   (obstacle in right lane)
+Row 3:  [X] [ ] [ ]   (obstacle in left lane)
+
+Player path: Right -> Left -> Right</code></pre></div>
+
+      <h3>The Funnel</h3>
+      <p>Two obstacles in the outer lanes, forcing the player to the center. Then an obstacle in the center, forcing them to a side.</p>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Pattern: Funnel</span><span class="lang-badge">Layout</span></div><pre><code>Row 1:  [X] [ ] [X]   (outer lanes blocked)
+Row 2:  [ ] [X] [ ]   (center blocked)
+
+Player path: Center -> Left or Right</code></pre></div>
+
+      <h3>The Jump-Slide Combo</h3>
+      <p>A low barrier followed immediately by a high barrier in the same lane, requiring a jump then an immediate slide.</p>
+      <div class="code-block"><div class="code-block-header"><span class="file-name">Pattern: Jump-Slide</span><span class="lang-badge">Layout</span></div><pre><code>Row 1:  [ ] [LOW] [ ]  (jump over)
+Row 2:  [ ] [HIGH] [ ] (slide under - close behind row 1)
+
+Player path: Jump, then immediately slide</code></pre></div>
+
+      <div class="callout tip">
+        <div class="callout-title">Pattern Design Philosophy</div>
+        <p>Every pattern should have at least one "escape route." The player should die because they made the wrong choice or reacted too slowly, never because there was no correct choice. When designing new patterns, always play through them mentally: "if I were running forward, could I survive this?" If not, make it easier. If it's too easy, add another obstacle to a different lane &mdash; but always leave an escape.</p>
+      </div>
+
+      <!-- Section: Connecting to WorldGenerator -->
+      <h2>Integrating with the WorldGenerator</h2>
+      <p>Now we need to update the WorldGenerator (Chapter 13) to use the ObstacleSpawner instead of its temporary inline spawning code.</p>
+
+      <div class="code-block"><div class="code-block-header"><span class="file-name">WorldGenerator.cs (updated PopulateObstacles)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Add this field to WorldGenerator:
+[Header("Spawners")]
+[SerializeField] private ObstacleSpawner obstacleSpawner;
+
+// Replace the old PopulateObstacles method with:
+private void PopulateObstacles(ChunkData chunkData, ChunkConfig config)
+{
+    if (obstacleSpawner == null)
+    {
+        Debug.LogWarning("WorldGenerator: No ObstacleSpawner assigned!");
+        return;
+    }
+
+    obstacleSpawner.SpawnObstacles(chunkData, config.MaxObstacles);
+}</code></pre></div>
+
+      <!-- Section: Creating Obstacle Prefabs -->
+      <h2>Creating Obstacle Prefabs Step by Step</h2>
+      <ol class="steps">
+        <li>Create a folder <code>Assets/Prefabs/Obstacles</code>.</li>
+        <li>For the <strong>Low Barrier</strong>:
+          <ul>
+            <li>Create an empty GameObject named <code>Obstacle_Low</code>.</li>
+            <li>Add a child Cube. Set Scale to (1.5, 0.5, 0.5) and Position to (0, 0.25, 0).</li>
+            <li>On the root, add a <strong>Box Collider</strong>: Center (0, 0.25, 0), Size (1.5, 0.5, 0.5), Is Trigger checked.</li>
+            <li>Add the <code>Obstacle</code> script. Set Type to LowBarrier, Is Lethal checked.</li>
+            <li>Drag to <code>Prefabs/Obstacles</code> to create the prefab.</li>
+          </ul>
+        </li>
+        <li>For the <strong>High Barrier</strong>:
+          <ul>
+            <li>Create <code>Obstacle_High</code> with two post cubes and a bar cube (see collider setup section above).</li>
+            <li>Add Box Collider: Center (0, 1.25, 0), Size (1.5, 1.5, 0.5), Is Trigger checked.</li>
+            <li>Add Obstacle script. Type: HighBarrier.</li>
+            <li>Save as prefab.</li>
+          </ul>
+        </li>
+        <li>For the <strong>Full-Width Barrier</strong>:
+          <ul>
+            <li>Create <code>Obstacle_Full</code> with a large cube: Scale (1.5, 2.0, 0.5), Position (0, 1.0, 0).</li>
+            <li>Box Collider: Center (0, 1.0, 0), Size (1.5, 2.0, 0.5), Is Trigger checked.</li>
+            <li>Obstacle script. Type: FullWidthBarrier.</li>
+            <li>Save as prefab.</li>
+          </ul>
+        </li>
+        <li>For the <strong>Moving Obstacle</strong>:
+          <ul>
+            <li>Create <code>Obstacle_Moving</code> same as Full-Width but add the <code>MovingObstacle</code> script instead of the base <code>Obstacle</code> script.</li>
+            <li>Set Move Speed to 3, Left Bound to -2, Right Bound to 2.</li>
+            <li>Save as prefab.</li>
+          </ul>
+        </li>
+        <li>For the <strong>Ramp</strong>:
+          <ul>
+            <li>Create <code>Obstacle_Ramp</code>. Use a cube rotated to create a slope (Rotation X: -20, Scale: 1.5, 0.1, 2.0).</li>
+            <li>Add a trigger collider at the base for detection.</li>
+            <li>Add the <code>RampObstacle</code> script. Set Is Lethal to false.</li>
+            <li>Save as prefab.</li>
+          </ul>
+        </li>
+        <li>In the <strong>PoolManager</strong>, add pools for each obstacle prefab:
+          <ul>
+            <li>"Obstacle_Low" &mdash; Initial Size: 15</li>
+            <li>"Obstacle_High" &mdash; Initial Size: 10</li>
+            <li>"Obstacle_Full" &mdash; Initial Size: 10</li>
+            <li>"Obstacle_Moving" &mdash; Initial Size: 5</li>
+            <li>"Obstacle_Ramp" &mdash; Initial Size: 5</li>
+          </ul>
+        </li>
+        <li>On the <strong>ObstacleSpawner</strong> component, configure the Obstacle Variants array with each type, its pool ID, weight, and minimum difficulty.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">Suggested Variant Configuration</div>
+        <p>Here is a balanced starting configuration for the ObstacleSpawner:</p>
+        <ul>
+          <li>LowBarrier: poolId = "Obstacle_Low", weight = 30, minDifficulty = 0</li>
+          <li>HighBarrier: poolId = "Obstacle_High", weight = 20, minDifficulty = 1</li>
+          <li>FullWidthBarrier: poolId = "Obstacle_Full", weight = 15, minDifficulty = 2</li>
+          <li>MovingObstacle: poolId = "Obstacle_Moving", weight = 5, minDifficulty = 4</li>
+          <li>Ramp: poolId = "Obstacle_Ramp", weight = 10, minDifficulty = 0</li>
+        </ul>
+        <p>This means Low Barriers appear most often and from the start, while Moving Obstacles are rare and only appear after difficulty reaches 4. Adjust these values based on playtesting.</p>
+      </div>
+
+      <!-- Section: Visual Variety -->
+      <h2>Adding Visual Variety</h2>
+      <p>Seeing the exact same gray cube hundreds of times gets boring fast. The <code>materialVariants</code> array on the Obstacle base class lets you add visual variety without creating separate prefabs for each color.</p>
+      <ol class="steps">
+        <li>Create a folder <code>Assets/Materials/Obstacles</code>.</li>
+        <li>Create 3-4 materials with different colors:
+          <ul>
+            <li><code>Mat_Obstacle_Red</code> &mdash; A warning red</li>
+            <li><code>Mat_Obstacle_Orange</code> &mdash; A caution orange</li>
+            <li><code>Mat_Obstacle_Yellow</code> &mdash; A bright yellow</li>
+            <li><code>Mat_Obstacle_Metal</code> &mdash; A metallic gray</li>
+          </ul>
+        </li>
+        <li>On each obstacle prefab, drag these materials into the Material Variants array.</li>
+        <li>Now every time an obstacle spawns, it randomly picks one of the materials, making the world feel more varied.</li>
+      </ol>
+
+      <!-- Section: Summary -->
+      <h2>What We Built</h2>
+      <p>The obstacle system is the core of our gameplay. Here's what we now have:</p>
+      <ul>
+        <li><strong>ObstacleType enum</strong> &mdash; Five obstacle types, each requiring a different player response (jump, slide, lane switch, timing, or none for ramps).</li>
+        <li><strong>Obstacle.cs</strong> &mdash; A poolable base class that handles collision detection, visual variety, and clean integration with the pool system.</li>
+        <li><strong>MovingObstacle.cs</strong> &mdash; A derived class that adds sideways movement between lanes.</li>
+        <li><strong>RampObstacle.cs</strong> &mdash; A derived class that launches the player into the air instead of killing them.</li>
+        <li><strong>ObstacleSpawner.cs</strong> &mdash; An intelligent spawner that places obstacles on chunk spawn points using weighted random selection, difficulty filtering, and pattern validation to ensure fairness.</li>
+        <li><strong>Five obstacle prefabs</strong> with properly sized colliders and pool configurations.</li>
+        <li><strong>Pattern validation</strong> &mdash; The critical rule that ensures at least one lane is always open, preventing unfair deaths.</li>
+      </ul>
+      <p>In the next chapter, we'll build the <strong>collectible system</strong> &mdash; coins and power-ups that reward the player and add positive reinforcement to balance out the danger of obstacles.</p>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Obstacles are in. Let's save and start a new feature branch for the gameplay systems.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git checkout -b feature/gameplay
+git add .
+git commit -m "Add obstacle system with patterns and spawning"</code></pre>
+        </div>
+        <p>New feature branch for Part 4: Gameplay. Same pattern as before — we'll work here through Chapter 18 and merge back.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="14-origin-shifting.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Origin Shifting</span></a>
+        <a href="16-collectibles.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Collectibles</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

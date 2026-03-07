@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Manager &amp; State Machine - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link active"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 6</span>
+        <h1>Game Manager &amp; State Machine</h1>
+        <p class="chapter-desc">Build the central brain of your game &mdash; a Game Manager that tracks what state the game is in and coordinates everything else.</p>
+      </div>
+
+      <!-- SECTION: What is a Game Manager? -->
+      <section>
+        <h2>What Is a Game Manager?</h2>
+        <p>Every game needs a "boss" &mdash; a single script that knows what is happening in the game right now. Is the player on the main menu? Are they actively running? Did they pause? Did they die? That boss script is the <strong>Game Manager</strong>.</p>
+        <p>Think of the Game Manager like a movie director. The director does not act, operate the camera, or compose music &mdash; but they tell every department what to do and when. Your Game Manager will not move the player or spawn obstacles directly, but it will tell those systems "the game just started, do your thing" or "the player died, stop everything."</p>
+
+        <div class="callout info">
+          <div class="callout-title">Why Not Just Put Logic Everywhere?</div>
+          <p>Without a Game Manager, every script has to figure out the current state on its own. The UI script checks a boolean. The obstacle spawner checks a different boolean. The player checks yet another. When these get out of sync &mdash; and they will &mdash; you get bugs like obstacles spawning on the menu screen or the player running after dying. A single source of truth prevents all of this.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Game States -->
+      <section>
+        <h2>Defining Game States</h2>
+        <p>Before we write any code, let us think about the different "modes" our infinite runner can be in. At any given moment, the game is in exactly one of these states:</p>
+
+        <table>
+          <thead>
+            <tr><th>State</th><th>What Happens</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Menu</strong></td><td>The main menu is visible. Nothing moves. The player sees a "Tap to Play" prompt.</td></tr>
+            <tr><td><strong>Playing</strong></td><td>The player is running. Obstacles spawn. Score increases. Input is active.</td></tr>
+            <tr><td><strong>Paused</strong></td><td>Everything freezes. A pause overlay appears. The player can resume or quit.</td></tr>
+            <tr><td><strong>GameOver</strong></td><td>The player hit an obstacle. A death animation plays. Final score is shown. The player can restart.</td></tr>
+          </tbody>
+        </table>
+
+        <p>We represent these states with a C# <strong>enum</strong>. An enum is simply a list of named constants &mdash; it makes your code readable and prevents typos (you cannot accidentally type <code>"Plaiyng"</code> like you could with strings).</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// All possible states the game can be in.
+    /// The game is always in exactly ONE of these states.
+    /// &lt;/summary&gt;
+    public enum GameState
+    {
+        Menu,
+        Playing,
+        Paused,
+        GameOver
+    }
+}</code></pre>
+        </div>
+
+        <p>Create this file at <code>Assets/Scripts/Core/GameState.cs</code>. It is a tiny file, but keeping it separate makes it easy for any script in the project to reference these states.</p>
+      </section>
+
+      <!-- SECTION: The Singleton Pattern -->
+      <section>
+        <h2>The Singleton Pattern</h2>
+        <p>We need the Game Manager to be accessible from anywhere &mdash; the UI needs to ask "are we paused?", the player controller needs to ask "are we playing?", the spawner needs to ask "should I spawn?". The classic solution is the <strong>Singleton pattern</strong>.</p>
+
+        <p>A Singleton guarantees that:</p>
+        <ol>
+          <li>Only <strong>one</strong> instance of the class exists in the entire game.</li>
+          <li>That instance is accessible from anywhere via a <strong>static property</strong> (e.g., <code>GameManager.Instance</code>).</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Singleton: Pros and Cons</div>
+          <p><strong>Pros:</strong> Simple, easy to access, perfect for truly global systems like a Game Manager or Audio Manager.</p>
+          <p><strong>Cons:</strong> Can lead to tight coupling if overused. Makes unit testing harder. If you make everything a Singleton, your code becomes a tangled web of global state. <strong>Rule of thumb:</strong> use Singletons sparingly &mdash; Game Manager, Audio Manager, and maybe one or two others. For communication between systems, use events (Chapter 7).</p>
+        </div>
+
+        <p>Here is a reusable base class that any MonoBehaviour can inherit from to become a Singleton:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Singleton.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Generic Singleton base class for MonoBehaviours.
+    /// Inherit from this to make any MonoBehaviour a Singleton.
+    /// Usage: public class GameManager : Singleton&lt;GameManager&gt; { }
+    /// &lt;/summary&gt;
+    public abstract class Singleton&lt;T&gt; : MonoBehaviour where T : MonoBehaviour
+    {
+        // The single instance of this class
+        private static T _instance;
+
+        // A lock object to prevent race conditions (safety measure)
+        private static readonly object _lock = new object();
+
+        // Has the application quit? Prevents creating instances during shutdown.
+        private static bool _applicationIsQuitting = false;
+
+        /// &lt;summary&gt;
+        /// Access the Singleton instance. Creates one if it does not exist.
+        /// &lt;/summary&gt;
+        public static T Instance
+        {
+            get
+            {
+                // If the application is quitting, do not create a new instance
+                if (_applicationIsQuitting)
+                {
+                    Debug.LogWarning(
+                        $"[Singleton] Instance of {typeof(T)} requested after " +
+                        "application quit. Returning null.");
+                    return null;
+                }
+
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        // Search the scene for an existing instance
+                        _instance = FindFirstObjectByType&lt;T&gt;();
+
+                        if (_instance == null)
+                        {
+                            // None found — create a new GameObject with this component
+                            var singletonObject = new GameObject($"[{typeof(T).Name}]");
+                            _instance = singletonObject.AddComponent&lt;T&gt;();
+                            DontDestroyOnLoad(singletonObject);
+                        }
+                    }
+
+                    return _instance;
+                }
+            }
+        }
+
+        protected virtual void Awake()
+        {
+            // If an instance already exists and it is not this one, destroy this duplicate
+            if (_instance != null &amp;&amp; _instance != this)
+            {
+                Debug.LogWarning(
+                    $"[Singleton] Duplicate {typeof(T).Name} detected. " +
+                    "Destroying the new one.");
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this as T;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        protected virtual void OnApplicationQuit()
+        {
+            _applicationIsQuitting = true;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this file at <code>Assets/Scripts/Core/Singleton.cs</code>. Let us break down what every part does:</p>
+
+        <ul>
+          <li><strong><code>private static T _instance</code></strong> &mdash; The single stored reference. <code>static</code> means it belongs to the class itself, not any particular object.</li>
+          <li><strong><code>where T : MonoBehaviour</code></strong> &mdash; A constraint that says "T must be a MonoBehaviour." This prevents someone from accidentally using this with a plain C# class.</li>
+          <li><strong><code>FindFirstObjectByType&lt;T&gt;()</code></strong> &mdash; Unity method that searches the entire scene for an object of this type.</li>
+          <li><strong><code>DontDestroyOnLoad()</code></strong> &mdash; Tells Unity "do not destroy this object when loading a new scene." Our Game Manager should survive scene transitions.</li>
+          <li><strong>Duplicate check in Awake()</strong> &mdash; If we load a scene that also has a Game Manager, the duplicate destroys itself immediately.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: State Machine Pattern -->
+      <section>
+        <h2>The State Machine Pattern</h2>
+        <p>A naive approach to handling game states might look like this:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">BadExample.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// BAD: Do NOT do this! This becomes unmanageable fast.
+void Update()
+{
+    if (currentState == GameState.Menu)
+    {
+        // 50 lines of menu logic...
+    }
+    else if (currentState == GameState.Playing)
+    {
+        // 100 lines of gameplay logic...
+    }
+    else if (currentState == GameState.Paused)
+    {
+        // 30 lines of pause logic...
+    }
+    else if (currentState == GameState.GameOver)
+    {
+        // 40 lines of game over logic...
+    }
+}</code></pre>
+        </div>
+
+        <p>This quickly becomes a nightmare. Hundreds of lines in a single method, all tangled together. Instead, we use the <strong>State pattern</strong>: each state is its own class with its own Enter, Update, and Exit methods.</p>
+
+        <h3>The IGameState Interface</h3>
+        <p>An <strong>interface</strong> is like a contract. It says "any class that implements me must have these methods." Our interface defines what every game state must be able to do:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">IGameState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Interface that all game states must implement.
+    /// Each state knows how to enter, update each frame, and exit.
+    /// &lt;/summary&gt;
+    public interface IGameState
+    {
+        /// &lt;summary&gt;
+        /// Called once when this state becomes the active state.
+        /// Use this for setup: show UI panels, reset variables, etc.
+        /// &lt;/summary&gt;
+        void Enter();
+
+        /// &lt;summary&gt;
+        /// Called every frame while this state is active.
+        /// Use this for ongoing logic: checking input, updating timers, etc.
+        /// &lt;/summary&gt;
+        void Update();
+
+        /// &lt;summary&gt;
+        /// Called once when leaving this state for another.
+        /// Use this for cleanup: hide UI panels, stop coroutines, etc.
+        /// &lt;/summary&gt;
+        void Exit();
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Core/IGameState.cs</code>.</p>
+
+        <h3>Concrete State Classes</h3>
+        <p>Now we create one class per state. Each class implements <code>IGameState</code> and holds a reference back to the Game Manager so it can trigger state transitions.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">MenuState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core.States
+{
+    /// &lt;summary&gt;
+    /// The main menu state. Displayed when the game first opens
+    /// or when the player returns from a game over.
+    /// &lt;/summary&gt;
+    public class MenuState : IGameState
+    {
+        private readonly GameManager _gameManager;
+
+        public MenuState(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public void Enter()
+        {
+            Debug.Log("[MenuState] Entered Menu State");
+
+            // Freeze game time so nothing moves in the background
+            Time.timeScale = 1f;
+
+            // TODO: Show main menu UI panel
+            // TODO: Hide HUD (score, pause button)
+            // TODO: Play menu music
+        }
+
+        public void Update()
+        {
+            // In the menu state, we wait for the player to tap/click "Play"
+            // The actual button press will call GameManager.StartGame()
+            // so there is nothing we need to poll here yet.
+        }
+
+        public void Exit()
+        {
+            Debug.Log("[MenuState] Exiting Menu State");
+
+            // TODO: Hide main menu UI panel
+            // TODO: Stop menu music
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayingState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core.States
+{
+    /// &lt;summary&gt;
+    /// The main gameplay state. The player is running,
+    /// obstacles are spawning, and the score is counting up.
+    /// &lt;/summary&gt;
+    public class PlayingState : IGameState
+    {
+        private readonly GameManager _gameManager;
+
+        public PlayingState(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public void Enter()
+        {
+            Debug.Log("[PlayingState] Entered Playing State");
+
+            // Make sure game time is running at normal speed
+            Time.timeScale = 1f;
+
+            // TODO: Show gameplay HUD (score, pause button)
+            // TODO: Start spawning obstacles
+            // TODO: Enable player input
+            // TODO: Play gameplay music
+        }
+
+        public void Update()
+        {
+            // This runs every frame during gameplay.
+            // The GameManager's Update() calls this.
+
+            // Check for pause input (Escape key on desktop)
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _gameManager.PauseGame();
+            }
+        }
+
+        public void Exit()
+        {
+            Debug.Log("[PlayingState] Exiting Playing State");
+
+            // TODO: Stop spawning obstacles (if transitioning to pause/gameover)
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PausedState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core.States
+{
+    /// &lt;summary&gt;
+    /// The paused state. Everything freezes.
+    /// The player can resume or quit to the menu.
+    /// &lt;/summary&gt;
+    public class PausedState : IGameState
+    {
+        private readonly GameManager _gameManager;
+
+        public PausedState(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public void Enter()
+        {
+            Debug.Log("[PausedState] Entered Paused State");
+
+            // Freeze all physics and time-based movement
+            // timeScale = 0 stops Time.deltaTime from advancing
+            Time.timeScale = 0f;
+
+            // TODO: Show pause menu UI
+            // TODO: Mute or lower game audio
+        }
+
+        public void Update()
+        {
+            // Even though timeScale is 0, Update() still runs!
+            // We can still check for input to resume.
+
+            // Note: We use unscaledDeltaTime for anything time-based
+            // while paused, since deltaTime will be 0.
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                _gameManager.ResumeGame();
+            }
+        }
+
+        public void Exit()
+        {
+            Debug.Log("[PausedState] Exiting Paused State");
+
+            // Restore normal time
+            Time.timeScale = 1f;
+
+            // TODO: Hide pause menu UI
+            // TODO: Restore audio
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameOverState.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core.States
+{
+    /// &lt;summary&gt;
+    /// The game over state. The player has died.
+    /// Shows final score and options to restart or go to menu.
+    /// &lt;/summary&gt;
+    public class GameOverState : IGameState
+    {
+        private readonly GameManager _gameManager;
+
+        public GameOverState(GameManager gameManager)
+        {
+            _gameManager = gameManager;
+        }
+
+        public void Enter()
+        {
+            Debug.Log("[GameOverState] Entered Game Over State");
+
+            // Slow down time for a dramatic death effect (optional)
+            Time.timeScale = 0.5f;
+
+            // TODO: Show game over UI with final score
+            // TODO: Disable player input
+            // TODO: Save high score
+            // TODO: Play death sound effect
+        }
+
+        public void Update()
+        {
+            // Wait for player to choose Restart or Menu.
+            // Buttons will call GameManager methods directly.
+        }
+
+        public void Exit()
+        {
+            Debug.Log("[GameOverState] Exiting Game Over State");
+
+            // Restore normal time
+            Time.timeScale = 1f;
+
+            // TODO: Hide game over UI
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Why Use a State Machine?</div>
+          <p>Each state class is small, focused, and testable. When you need to change what happens during "Game Over," you open <code>GameOverState.cs</code> and nothing else. Compare that to scrolling through a 500-line if/else chain in a single file. The state pattern also makes it trivial to add new states later (e.g., a Tutorial state or a Cutscene state).</p>
+        </div>
+      </section>
+
+      <!-- SECTION: The Full GameManager -->
+      <section>
+        <h2>The Full GameManager Script</h2>
+        <p>Now we bring everything together. The Game Manager inherits from our Singleton base, creates all the state objects, and provides public methods for transitioning between them.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameManager.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using UnityEngine;
+using InfiniteRunner.Core.States;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// The central manager for the entire game.
+    /// Tracks the current game state and provides methods to transition
+    /// between states. Accessible from anywhere via GameManager.Instance.
+    /// &lt;/summary&gt;
+    public class GameManager : Singleton&lt;GameManager&gt;
+    {
+        // ─── Events ─────────────────────────────────────────────
+        // Other scripts can subscribe to this event to be notified
+        // whenever the game state changes.
+        // Example: UIManager listens and shows/hides panels accordingly.
+        public event Action&lt;GameState&gt; OnGameStateChanged;
+
+        // ─── State Machine ──────────────────────────────────────
+        // The state machine fields. These are created once in Awake
+        // and reused for the entire lifetime of the game.
+        private IGameState _menuState;
+        private IGameState _playingState;
+        private IGameState _pausedState;
+        private IGameState _gameOverState;
+
+        // The currently active state
+        private IGameState _currentState;
+
+        // ─── Public Properties ──────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// The current game state as an enum value.
+        /// Useful for quick checks: if (GameManager.Instance.CurrentState == GameState.Playing)
+        /// &lt;/summary&gt;
+        public GameState CurrentState { get; private set; } = GameState.Menu;
+
+        /// &lt;summary&gt;
+        /// How many times the player has played this session.
+        /// Useful for showing tutorials only on the first run.
+        /// &lt;/summary&gt;
+        public int PlayCount { get; private set; } = 0;
+
+        // ─── Unity Lifecycle ────────────────────────────────────
+
+        protected override void Awake()
+        {
+            // IMPORTANT: Call the base Singleton.Awake() first!
+            // It handles the duplicate-instance check and DontDestroyOnLoad.
+            base.Awake();
+
+            // Create all state objects, passing a reference to this GameManager
+            _menuState = new MenuState(this);
+            _playingState = new PlayingState(this);
+            _pausedState = new PausedState(this);
+            _gameOverState = new GameOverState(this);
+        }
+
+        private void Start()
+        {
+            // Begin in the Menu state
+            TransitionToState(GameState.Menu);
+        }
+
+        private void Update()
+        {
+            // Delegate the Update call to whatever state is currently active.
+            // This is the heart of the state machine — the GameManager itself
+            // does not need to know what "updating" means for each state.
+            _currentState?.Update();
+        }
+
+        // ─── Public Methods (called by UI buttons, other scripts) ───
+
+        /// &lt;summary&gt;
+        /// Called when the player taps "Play" on the main menu.
+        /// &lt;/summary&gt;
+        public void StartGame()
+        {
+            PlayCount++;
+            TransitionToState(GameState.Playing);
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player presses the pause button.
+        /// &lt;/summary&gt;
+        public void PauseGame()
+        {
+            if (CurrentState == GameState.Playing)
+            {
+                TransitionToState(GameState.Paused);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player presses "Resume" in the pause menu.
+        /// &lt;/summary&gt;
+        public void ResumeGame()
+        {
+            if (CurrentState == GameState.Paused)
+            {
+                TransitionToState(GameState.Playing);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player hits an obstacle and dies.
+        /// &lt;/summary&gt;
+        public void EndGame()
+        {
+            if (CurrentState == GameState.Playing)
+            {
+                TransitionToState(GameState.GameOver);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player taps "Restart" on the game over screen.
+        /// &lt;/summary&gt;
+        public void RestartGame()
+        {
+            // Go back to Playing directly (skip the menu)
+            PlayCount++;
+            TransitionToState(GameState.Playing);
+        }
+
+        /// &lt;summary&gt;
+        /// Called when the player taps "Main Menu" from pause or game over.
+        /// &lt;/summary&gt;
+        public void GoToMenu()
+        {
+            TransitionToState(GameState.Menu);
+        }
+
+        // ─── Private Methods ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Handles the transition from one state to another.
+        /// Calls Exit() on the old state and Enter() on the new one.
+        /// &lt;/summary&gt;
+        private void TransitionToState(GameState newState)
+        {
+            // Exit the current state (if there is one)
+            _currentState?.Exit();
+
+            // Update the enum value
+            CurrentState = newState;
+
+            // Map the enum to the actual state object
+            _currentState = newState switch
+            {
+                GameState.Menu     =&gt; _menuState,
+                GameState.Playing  =&gt; _playingState,
+                GameState.Paused   =&gt; _pausedState,
+                GameState.GameOver =&gt; _gameOverState,
+                _ =&gt; throw new ArgumentOutOfRangeException(
+                    nameof(newState), newState,
+                    "Unhandled game state!")
+            };
+
+            // Enter the new state
+            _currentState.Enter();
+
+            // Notify all listeners that the state has changed
+            OnGameStateChanged?.Invoke(newState);
+
+            Debug.Log($"[GameManager] State changed to: {newState}");
+        }
+    }
+}</code></pre>
+        </div>
+
+        <p>Save this at <code>Assets/Scripts/Core/GameManager.cs</code>. Let us walk through the key parts:</p>
+
+        <h3>Line-by-Line Breakdown</h3>
+
+        <ul>
+          <li><strong><code>public event Action&lt;GameState&gt; OnGameStateChanged</code></strong> &mdash; An event that fires whenever the state changes. Other scripts subscribe to this to react. We will build a full event system in Chapter 7, but this built-in C# event works great for the Game Manager itself.</li>
+          <li><strong><code>TransitionToState()</code></strong> &mdash; The most important method. It calls <code>Exit()</code> on the old state, swaps the active state, then calls <code>Enter()</code> on the new one. This guarantees clean transitions.</li>
+          <li><strong><code>switch expression</code></strong> &mdash; The <code>newState switch { ... }</code> syntax is a modern C# feature that maps each enum value to a state object. The <code>_</code> at the end is a catch-all that throws an error if we somehow pass an unknown state.</li>
+          <li><strong>Guard clauses</strong> &mdash; Methods like <code>PauseGame()</code> check the current state first. You cannot pause if you are not playing. This prevents impossible state transitions.</li>
+        </ul>
+
+        <div class="callout tip">
+          <div class="callout-title">The ? Operator (Null-Conditional)</div>
+          <p><code>_currentState?.Update()</code> means "if _currentState is not null, call Update() on it." If _currentState IS null, it simply does nothing instead of crashing. This is a safety measure for the first frame before Start() runs.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Setting Up in the Scene -->
+      <section>
+        <h2>Setting Up the GameManager in the Scene</h2>
+        <p>Follow these steps to add the Game Manager to your Unity scene:</p>
+
+        <ol class="steps">
+          <li>
+            <strong>Create an empty GameObject.</strong> In the Hierarchy window, right-click and choose <strong>Create Empty</strong>. Name it <code>[GameManager]</code>. The square brackets are a convention that signals "this is a manager object, not a visual thing in the scene."
+          </li>
+          <li>
+            <strong>Attach the script.</strong> Select the <code>[GameManager]</code> object, then in the Inspector click <strong>Add Component</strong>. Search for "GameManager" and select it.
+          </li>
+          <li>
+            <strong>Position does not matter.</strong> Since the Game Manager has no visual representation, its Transform position is irrelevant. Leave it at (0, 0, 0).
+          </li>
+          <li>
+            <strong>Verify DontDestroyOnLoad.</strong> Press Play. In the Hierarchy, you should see the <code>[GameManager]</code> object move to a special "DontDestroyOnLoad" section. This proves it will survive scene changes.
+          </li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Only One GameManager!</div>
+          <p>Never place a GameManager in more than one scene. Because of <code>DontDestroyOnLoad</code>, the first one persists. If a second scene also has one, the Singleton base class will detect the duplicate and destroy it, but it is cleaner to only have one in your initial scene.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Testing State Transitions -->
+      <section>
+        <h2>Testing State Transitions</h2>
+        <p>Let us verify everything works. We will create a simple test script that listens for state changes and lets us trigger transitions with keyboard keys.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">GameManagerTester.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Debug
+{
+    /// &lt;summary&gt;
+    /// Temporary test script for verifying Game Manager state transitions.
+    /// Attach to any GameObject. Delete this before shipping!
+    /// &lt;/summary&gt;
+    public class GameManagerTester : MonoBehaviour
+    {
+        private void OnEnable()
+        {
+            // Subscribe to the state change event
+            GameManager.Instance.OnGameStateChanged += HandleStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            // Always unsubscribe to prevent memory leaks!
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleStateChanged;
+            }
+        }
+
+        private void Update()
+        {
+            // Press number keys to trigger state transitions
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Debug.Log("TEST: Going to Menu");
+                GameManager.Instance.GoToMenu();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                Debug.Log("TEST: Starting Game");
+                GameManager.Instance.StartGame();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                Debug.Log("TEST: Pausing Game");
+                GameManager.Instance.PauseGame();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                Debug.Log("TEST: Resuming Game");
+                GameManager.Instance.ResumeGame();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha5))
+            {
+                Debug.Log("TEST: Ending Game (Player Died)");
+                GameManager.Instance.EndGame();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha6))
+            {
+                Debug.Log("TEST: Restarting Game");
+                GameManager.Instance.RestartGame();
+            }
+        }
+
+        private void HandleStateChanged(GameState newState)
+        {
+            Debug.Log($"&lt;color=cyan&gt;[StateChanged]&lt;/color&gt; " +
+                      $"Game is now in: {newState}");
+        }
+    }
+}</code></pre>
+        </div>
+
+        <ol class="steps">
+          <li>Create a new empty GameObject named <code>[Tester]</code>.</li>
+          <li>Attach the <code>GameManagerTester</code> script to it.</li>
+          <li>Press <strong>Play</strong>.</li>
+          <li>Open the <strong>Console</strong> window (Window &gt; General &gt; Console).</li>
+          <li>Press the number keys 1 through 6 and watch the Console output. You should see Enter and Exit messages for each state transition.</li>
+        </ol>
+
+        <p>Expected Console output when you press 2 (Start Game), then 3 (Pause), then 4 (Resume), then 5 (End Game):</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Console Output</span><span class="lang-badge">Log</span></div>
+          <pre><code>[MenuState] Exiting Menu State
+[PlayingState] Entered Playing State
+[GameManager] State changed to: Playing
+[StateChanged] Game is now in: Playing
+
+[PlayingState] Exiting Playing State
+[PausedState] Entered Paused State
+[GameManager] State changed to: Paused
+[StateChanged] Game is now in: Paused
+
+[PausedState] Exiting Paused State
+[PlayingState] Entered Playing State
+[GameManager] State changed to: Playing
+[StateChanged] Game is now in: Playing
+
+[PlayingState] Exiting Playing State
+[GameOverState] Entered Game Over State
+[GameManager] State changed to: GameOver
+[StateChanged] Game is now in: GameOver</code></pre>
+        </div>
+
+        <div class="callout tip">
+          <div class="callout-title">Clean Up After Testing</div>
+          <p>The <code>GameManagerTester</code> script is for development only. Once you have verified everything works, you can disable or delete it. In a production project, you would write proper unit tests instead (we will cover testing in a later chapter).</p>
+        </div>
+      </section>
+
+      <!-- SECTION: File Structure Recap -->
+      <section>
+        <h2>Project Files So Far</h2>
+        <p>After this chapter, your <code>Assets/Scripts/</code> folder should look like this:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Scripts/
+    Core/
+      GameState.cs           &lt;-- The enum with Menu, Playing, Paused, GameOver
+      IGameState.cs          &lt;-- The interface all states implement
+      Singleton.cs           &lt;-- Reusable Singleton base class
+      GameManager.cs         &lt;-- The main Game Manager
+      States/
+        MenuState.cs         &lt;-- What happens in the menu
+        PlayingState.cs      &lt;-- What happens during gameplay
+        PausedState.cs       &lt;-- What happens when paused
+        GameOverState.cs     &lt;-- What happens after death
+    Debug/
+      GameManagerTester.cs   &lt;-- Temporary test script</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <p>In this chapter, we created the backbone of our entire game:</p>
+        <ul>
+          <li>A <strong>GameState enum</strong> that defines all possible game states.</li>
+          <li>A reusable <strong>Singleton base class</strong> that guarantees exactly one instance.</li>
+          <li>An <strong>IGameState interface</strong> with Enter, Update, and Exit methods.</li>
+          <li>Four <strong>concrete state classes</strong> that each handle their own logic cleanly.</li>
+          <li>A <strong>GameManager</strong> that ties it all together and provides public methods for state transitions.</li>
+          <li>An <strong>event</strong> (<code>OnGameStateChanged</code>) that other systems can listen to.</li>
+        </ul>
+        <p>In the next chapter, we will build a proper <strong>Event System</strong> using ScriptableObject event channels &mdash; a pattern used by professional Unity developers to decouple systems and keep your codebase clean.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The GameManager and state machine are working. Time to lock this in.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git add .
+git commit -m "Add GameManager with state machine pattern"</code></pre>
+        </div>
+        <p>Three commands. Every time. It becomes second nature fast.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="05-project-architecture.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Architecture</span></a>
+        <a href="07-event-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Event System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

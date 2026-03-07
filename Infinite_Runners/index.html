@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build an Infinite Runner in Unity - Complete Beginner's Guide</title>
+  <meta name="description" content="Learn to build a production-grade 3-lane infinite runner game in Unity from absolute scratch. 25 chapters covering architecture, systems, and polish.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js"></script>
+</head>
+<body class="landing">
+
+  <div class="progress-bar"></div>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-wrapper">
+
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-badge">Free &middot; Open Source &middot; Production-Grade</div>
+        <h1>Build a Production-Grade Infinite Runner in Unity</h1>
+        <p>A complete, beginner-friendly guide to building a 3-lane infinite runner from absolute scratch. Learn real game architecture, not just tutorials that fall apart at scale.</p>
+        <a href="chapters/01-welcome.html" class="hero-cta">
+          Start Learning &rarr;
+        </a>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="stat-value">25</div>
+            <div class="stat-label">Chapters</div>
+          </div>
+          <div class="hero-stat">
+            <div class="stat-value">6</div>
+            <div class="stat-label">Systems</div>
+          </div>
+          <div class="hero-stat">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Free</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon green">&#9881;</div>
+          <h3>Production Architecture</h3>
+          <p>Object pooling, event systems, state machines, and origin shifting taught from day one. No "we'll fix this later."</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon purple">&#9776;</div>
+          <h3>System by System</h3>
+          <p>Each chapter builds one clean, modular system. Understand how every piece fits together in a real game.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon yellow">&#9733;</div>
+          <h3>True Beginner Friendly</h3>
+          <p>Never touched Unity? Perfect. We start from installing Unity and walk through every click, every line of code.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">&#128187;</div>
+          <h3>Real Git Workflow</h3>
+          <p>Learn version control by doing it. Commit after every chapter, use feature branches, push to GitHub. 20+ commits of muscle memory.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">&#128640;</div>
+          <h3>Ship It</h3>
+          <p>Not just a prototype. Build something you can actually publish to app stores. Performance-optimized and polished.</p>
+        </div>
+      </section>
+
+      <!-- What We're Building -->
+      <section style="margin: 3rem 0;">
+        <h2 style="border: none; margin-top: 0;">What You'll Build</h2>
+        <p>A 3-lane infinite runner inspired by games like Subway Surfers and Temple Run. The player runs forward automatically, and you swipe (or press keys) to dodge obstacles, collect coins, and survive as long as possible.</p>
+        <div class="callout tip">
+          <div class="callout-title">&#9989; What makes this different</div>
+          <p>Most tutorials teach you to slap things together. This course teaches you the <strong>architecture</strong> that real game studios use. Every system is modular, testable, and production-ready. When you finish, you won't just have a game &mdash; you'll understand <em>why</em> it's built that way.</p>
+        </div>
+        <h3>Features We'll Implement</h3>
+        <ul>
+          <li><strong>3-lane player movement</strong> &mdash; smooth lane switching, jumping, sliding</li>
+          <li><strong>Procedural world generation</strong> &mdash; infinite chunks with obstacles and collectibles</li>
+          <li><strong>Object pooling</strong> &mdash; zero runtime allocations for spawned objects</li>
+          <li><strong>Origin shifting</strong> &mdash; no floating point issues, even after hours of play</li>
+          <li><strong>Event-driven architecture</strong> &mdash; decoupled systems that communicate cleanly</li>
+          <li><strong>Difficulty progression</strong> &mdash; speed and complexity ramp over time</li>
+          <li><strong>Power-ups</strong> &mdash; magnet, shield, score multiplier</li>
+          <li><strong>Full UI</strong> &mdash; menus, HUD, pause, game over screens</li>
+          <li><strong>Audio system</strong> &mdash; music, SFX with pooling</li>
+          <li><strong>Save system</strong> &mdash; high scores, settings, unlockables</li>
+          <li><strong>Particle effects &amp; animations</strong> &mdash; juice that makes it feel good</li>
+          <li><strong>Performance optimization</strong> &mdash; profiling, batching, mobile-ready</li>
+          <li><strong>Git version control</strong> &mdash; branching, merging, GitHub, tagging releases &mdash; practiced every chapter until it's muscle memory</li>
+        </ul>
+      </section>
+
+      <!-- Prerequisites -->
+      <section style="margin: 3rem 0;">
+        <h2 style="border: none; margin-top: 0;">Prerequisites</h2>
+        <div class="callout info">
+          <div class="callout-title">&#8505;&#65039; You need</div>
+          <p><strong>A computer</strong> (Windows, Mac, or Linux) and <strong>an internet connection</strong> to download Unity. That's it. We assume zero prior experience with Unity, C#, or game development. Everything is taught from scratch.</p>
+        </div>
+      </section>
+
+      <!-- Chapter List -->
+      <section class="chapter-list-section">
+        <h2 style="border: none; margin-top: 0;">Course Chapters</h2>
+        <p>25 chapters across 6 parts. Each builds on the last. Follow them in order for the best experience.</p>
+
+        <!-- Part 1 -->
+        <div class="part-group">
+          <div class="part-title">Part 1 &mdash; Foundations</div>
+          <a href="chapters/01-welcome.html" class="chapter-card">
+            <div class="ch-number">01</div>
+            <div class="ch-info">
+              <h3>Welcome &amp; What We're Building</h3>
+              <p>Course overview, what an infinite runner is, and the production mindset.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/02-unity-setup.html" class="chapter-card">
+            <div class="ch-number">02</div>
+            <div class="ch-info">
+              <h3>Installing Unity &amp; Project Setup</h3>
+              <p>Download Unity Hub, install the editor, create your first project.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/03-editor-tour.html" class="chapter-card">
+            <div class="ch-number">03</div>
+            <div class="ch-info">
+              <h3>Unity Editor Tour</h3>
+              <p>Scene view, Game view, Inspector, Hierarchy &mdash; understand every panel.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/04-csharp-basics.html" class="chapter-card">
+            <div class="ch-number">04</div>
+            <div class="ch-info">
+              <h3>C# Crash Course for Unity</h3>
+              <p>Variables, methods, classes, MonoBehaviour lifecycle &mdash; everything you need.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/05-project-architecture.html" class="chapter-card">
+            <div class="ch-number">05</div>
+            <div class="ch-info">
+              <h3>Project Architecture &amp; Folder Structure</h3>
+              <p>Namespaces, assembly definitions, and the systems we'll build.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Part 2 -->
+        <div class="part-group">
+          <div class="part-title">Part 2 &mdash; Core Systems</div>
+          <a href="chapters/06-game-manager.html" class="chapter-card">
+            <div class="ch-number">06</div>
+            <div class="ch-info">
+              <h3>Game Manager &amp; State Machine</h3>
+              <p>Control game flow with a proper state machine pattern.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/07-event-system.html" class="chapter-card">
+            <div class="ch-number">07</div>
+            <div class="ch-info">
+              <h3>Event System</h3>
+              <p>Decouple your systems with ScriptableObject event channels.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/08-input-system.html" class="chapter-card">
+            <div class="ch-number">08</div>
+            <div class="ch-info">
+              <h3>Input System</h3>
+              <p>Unity's New Input System with keyboard and swipe support.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/09-player-controller.html" class="chapter-card">
+            <div class="ch-number">09</div>
+            <div class="ch-info">
+              <h3>Player Controller</h3>
+              <p>Lane-based movement, jumping, sliding, and ground detection.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/10-camera-system.html" class="chapter-card">
+            <div class="ch-number">10</div>
+            <div class="ch-info">
+              <h3>Camera System</h3>
+              <p>Cinemachine follow camera with smooth tracking and screen shake.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Part 3 -->
+        <div class="part-group">
+          <div class="part-title">Part 3 &mdash; World Generation</div>
+          <a href="chapters/11-chunk-system.html" class="chapter-card">
+            <div class="ch-number">11</div>
+            <div class="ch-info">
+              <h3>Tile / Chunk System</h3>
+              <p>Design modular, reusable world chunks with spawn points.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/12-object-pooling.html" class="chapter-card">
+            <div class="ch-number">12</div>
+            <div class="ch-info">
+              <h3>Object Pooling</h3>
+              <p>Generic pool system for zero-allocation spawning.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/13-world-generation.html" class="chapter-card">
+            <div class="ch-number">13</div>
+            <div class="ch-info">
+              <h3>Procedural World Generation</h3>
+              <p>Spawn, recycle, and manage chunks for infinite terrain.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/14-origin-shifting.html" class="chapter-card">
+            <div class="ch-number">14</div>
+            <div class="ch-info">
+              <h3>Origin Shifting</h3>
+              <p>Solve floating point precision for truly infinite worlds.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Part 4 -->
+        <div class="part-group">
+          <div class="part-title">Part 4 &mdash; Gameplay</div>
+          <a href="chapters/15-obstacles.html" class="chapter-card">
+            <div class="ch-number">15</div>
+            <div class="ch-info">
+              <h3>Obstacle System</h3>
+              <p>Obstacle types, patterns, placement, and collision handling.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/16-collectibles.html" class="chapter-card">
+            <div class="ch-number">16</div>
+            <div class="ch-info">
+              <h3>Collectibles &amp; Power-ups</h3>
+              <p>Coins, magnet, shield, score multiplier, and power-up manager.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/17-scoring.html" class="chapter-card">
+            <div class="ch-number">17</div>
+            <div class="ch-info">
+              <h3>Scoring System</h3>
+              <p>Distance and coin scoring with persistent high scores.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/18-difficulty.html" class="chapter-card">
+            <div class="ch-number">18</div>
+            <div class="ch-info">
+              <h3>Difficulty Progression</h3>
+              <p>Speed curves, obstacle scaling, and ScriptableObject configs.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Part 5 -->
+        <div class="part-group">
+          <div class="part-title">Part 5 &mdash; Polish</div>
+          <a href="chapters/19-ui-system.html" class="chapter-card">
+            <div class="ch-number">19</div>
+            <div class="ch-info">
+              <h3>UI System</h3>
+              <p>Main menu, HUD, pause screen, game over, and UI animations.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/20-audio.html" class="chapter-card">
+            <div class="ch-number">20</div>
+            <div class="ch-info">
+              <h3>Audio System</h3>
+              <p>Audio manager with music, SFX, pooling, and volume controls.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/21-particles.html" class="chapter-card">
+            <div class="ch-number">21</div>
+            <div class="ch-info">
+              <h3>Particle Effects</h3>
+              <p>Coin collect, death, speed lines, and trail effects.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/22-animation.html" class="chapter-card">
+            <div class="ch-number">22</div>
+            <div class="ch-info">
+              <h3>Animation System</h3>
+              <p>Animator controllers, blend trees, and animation events.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+
+        <!-- Part 6 -->
+        <div class="part-group">
+          <div class="part-title">Part 6 &mdash; Ship It</div>
+          <a href="chapters/23-save-system.html" class="chapter-card">
+            <div class="ch-number">23</div>
+            <div class="ch-info">
+              <h3>Save System</h3>
+              <p>PlayerPrefs, JSON serialization, saving scores and settings.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/24-optimization.html" class="chapter-card">
+            <div class="ch-number">24</div>
+            <div class="ch-info">
+              <h3>Performance &amp; Optimization</h3>
+              <p>Profiler, draw calls, LOD, memory management, mobile tips.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+          <a href="chapters/25-build-publish.html" class="chapter-card">
+            <div class="ch-number">25</div>
+            <div class="ch-info">
+              <h3>Building &amp; Publishing</h3>
+              <p>Build settings, platform configs, and publishing to stores.</p>
+            </div>
+            <span class="ch-arrow">&rarr;</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <p>Built with care. Learn game development the right way.</p>
+      </footer>
+
+    </div>
+  </main>
+
+</body>
+</html>

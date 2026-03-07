@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Save System - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link active"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 23</span>
+        <h1>Save System</h1>
+        <p class="chapter-desc">Persist high scores, player settings, and unlockable items across play sessions using JSON serialization and file I/O.</p>
+      </div>
+
+      <!-- SECTION: Why We Need Saving -->
+      <section>
+        <h2>Why We Need Saving</h2>
+        <p>Right now, every time the player closes the game, everything resets. Their high score? Gone. Collected coins? Gone. Volume settings? Gone. That is a terrible experience. Players expect their progress to persist, and a save system is what makes that happen.</p>
+        <p>In our infinite runner, we need to save:</p>
+        <ul>
+          <li><strong>High Score</strong> &mdash; The best distance or score the player has achieved.</li>
+          <li><strong>Total Coins</strong> &mdash; Lifetime coins collected (used as currency for unlocking items).</li>
+          <li><strong>Settings</strong> &mdash; Music volume, SFX volume, selected quality level.</li>
+          <li><strong>Unlocked Items</strong> &mdash; Which characters or themes the player has purchased.</li>
+          <li><strong>Statistics</strong> &mdash; Total games played, total distance run, etc.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: PlayerPrefs -->
+      <section>
+        <h2>PlayerPrefs: The Simple Approach</h2>
+        <p>Unity provides a built-in saving mechanism called <code>PlayerPrefs</code>. It stores key-value pairs of simple types (int, float, string).</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">PlayerPrefs Example</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// Saving a value
+PlayerPrefs.SetInt("HighScore", 1500);
+PlayerPrefs.SetFloat("MusicVolume", 0.8f);
+PlayerPrefs.SetString("PlayerName", "Runner42");
+PlayerPrefs.Save(); // Write to disk
+
+// Loading a value (second parameter is the default if the key does not exist)
+int highScore = PlayerPrefs.GetInt("HighScore", 0);
+float musicVolume = PlayerPrefs.GetFloat("MusicVolume", 1.0f);
+string playerName = PlayerPrefs.GetString("PlayerName", "Player");
+
+// Checking if a key exists
+if (PlayerPrefs.HasKey("HighScore"))
+{
+    Debug.Log("High score exists!");
+}
+
+// Deleting a key
+PlayerPrefs.DeleteKey("HighScore");
+
+// Deleting ALL saved data
+PlayerPrefs.DeleteAll();</code></pre>
+        </div>
+
+        <h3>Pros and Cons of PlayerPrefs</h3>
+        <table>
+          <thead>
+            <tr><th>Pros</th><th>Cons</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Extremely simple &mdash; one line to save, one to load</td><td>Only stores int, float, string &mdash; no lists, objects, or arrays</td></tr>
+            <tr><td>Works on all platforms</td><td>Stored in platform-specific locations (Windows Registry on Windows, plist on macOS) &mdash; hard to manage</td></tr>
+            <tr><td>Great for quick prototyping</td><td>Not secure &mdash; easily editable by players</td></tr>
+            <tr><td>No file management needed</td><td>No structure &mdash; all data is flat key-value pairs</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warning">
+          <div class="callout-title">When to Use PlayerPrefs</div>
+          <p>PlayerPrefs is fine for one or two simple values during prototyping. But for a production game with multiple data types (scores, settings, unlockables), it becomes unwieldy. You end up with dozens of string keys scattered across your codebase, no type safety, and no way to version or migrate your save format. We will use PlayerPrefs only for quick settings (like a "has seen tutorial" flag) and build a proper JSON-based system for everything else.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: JSON Serialization -->
+      <section>
+        <h2>JSON Serialization: The Production Approach</h2>
+        <p>For a real game, we serialize all save data into a <strong>JSON</strong> (JavaScript Object Notation) string and write it to a file. JSON is human-readable, easy to debug, and supported natively by Unity via <code>JsonUtility</code>.</p>
+
+        <h3>What Is JSON?</h3>
+        <p>JSON is a text format for storing structured data. Here is what our save data might look like:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">save_data.json</span><span class="lang-badge">JSON</span></div>
+          <pre><code>{
+    "highScore": 15230,
+    "totalCoinsCollected": 4820,
+    "gamesPlayed": 47,
+    "totalDistanceRun": 125600.5,
+    "musicVolume": 0.8,
+    "sfxVolume": 1.0,
+    "unlockedCharacters": ["default", "ninja", "robot"],
+    "selectedCharacter": "ninja",
+    "lastPlayedDate": "2026-03-07"
+}</code></pre>
+        </div>
+
+        <p>Every field is clearly named and easy to read. If a player reports a bug, you can ask them to send their save file and immediately understand their state.</p>
+
+        <h3>The SaveData Class</h3>
+        <p>We define a C# class that mirrors this JSON structure. Unity's <code>JsonUtility</code> can convert between C# objects and JSON strings automatically.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">SaveData.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace InfiniteRunner.Data
+{
+    /// &lt;summary&gt;
+    /// Contains all persistent data that is saved to disk.
+    /// This class is serialized to JSON by the SaveManager.
+    ///
+    /// IMPORTANT: All fields must be public (or have [SerializeField])
+    /// for JsonUtility to serialize them. We use public fields here
+    /// for simplicity since this is a pure data container.
+    /// &lt;/summary&gt;
+    [Serializable]
+    public class SaveData
+    {
+        // ─── Scores ─────────────────────────────────────────────
+        /// &lt;summary&gt;The highest score ever achieved.&lt;/summary&gt;
+        public int highScore;
+
+        /// &lt;summary&gt;Total coins collected across all games (lifetime).&lt;/summary&gt;
+        public int totalCoinsCollected;
+
+        /// &lt;summary&gt;Coins currently available to spend (not yet spent).&lt;/summary&gt;
+        public int currentCoins;
+
+        // ─── Statistics ─────────────────────────────────────────
+        /// &lt;summary&gt;Total number of games played.&lt;/summary&gt;
+        public int gamesPlayed;
+
+        /// &lt;summary&gt;Total distance run across all games (in world units).&lt;/summary&gt;
+        public float totalDistanceRun;
+
+        /// &lt;summary&gt;Longest single run distance.&lt;/summary&gt;
+        public float longestRun;
+
+        // ─── Settings ───────────────────────────────────────────
+        /// &lt;summary&gt;Music volume from 0 (muted) to 1 (full).&lt;/summary&gt;
+        public float musicVolume;
+
+        /// &lt;summary&gt;Sound effects volume from 0 to 1.&lt;/summary&gt;
+        public float sfxVolume;
+
+        /// &lt;summary&gt;Quality level index (0 = Low, 1 = Medium, 2 = High).&lt;/summary&gt;
+        public int qualityLevel;
+
+        // ─── Unlockables ────────────────────────────────────────
+        /// &lt;summary&gt;
+        /// List of unlocked character IDs. The player starts with "default".
+        /// New characters are added when purchased with coins.
+        /// &lt;/summary&gt;
+        public List&lt;string&gt; unlockedCharacters;
+
+        /// &lt;summary&gt;The currently selected character ID.&lt;/summary&gt;
+        public string selectedCharacter;
+
+        // ─── Meta ───────────────────────────────────────────────
+        /// &lt;summary&gt;
+        /// Save file version number. Used for migration when the
+        /// save format changes between game updates.
+        /// &lt;/summary&gt;
+        public int saveVersion;
+
+        /// &lt;summary&gt;ISO 8601 date string of when the save was last written.&lt;/summary&gt;
+        public string lastSaveDate;
+
+        // ─── Constructor (defaults for first-time players) ──────
+
+        /// &lt;summary&gt;
+        /// Creates a new SaveData with sensible defaults.
+        /// This is what first-time players start with.
+        /// &lt;/summary&gt;
+        public SaveData()
+        {
+            highScore = 0;
+            totalCoinsCollected = 0;
+            currentCoins = 0;
+
+            gamesPlayed = 0;
+            totalDistanceRun = 0f;
+            longestRun = 0f;
+
+            musicVolume = 1.0f;
+            sfxVolume = 1.0f;
+            qualityLevel = 2; // Default to High quality
+
+            unlockedCharacters = new List&lt;string&gt; { "default" };
+            selectedCharacter = "default";
+
+            saveVersion = 1;
+            lastSaveDate = DateTime.Now.ToString("yyyy-MM-dd");
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title">Why [Serializable]?</div>
+          <p>The <code>[Serializable]</code> attribute tells C# and Unity that this class can be converted to and from a data format (like JSON). Without it, <code>JsonUtility.ToJson()</code> will not see the fields. Also note that <code>JsonUtility</code> requires fields to be <strong>public</strong> or marked with <code>[SerializeField]</code>. Private fields are ignored.</p>
+        </div>
+
+        <div class="callout warning">
+          <div class="callout-title">JsonUtility Limitations</div>
+          <p>Unity's <code>JsonUtility</code> is fast but limited. It does not support dictionaries, polymorphism, or top-level arrays. For our use case (a single SaveData object with lists), it works perfectly. If you need more advanced JSON features in the future, consider the <strong>Newtonsoft.Json</strong> package (installable via Unity Package Manager under "com.unity.nuget.newtonsoft-json").</p>
+        </div>
+      </section>
+
+      <!-- SECTION: SaveManager -->
+      <section>
+        <h2>The SaveManager Script</h2>
+        <p>Now we build the manager that handles serialization, file I/O, and provides a clean API for the rest of the game to read and write save data.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">SaveManager.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using System.IO;
+using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Data
+{
+    /// &lt;summary&gt;
+    /// Manages saving and loading game data to/from a JSON file.
+    /// Access via SaveManager.Instance (Singleton).
+    ///
+    /// Usage:
+    ///   SaveManager.Instance.Data.highScore = 1500;
+    ///   SaveManager.Instance.Save();
+    ///
+    ///   int highScore = SaveManager.Instance.Data.highScore;
+    /// &lt;/summary&gt;
+    public class SaveManager : Singleton&lt;SaveManager&gt;
+    {
+        // ─── Constants ──────────────────────────────────────────
+        // The file name for our save data. Stored in Application.persistentDataPath.
+        private const string SAVE_FILE_NAME = "save_data.json";
+
+        // Current save format version. Increment this when you change SaveData fields.
+        private const int CURRENT_SAVE_VERSION = 1;
+
+        // ─── Public Properties ──────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// The current save data. Read and modify this directly, then call Save().
+        /// This is never null — if no save file exists, it holds default values.
+        /// &lt;/summary&gt;
+        public SaveData Data { get; private set; }
+
+        /// &lt;summary&gt;
+        /// Whether a save file exists on disk.
+        /// Useful for showing "Continue" vs "New Game" on the menu.
+        /// &lt;/summary&gt;
+        public bool SaveExists =&gt; File.Exists(GetSavePath());
+
+        // ─── Unity Lifecycle ────────────────────────────────────
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            // Load save data immediately on startup.
+            // If no save file exists, Data will be initialized with defaults.
+            Load();
+        }
+
+        private void OnEnable()
+        {
+            // Auto-save when the game ends
+            GameManager.Instance.OnGameStateChanged += HandleGameStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
+            }
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            // Auto-save when the app is backgrounded (important on mobile!)
+            // On Android/iOS, the OS can kill your app at any time after
+            // it goes to the background. Save immediately.
+            if (pauseStatus)
+            {
+                Save();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            // Auto-save when the application is closing
+            Save();
+        }
+
+        // ─── Public Methods ─────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Saves the current Data object to a JSON file on disk.
+        /// Call this after modifying Data (e.g., after a game over).
+        /// &lt;/summary&gt;
+        public void Save()
+        {
+            try
+            {
+                // Update the save metadata
+                Data.lastSaveDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                Data.saveVersion = CURRENT_SAVE_VERSION;
+
+                // Convert the SaveData object to a JSON string.
+                // The 'true' parameter enables pretty-printing (indented JSON).
+                // Set to 'false' in a shipping build to save file size.
+                string json = JsonUtility.ToJson(Data, true);
+
+                // Write the JSON string to a file.
+                // File.WriteAllText creates the file if it does not exist,
+                // or overwrites it if it does.
+                string path = GetSavePath();
+                File.WriteAllText(path, json);
+
+                Debug.Log($"[SaveManager] Game saved to: {path}");
+            }
+            catch (Exception e)
+            {
+                // Something went wrong (disk full, permissions, etc.)
+                // Log the error but do not crash the game.
+                Debug.LogError(
+                    $"[SaveManager] Failed to save game data: {e.Message}\n" +
+                    $"Stack trace: {e.StackTrace}");
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Loads save data from the JSON file on disk.
+        /// If no file exists, creates a new SaveData with defaults.
+        /// If the file is corrupted, creates a new SaveData and logs a warning.
+        /// &lt;/summary&gt;
+        public void Load()
+        {
+            string path = GetSavePath();
+
+            // Case 1: No save file exists (first-time player)
+            if (!File.Exists(path))
+            {
+                Debug.Log("[SaveManager] No save file found. Creating defaults.");
+                Data = new SaveData();
+                return;
+            }
+
+            try
+            {
+                // Read the entire file content as a string
+                string json = File.ReadAllText(path);
+
+                // Validate that we actually got content
+                if (string.IsNullOrWhiteSpace(json))
+                {
+                    Debug.LogWarning(
+                        "[SaveManager] Save file is empty. Creating defaults.");
+                    Data = new SaveData();
+                    return;
+                }
+
+                // Deserialize the JSON string back into a SaveData object
+                Data = JsonUtility.FromJson&lt;SaveData&gt;(json);
+
+                // Validate that deserialization succeeded
+                if (Data == null)
+                {
+                    Debug.LogWarning(
+                        "[SaveManager] Deserialization returned null. " +
+                        "Creating defaults.");
+                    Data = new SaveData();
+                    return;
+                }
+
+                // Check for save version migration
+                if (Data.saveVersion &lt; CURRENT_SAVE_VERSION)
+                {
+                    MigrateSaveData(Data);
+                }
+
+                // Ensure lists are not null (can happen with old save files
+                // that predate the list being added)
+                if (Data.unlockedCharacters == null)
+                {
+                    Data.unlockedCharacters =
+                        new System.Collections.Generic.List&lt;string&gt; { "default" };
+                }
+
+                Debug.Log(
+                    $"[SaveManager] Save data loaded. " +
+                    $"High score: {Data.highScore}, " +
+                    $"Games played: {Data.gamesPlayed}");
+            }
+            catch (Exception e)
+            {
+                // The file exists but is corrupted or unreadable
+                Debug.LogError(
+                    $"[SaveManager] Failed to load save data: {e.Message}\n" +
+                    "Creating fresh save data. Old file will be overwritten on next save.");
+                Data = new SaveData();
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Deletes the save file from disk and resets Data to defaults.
+        /// Use this for a "Reset Progress" button in settings.
+        /// &lt;/summary&gt;
+        public void DeleteSave()
+        {
+            try
+            {
+                string path = GetSavePath();
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    Debug.Log("[SaveManager] Save file deleted.");
+                }
+
+                // Reset in-memory data to defaults
+                Data = new SaveData();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(
+                    $"[SaveManager] Failed to delete save file: {e.Message}");
+            }
+        }
+
+        // ─── Convenience Methods ────────────────────────────────
+        // These wrap common save operations so callers do not need
+        // to manipulate Data fields directly.
+
+        /// &lt;summary&gt;
+        /// Records the result of a completed game run.
+        /// Updates high score, stats, and coins, then saves.
+        /// &lt;/summary&gt;
+        /// &lt;param name="score"&gt;The score achieved this run.&lt;/param&gt;
+        /// &lt;param name="distance"&gt;The distance traveled this run.&lt;/param&gt;
+        /// &lt;param name="coinsCollected"&gt;Coins collected this run.&lt;/param&gt;
+        public void RecordGameResult(int score, float distance, int coinsCollected)
+        {
+            // Update high score if this run was the best
+            if (score &gt; Data.highScore)
+            {
+                Data.highScore = score;
+                Debug.Log($"[SaveManager] New high score: {score}!");
+            }
+
+            // Update longest run
+            if (distance &gt; Data.longestRun)
+            {
+                Data.longestRun = distance;
+            }
+
+            // Update cumulative statistics
+            Data.gamesPlayed++;
+            Data.totalDistanceRun += distance;
+            Data.totalCoinsCollected += coinsCollected;
+            Data.currentCoins += coinsCollected;
+
+            // Save to disk immediately
+            Save();
+        }
+
+        /// &lt;summary&gt;
+        /// Attempts to spend coins on an unlock. Returns true if successful.
+        /// &lt;/summary&gt;
+        /// &lt;param name="characterId"&gt;The ID of the character to unlock.&lt;/param&gt;
+        /// &lt;param name="cost"&gt;The coin cost.&lt;/param&gt;
+        /// &lt;returns&gt;True if the purchase succeeded, false if not enough coins.&lt;/returns&gt;
+        public bool TryPurchaseCharacter(string characterId, int cost)
+        {
+            // Check if already unlocked
+            if (Data.unlockedCharacters.Contains(characterId))
+            {
+                Debug.LogWarning(
+                    $"[SaveManager] Character '{characterId}' is already unlocked.");
+                return false;
+            }
+
+            // Check if the player can afford it
+            if (Data.currentCoins &lt; cost)
+            {
+                Debug.Log(
+                    $"[SaveManager] Not enough coins. " +
+                    $"Need {cost}, have {Data.currentCoins}.");
+                return false;
+            }
+
+            // Deduct coins and unlock
+            Data.currentCoins -= cost;
+            Data.unlockedCharacters.Add(characterId);
+
+            Save();
+            Debug.Log($"[SaveManager] Unlocked character: {characterId}");
+            return true;
+        }
+
+        /// &lt;summary&gt;
+        /// Updates audio settings and saves.
+        /// &lt;/summary&gt;
+        public void SaveAudioSettings(float musicVolume, float sfxVolume)
+        {
+            Data.musicVolume = Mathf.Clamp01(musicVolume);
+            Data.sfxVolume = Mathf.Clamp01(sfxVolume);
+            Save();
+        }
+
+        // ─── Private Helpers ────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Returns the full file path for the save file.
+        /// Application.persistentDataPath is a platform-safe directory:
+        ///   Windows: C:/Users/USERNAME/AppData/LocalLow/CompanyName/ProductName/
+        ///   macOS:   ~/Library/Application Support/CompanyName/ProductName/
+        ///   Android: /data/data/com.company.product/files/
+        ///   iOS:     /var/mobile/.../Documents/
+        /// &lt;/summary&gt;
+        private string GetSavePath()
+        {
+            return Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME);
+        }
+
+        /// &lt;summary&gt;
+        /// Migrates save data from an older version to the current version.
+        /// Called when the loaded save file has a lower version number than expected.
+        ///
+        /// Example: If we add a new field in version 2, we set its default value here
+        /// for players upgrading from version 1.
+        /// &lt;/summary&gt;
+        private void MigrateSaveData(SaveData data)
+        {
+            Debug.Log(
+                $"[SaveManager] Migrating save from version {data.saveVersion} " +
+                $"to version {CURRENT_SAVE_VERSION}.");
+
+            // Example migration: version 1 -> version 2
+            // if (data.saveVersion < 2)
+            // {
+            //     data.newFieldAddedInV2 = defaultValue;
+            //     data.saveVersion = 2;
+            // }
+
+            // After all migrations, set to current version
+            data.saveVersion = CURRENT_SAVE_VERSION;
+        }
+
+        /// &lt;summary&gt;
+        /// Handles game state changes. Auto-saves on game over.
+        /// &lt;/summary&gt;
+        private void HandleGameStateChanged(GameState newState)
+        {
+            if (newState == GameState.GameOver)
+            {
+                // The actual score recording should be done by the scoring
+                // system calling RecordGameResult(). This is a safety net
+                // to ensure data is persisted even if something goes wrong.
+                Save();
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Script Breakdown</h3>
+        <ul>
+          <li><strong><code>Application.persistentDataPath</code></strong> &mdash; This is the correct directory for save files on every platform. On Windows, it is in AppData. On Android, it is in your app's private storage. Unity guarantees this path exists and is writable.</li>
+          <li><strong><code>JsonUtility.ToJson()</code></strong> &mdash; Converts a C# object to a JSON string. The <code>true</code> parameter makes it pretty-printed (readable). Use <code>false</code> in shipping builds to reduce file size.</li>
+          <li><strong><code>JsonUtility.FromJson&lt;T&gt;()</code></strong> &mdash; Converts a JSON string back to a C# object. It matches JSON keys to field names.</li>
+          <li><strong>Error Handling</strong> &mdash; Every I/O operation is wrapped in try-catch. Disk operations can fail for many reasons (disk full, permissions, corrupted file). We always fall back to default data rather than crashing.</li>
+          <li><strong>Auto-Save</strong> &mdash; We save on game over, on application pause (critical for mobile!), and on application quit.</li>
+          <li><strong>Version Migration</strong> &mdash; When you update your game and add new fields to <code>SaveData</code>, old save files will not have those fields. The <code>MigrateSaveData()</code> method detects old versions and sets default values for new fields.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: First-Time Players -->
+      <section>
+        <h2>Handling First-Time Players</h2>
+        <p>When someone launches your game for the first time, there is no save file. Our system handles this gracefully:</p>
+
+        <ol>
+          <li><code>Load()</code> checks if the file exists with <code>File.Exists()</code>.</li>
+          <li>If the file does not exist, it creates a new <code>SaveData</code> object with the default constructor.</li>
+          <li>The default constructor sets sensible initial values: score 0, full volume, one unlocked character ("default").</li>
+          <li>The first save file is created when the game auto-saves (on first game over, pause, or quit).</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Detecting First Launch</div>
+          <p>You can check if this is the player's first time by looking at <code>Data.gamesPlayed == 0</code>. Use this to show a tutorial, skip the main menu and go straight to gameplay, or display a "Welcome" message. This is more reliable than a separate PlayerPrefs flag.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Corrupted Files -->
+      <section>
+        <h2>Handling Corrupted Save Files</h2>
+        <p>Save files can get corrupted if the game crashes mid-save, the device runs out of storage, or the player manually edits the file and introduces invalid JSON. Our system handles all of these cases:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Error Handling Flow</span><span class="lang-badge">Pseudocode</span></div>
+          <pre><code>Load()
+  |
+  +-- File does not exist?
+  |     -> Create default SaveData (first-time player)
+  |
+  +-- File exists but is empty?
+  |     -> Create default SaveData, log warning
+  |
+  +-- File exists but JSON is invalid?
+  |     -> Catch exception, create default SaveData, log error
+  |
+  +-- File exists, JSON is valid, but SaveData is null?
+  |     -> Create default SaveData, log warning
+  |
+  +-- File exists, JSON is valid, data loaded successfully
+        -> Use loaded data
+        -> Check saveVersion for migration</code></pre>
+        </div>
+
+        <p>The key principle is: <strong>never crash, always fall back to defaults</strong>. Losing save data is unfortunate, but crashing the game is worse. The player can always play again and earn their progress back.</p>
+
+        <div class="callout danger">
+          <div class="callout-title">Backup Strategy (Advanced)</div>
+          <p>For a commercial game, consider keeping a backup save file. Before writing the main save, copy the existing file to <code>save_data.backup.json</code>. If the main file is corrupted, try loading the backup. This adds complexity but protects against data loss.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: What NOT to Save -->
+      <section>
+        <h2>What NOT to Save</h2>
+        <p>Not everything should go in the save file. Here is a guideline:</p>
+
+        <table>
+          <thead>
+            <tr><th>Save</th><th>Do NOT Save</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>High scores and statistics</td><td>Current score during a run (that is runtime state)</td></tr>
+            <tr><td>Total coins (lifetime + spendable)</td><td>Current run coins (reset each run)</td></tr>
+            <tr><td>Audio/quality settings</td><td>Current game state (Menu, Playing, Paused)</td></tr>
+            <tr><td>Unlocked items</td><td>Positions of obstacles or world chunks</td></tr>
+            <tr><td>Selected character/theme</td><td>Temporary UI state (which panel is open)</td></tr>
+          </tbody>
+        </table>
+
+        <p>The rule of thumb: save data that must survive between play sessions. Do not save data that is regenerated each time the game starts.</p>
+      </section>
+
+      <!-- SECTION: Security -->
+      <section>
+        <h2>Security Considerations</h2>
+        <p>Our save file is plain text JSON. Any player who finds the file can open it in a text editor and change their high score to 999999 or give themselves infinite coins. For a single-player mobile game, this is usually acceptable &mdash; the player is only cheating themselves.</p>
+
+        <p>If you need basic tamper protection (e.g., for leaderboards), here are some options:</p>
+
+        <ul>
+          <li><strong>Simple hash check:</strong> When saving, compute a hash of the JSON string plus a secret salt, and store it alongside the data. On load, recompute the hash and compare. If they do not match, the file was tampered with.</li>
+          <li><strong>Encryption:</strong> Encrypt the JSON string using AES before writing to disk. Decrypt on load. This prevents casual editing but is not uncrackable.</li>
+          <li><strong>Server-side validation:</strong> For competitive leaderboards, validate scores on a server. The server can reject impossible scores (e.g., 1 million points after 2 seconds of play time).</li>
+        </ul>
+
+        <div class="callout info">
+          <div class="callout-title">Pragmatic Security</div>
+          <p>Do not over-engineer save security for a tutorial project. Plain JSON is fine for learning. If you ship a competitive game with leaderboards, add server-side validation. Client-side encryption is a speed bump, not a wall &mdash; determined cheaters will always find a way.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Using the Save System -->
+      <section>
+        <h2>Using the Save System in Practice</h2>
+        <p>Here is how other scripts in your game interact with the SaveManager:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Usage Examples</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">// ─── In your ScoreManager (end of a game run) ──────────────
+public void OnGameOver()
+{
+    int finalScore = CalculateFinalScore();
+    float distance = GetDistanceTraveled();
+    int coins = GetCoinsCollectedThisRun();
+
+    // Record the result — this updates high score, stats, and saves
+    SaveManager.Instance.RecordGameResult(finalScore, distance, coins);
+}
+
+// ─── In your UI (displaying high score on main menu) ────────
+public void ShowMainMenu()
+{
+    int highScore = SaveManager.Instance.Data.highScore;
+    int totalCoins = SaveManager.Instance.Data.currentCoins;
+
+    highScoreText.text = $"Best: {highScore}";
+    coinText.text = $"Coins: {totalCoins}";
+}
+
+// ─── In your Settings panel (audio sliders) ─────────────────
+public void OnMusicVolumeChanged(float value)
+{
+    // Update the audio mixer (see Chapter 20)
+    // AudioManager.Instance.SetMusicVolume(value);
+
+    // Persist the setting
+    SaveManager.Instance.SaveAudioSettings(value, SaveManager.Instance.Data.sfxVolume);
+}
+
+// ─── In your Shop screen (buying a character) ───────────────
+public void OnBuyCharacterClicked(string characterId, int cost)
+{
+    bool success = SaveManager.Instance.TryPurchaseCharacter(characterId, cost);
+
+    if (success)
+    {
+        // Update UI to show the character as unlocked
+        RefreshShopUI();
+    }
+    else
+    {
+        // Show "Not enough coins" message
+        ShowNotEnoughCoinsPopup();
+    }
+}
+
+// ─── In your Settings panel (reset progress button) ─────────
+public void OnResetProgressClicked()
+{
+    // Show a confirmation dialog first!
+    // "Are you sure? This cannot be undone."
+    SaveManager.Instance.DeleteSave();
+    // Reload the game or return to main menu
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Setting Up in Scene -->
+      <section>
+        <h2>Setting Up in the Scene</h2>
+        <ol class="steps">
+          <li>Create an empty GameObject named <code>[SaveManager]</code>.</li>
+          <li>Attach the <code>SaveManager</code> script. It inherits from Singleton, so it will persist across scenes.</li>
+          <li>Press Play and check the Console &mdash; you should see either "No save file found. Creating defaults." or "Save data loaded." with the high score.</li>
+          <li>To find the save file on disk, add a temporary <code>Debug.Log(Application.persistentDataPath)</code> to see the path. Navigate there and you will find <code>save_data.json</code> after the first save.</li>
+        </ol>
+      </section>
+
+      <!-- SECTION: Project Files -->
+      <section>
+        <h2>Project Files</h2>
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">Project Structure</span><span class="lang-badge">Folder</span></div>
+          <pre><code>Assets/
+  Scripts/
+    Data/
+      SaveData.cs          &lt;-- The data container class
+      SaveManager.cs       &lt;-- The save/load manager (Singleton)</code></pre>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <p>In this chapter, we created a complete save system:</p>
+        <ul>
+          <li>A <strong>SaveData</strong> class that holds all persistent data &mdash; scores, stats, settings, and unlockables &mdash; with sensible defaults for first-time players.</li>
+          <li>A <strong>SaveManager</strong> Singleton that serializes SaveData to JSON and writes it to <code>Application.persistentDataPath</code>, with full error handling for corrupted or missing files.</li>
+          <li><strong>Auto-save</strong> on game over, app pause, and app quit.</li>
+          <li><strong>Version migration</strong> to handle save format changes between game updates.</li>
+          <li><strong>Convenience methods</strong> like <code>RecordGameResult()</code> and <code>TryPurchaseCharacter()</code> that encapsulate common operations.</li>
+        </ul>
+        <p>In the next chapter, we will focus on <strong>performance and optimization</strong> &mdash; using the Unity Profiler to find bottlenecks, reducing draw calls, eliminating garbage collection spikes, and ensuring our game runs at a smooth 60 FPS on mobile devices.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>The save system persists player data. Let's persist our code too.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add save system with JSON serialization"
+git push</code></pre>
+        </div>
+        <p>Almost done. Three more chapters.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="22-animation.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Animation</span></a>
+        <a href="24-optimization.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Optimization</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

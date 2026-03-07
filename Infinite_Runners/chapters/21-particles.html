@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Effects - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link active"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 21</span>
+        <h1>Particle Effects</h1>
+        <p class="chapter-desc">Add visual "juice" to your game with particle effects &mdash; coin bursts, crash explosions, speed lines, and player trails that make every interaction feel satisfying.</p>
+      </div>
+
+      <!-- SECTION: Why Particles Matter -->
+      <section>
+        <h2>Why Particles Matter</h2>
+        <p>Play any top-tier mobile game &mdash; Subway Surfers, Temple Run, Crossy Road &mdash; and pay attention to what happens when you collect a coin. There is a satisfying burst of sparkles. When you crash, debris flies everywhere. When you are running fast, streaks rush past the camera. These are <strong>particle effects</strong>, and they are a massive part of what game designers call "juice" or "game feel."</p>
+        <p>Without particles, your game feels flat. A coin disappears and the score goes up &mdash; functional, but boring. With particles, the coin explodes into a shower of gold sparkles, and the player's brain gets a tiny dopamine hit. That feedback loop is what keeps players coming back.</p>
+
+        <div class="callout info">
+          <div class="callout-title">What Is "Juice"?</div>
+          <p>"Juice" is a game design term for all the little effects that make a game feel good &mdash; screen shakes, particle bursts, sound effects, animations, color flashes. Individually, each is subtle. Together, they transform a prototype into a polished product. Particles are one of the most impactful forms of juice because they are highly visual and relatively easy to implement.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Unity Particle System Basics -->
+      <section>
+        <h2>Unity Particle System Basics</h2>
+        <p>Unity has a powerful built-in <strong>Particle System</strong> component (sometimes called "Shuriken"). A Particle System emits many small sprites or meshes (called "particles") that move, change color, shrink, and fade over time. By tweaking a handful of settings, you can create fire, smoke, sparks, rain, magic spells &mdash; or in our case, coin bursts and crash effects.</p>
+
+        <h3>Creating Your First Particle System</h3>
+        <ol class="steps">
+          <li>In the Hierarchy window, right-click and select <strong>Effects &gt; Particle System</strong>.</li>
+          <li>Unity creates a new GameObject with a Particle System component. You will immediately see white particles spraying upward in the Scene view.</li>
+          <li>Select the Particle System object to see its Inspector &mdash; there are many modules listed on the left side.</li>
+        </ol>
+
+        <h3>Key Modules Explained</h3>
+        <p>The Particle System has dozens of modules, but we only need a handful for our infinite runner. Here are the ones that matter most:</p>
+
+        <table>
+          <thead>
+            <tr><th>Module</th><th>What It Controls</th><th>Key Settings</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Main</strong></td><td>Overall behavior &mdash; duration, looping, start lifetime, start speed, start size, start color, gravity.</td><td>Duration, Start Lifetime, Start Speed, Start Size, Start Color, Max Particles</td></tr>
+            <tr><td><strong>Emission</strong></td><td>How many particles are emitted and when. "Rate over Time" for continuous effects, "Bursts" for one-shot explosions.</td><td>Rate over Time, Bursts (Count, Time)</td></tr>
+            <tr><td><strong>Shape</strong></td><td>The shape of the emitter &mdash; sphere, cone, box, etc. Controls the initial direction and spread of particles.</td><td>Shape type, Radius, Angle</td></tr>
+            <tr><td><strong>Color over Lifetime</strong></td><td>Changes particle color as it ages. Great for fading out (set alpha to 0 at the end).</td><td>Gradient editor</td></tr>
+            <tr><td><strong>Size over Lifetime</strong></td><td>Changes particle size as it ages. Shrinking to zero before death looks clean.</td><td>Curve editor</td></tr>
+            <tr><td><strong>Renderer</strong></td><td>How particles are drawn &mdash; billboard (always facing camera), stretched billboard, mesh.</td><td>Render Mode, Material</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout tip">
+          <div class="callout-title">Looping vs. One-Shot</div>
+          <p>For continuous effects like speed lines or trails, set <strong>Looping</strong> to true. For one-shot effects like a coin burst or crash explosion, uncheck <strong>Looping</strong> and set <strong>Play On Awake</strong> to false &mdash; you will trigger them from code using <code>Play()</code>. Also set <strong>Stop Action</strong> to "Disable" so the system automatically deactivates when it finishes, making it ready to be returned to a pool.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Coin Collect Effect -->
+      <section>
+        <h2>Coin Collect Effect</h2>
+        <p>When the player collects a coin, we want a satisfying burst of gold sparkles at the coin's position. This is a classic "one-shot" particle effect.</p>
+
+        <h3>Step-by-Step Inspector Setup</h3>
+        <ol class="steps">
+          <li>Create a new Particle System: right-click in the Hierarchy &gt; <strong>Effects &gt; Particle System</strong>. Name it <code>CoinCollectVFX</code>.</li>
+          <li>
+            <strong>Main Module:</strong>
+            <ul>
+              <li><strong>Duration:</strong> 0.5</li>
+              <li><strong>Looping:</strong> Unchecked (one-shot)</li>
+              <li><strong>Start Lifetime:</strong> 0.3 to 0.6 (random between two constants)</li>
+              <li><strong>Start Speed:</strong> 3 to 6 (random between two constants)</li>
+              <li><strong>Start Size:</strong> 0.1 to 0.25 (random between two constants)</li>
+              <li><strong>Start Color:</strong> Gold/yellow (e.g., #FFD700)</li>
+              <li><strong>Simulation Space:</strong> World (so particles stay in place as the player moves away)</li>
+              <li><strong>Play On Awake:</strong> Unchecked</li>
+              <li><strong>Stop Action:</strong> Disable</li>
+              <li><strong>Max Particles:</strong> 30</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Emission Module:</strong>
+            <ul>
+              <li><strong>Rate over Time:</strong> 0 (we do not want continuous emission)</li>
+              <li>Click the <strong>+</strong> under Bursts to add a burst</li>
+              <li><strong>Time:</strong> 0, <strong>Count:</strong> 20, <strong>Cycles:</strong> 1</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Shape Module:</strong>
+            <ul>
+              <li><strong>Shape:</strong> Sphere</li>
+              <li><strong>Radius:</strong> 0.3</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Color over Lifetime:</strong> Enable this module. Set a gradient from full-opacity gold on the left to zero-opacity gold on the right. This makes particles fade out before they die.</li>
+          <li>
+            <strong>Size over Lifetime:</strong> Enable this module. Set the curve to start at 1.0 and decrease to 0.0. This makes particles shrink as they age.</li>
+          <li>
+            <strong>Renderer Module:</strong>
+            <ul>
+              <li><strong>Render Mode:</strong> Billboard</li>
+              <li><strong>Material:</strong> Use the Default-Particle material, or create a simple unlit particle material</li>
+            </ul>
+          </li>
+          <li>Drag <code>CoinCollectVFX</code> into your <code>Assets/Prefabs/VFX/</code> folder to create a prefab. Delete the instance from the scene.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Random Between Two Constants</div>
+          <p>For fields like Start Lifetime and Start Speed, click the small dropdown arrow next to the value and select <strong>Random Between Two Constants</strong>. This gives each particle a slightly different value, making the effect look more natural and less mechanical.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Death/Crash Effect -->
+      <section>
+        <h2>Death / Crash Effect</h2>
+        <p>When the player crashes into an obstacle, we want a dramatic explosion of particles &mdash; bigger, more numerous, and more colorful than the coin effect.</p>
+
+        <h3>Inspector Setup</h3>
+        <ol class="steps">
+          <li>Create a new Particle System and name it <code>CrashVFX</code>.</li>
+          <li>
+            <strong>Main Module:</strong>
+            <ul>
+              <li><strong>Duration:</strong> 1.0</li>
+              <li><strong>Looping:</strong> Unchecked</li>
+              <li><strong>Start Lifetime:</strong> 0.5 to 1.0</li>
+              <li><strong>Start Speed:</strong> 5 to 10</li>
+              <li><strong>Start Size:</strong> 0.2 to 0.5</li>
+              <li><strong>Start Color:</strong> Random between orange (#FF6600) and red (#FF0000)</li>
+              <li><strong>Gravity Modifier:</strong> 1.0 (particles fall after exploding outward)</li>
+              <li><strong>Simulation Space:</strong> World</li>
+              <li><strong>Play On Awake:</strong> Unchecked</li>
+              <li><strong>Stop Action:</strong> Disable</li>
+              <li><strong>Max Particles:</strong> 60</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Emission Module:</strong>
+            <ul>
+              <li><strong>Rate over Time:</strong> 0</li>
+              <li>Add a burst: <strong>Time:</strong> 0, <strong>Count:</strong> 40, <strong>Cycles:</strong> 1</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Shape Module:</strong>
+            <ul>
+              <li><strong>Shape:</strong> Sphere</li>
+              <li><strong>Radius:</strong> 0.5</li>
+            </ul>
+          </li>
+          <li><strong>Color over Lifetime:</strong> Gradient from orange (full opacity) to dark red (zero opacity).</li>
+          <li><strong>Size over Lifetime:</strong> Curve from 1.0 to 0.0.</li>
+          <li>Save as a prefab in <code>Assets/Prefabs/VFX/</code>.</li>
+        </ol>
+
+        <div class="callout info">
+          <div class="callout-title">Gravity Modifier</div>
+          <p>Setting <strong>Gravity Modifier</strong> to 1.0 means particles are affected by Unity's gravity. After the initial burst pushes them outward, they arc downward and fall &mdash; exactly like real debris would. For the coin effect, we left gravity at 0 so the sparkles float freely. This subtle difference makes each effect feel distinct.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Speed Lines Effect -->
+      <section>
+        <h2>Speed Lines Effect</h2>
+        <p>Speed lines are stretched particles that fly past the camera to convey a sense of velocity. As the player runs faster, more lines appear and they move faster. This is a <strong>looping</strong> effect attached to the camera.</p>
+
+        <h3>Inspector Setup</h3>
+        <ol class="steps">
+          <li>Create a new Particle System and name it <code>SpeedLinesVFX</code>.</li>
+          <li>
+            <strong>Main Module:</strong>
+            <ul>
+              <li><strong>Duration:</strong> 1.0</li>
+              <li><strong>Looping:</strong> Checked (continuous effect)</li>
+              <li><strong>Start Lifetime:</strong> 0.3 to 0.5</li>
+              <li><strong>Start Speed:</strong> 20 to 40</li>
+              <li><strong>Start Size:</strong> 0.02 to 0.05</li>
+              <li><strong>Start Color:</strong> White with slight transparency (alpha ~180)</li>
+              <li><strong>Simulation Space:</strong> Local</li>
+              <li><strong>Play On Awake:</strong> Unchecked</li>
+              <li><strong>Max Particles:</strong> 100</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Emission Module:</strong>
+            <ul>
+              <li><strong>Rate over Time:</strong> 30 (we will adjust this from code based on speed)</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Shape Module:</strong>
+            <ul>
+              <li><strong>Shape:</strong> Box</li>
+              <li><strong>Scale:</strong> (4, 3, 0) &mdash; wide and tall rectangle in front of the camera</li>
+              <li><strong>Position:</strong> (0, 0, 10) &mdash; spawn 10 units ahead of the camera</li>
+            </ul>
+          </li>
+          <li>
+            <strong>Renderer Module:</strong>
+            <ul>
+              <li><strong>Render Mode:</strong> Stretched Billboard</li>
+              <li><strong>Speed Scale:</strong> 0.5 (stretches particles in the direction of travel)</li>
+              <li><strong>Length Scale:</strong> 5 (makes them long streaks)</li>
+            </ul>
+          </li>
+          <li><strong>Color over Lifetime:</strong> White to transparent white.</li>
+          <li>Make this a child of your Main Camera object, or position it in code relative to the camera.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Stretched Billboard</div>
+          <p>The <strong>Stretched Billboard</strong> render mode elongates particles along their direction of movement. Combined with a high <strong>Length Scale</strong>, particles become thin streaks that look like motion blur lines. This is the standard technique used in racing games and runners to convey speed.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Trail Effect -->
+      <section>
+        <h2>Trail Effect on Player</h2>
+        <p>A subtle trail behind the player adds visual flair and reinforces the sense of motion. You can achieve this with either a <strong>Trail Renderer</strong> component or a particle system with trails. We will use a Trail Renderer because it is simpler and more performant for this use case.</p>
+
+        <h3>Setting Up a Trail Renderer</h3>
+        <ol class="steps">
+          <li>Select your Player GameObject.</li>
+          <li>Create a child empty GameObject named <code>TrailPoint</code>. Position it slightly behind and below the player (e.g., (0, 0.1, -0.5)).</li>
+          <li>Add a <strong>Trail Renderer</strong> component to <code>TrailPoint</code>.</li>
+          <li>
+            <strong>Configure the Trail Renderer:</strong>
+            <ul>
+              <li><strong>Time:</strong> 0.3 (how long the trail lingers, in seconds)</li>
+              <li><strong>Width Curve:</strong> Start at 0.3, end at 0 (trail tapers from wide to nothing)</li>
+              <li><strong>Color Gradient:</strong> Start with a bright color (e.g., cyan #00FFFF at full opacity), end fully transparent</li>
+              <li><strong>Material:</strong> Create a simple unlit material with an additive or alpha-blended shader</li>
+              <li><strong>Min Vertex Distance:</strong> 0.1 (lower values = smoother trail, but more vertices)</li>
+              <li><strong>Corner Vertices:</strong> 3</li>
+              <li><strong>End Cap Vertices:</strong> 3</li>
+            </ul>
+          </li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Trail Renderer Gotcha</div>
+          <p>If you instantiate or reposition a Trail Renderer, it can draw a streak from the old position to the new one. To prevent this, call <code>trailRenderer.Clear()</code> immediately after teleporting or respawning the player. Otherwise, you will see an ugly line stretching across the entire screen.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: ParticleManager.cs -->
+      <section>
+        <h2>The ParticleManager Script</h2>
+        <p>Now let us build the system that manages all our particle effects. The <code>ParticleManager</code> uses <strong>object pooling</strong> (which we built in Chapter 12) to avoid Instantiate/Destroy overhead. It provides simple public methods like <code>PlayCoinCollect(position)</code> that any script can call.</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">ParticleManager.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.VFX
+{
+    /// &lt;summary&gt;
+    /// Manages all particle effects in the game.
+    /// Pools particle system instances to avoid garbage collection spikes.
+    /// Access via ParticleManager.Instance.
+    /// &lt;/summary&gt;
+    public class ParticleManager : Singleton&lt;ParticleManager&gt;
+    {
+        // ─── Inspector Fields ──────────────────────────────────
+        [Header("Particle Prefabs")]
+        [Tooltip("Burst of gold sparkles when collecting a coin.")]
+        [SerializeField] private ParticleSystem coinCollectPrefab;
+
+        [Tooltip("Explosion of debris when the player crashes.")]
+        [SerializeField] private ParticleSystem crashPrefab;
+
+        [Tooltip("Stretched speed lines attached to the camera.")]
+        [SerializeField] private ParticleSystem speedLinesPrefab;
+
+        [Header("Pool Settings")]
+        [Tooltip("How many of each effect to pre-create.")]
+        [SerializeField] private int poolSizePerEffect = 5;
+
+        // ─── Private Fields ────────────────────────────────────
+        // Each effect type has its own pool (a queue of inactive instances)
+        private Dictionary&lt;string, Queue&lt;ParticleSystem&gt;&gt; _pools;
+
+        // Reference to the active speed lines instance (only one at a time)
+        private ParticleSystem _activeSpeedLines;
+
+        // Parent transform to keep the Hierarchy tidy
+        private Transform _poolParent;
+
+        // ─── Unity Lifecycle ────────────────────────────────────
+
+        protected override void Awake()
+        {
+            base.Awake();
+            InitializePools();
+        }
+
+        // ─── Pool Initialization ────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Creates pools for each particle prefab.
+        /// Pre-instantiates instances so they are ready to use at runtime.
+        /// &lt;/summary&gt;
+        private void InitializePools()
+        {
+            _pools = new Dictionary&lt;string, Queue&lt;ParticleSystem&gt;&gt;();
+
+            // Create a parent object to keep pooled particles organized
+            _poolParent = new GameObject("[ParticlePools]").transform;
+            _poolParent.SetParent(transform);
+
+            // Create pools for each effect type
+            if (coinCollectPrefab != null)
+            {
+                CreatePool(coinCollectPrefab, poolSizePerEffect);
+            }
+
+            if (crashPrefab != null)
+            {
+                CreatePool(crashPrefab, poolSizePerEffect);
+            }
+
+            // Speed lines are a single persistent instance, not pooled
+            if (speedLinesPrefab != null)
+            {
+                _activeSpeedLines = Instantiate(speedLinesPrefab, _poolParent);
+                _activeSpeedLines.gameObject.SetActive(false);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Creates a pool of inactive particle system instances for a given prefab.
+        /// &lt;/summary&gt;
+        /// &lt;param name="prefab"&gt;The particle system prefab to pool.&lt;/param&gt;
+        /// &lt;param name="count"&gt;How many instances to pre-create.&lt;/param&gt;
+        private void CreatePool(ParticleSystem prefab, int count)
+        {
+            string key = prefab.name;
+            _pools[key] = new Queue&lt;ParticleSystem&gt;();
+
+            // Create a sub-parent for this effect type
+            Transform subParent = new GameObject($"Pool_{key}").transform;
+            subParent.SetParent(_poolParent);
+
+            for (int i = 0; i &lt; count; i++)
+            {
+                ParticleSystem instance = Instantiate(prefab, subParent);
+                instance.gameObject.SetActive(false);
+                _pools[key].Enqueue(instance);
+            }
+        }
+
+        // ─── Pool Retrieval ─────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Gets an inactive particle system from the pool.
+        /// If the pool is empty, creates a new instance (grows the pool).
+        /// &lt;/summary&gt;
+        /// &lt;param name="prefab"&gt;The prefab to get an instance of.&lt;/param&gt;
+        /// &lt;returns&gt;A ready-to-use ParticleSystem instance.&lt;/returns&gt;
+        private ParticleSystem GetFromPool(ParticleSystem prefab)
+        {
+            string key = prefab.name;
+
+            // If the pool does not exist yet, create it
+            if (!_pools.ContainsKey(key))
+            {
+                CreatePool(prefab, poolSizePerEffect);
+            }
+
+            Queue&lt;ParticleSystem&gt; pool = _pools[key];
+
+            // Try to find an inactive instance in the pool
+            // If all are in use, create a new one (pool growth)
+            ParticleSystem instance;
+
+            if (pool.Count &gt; 0)
+            {
+                instance = pool.Dequeue();
+            }
+            else
+            {
+                // Pool is exhausted — grow it by creating a new instance
+                Debug.LogWarning(
+                    $"[ParticleManager] Pool for '{key}' exhausted. " +
+                    "Creating new instance. Consider increasing pool size.");
+                instance = Instantiate(prefab, _poolParent);
+            }
+
+            return instance;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns a particle system instance to its pool after it finishes playing.
+        /// Called automatically by our coroutine.
+        /// &lt;/summary&gt;
+        /// &lt;param name="prefab"&gt;The original prefab (used as pool key).&lt;/param&gt;
+        /// &lt;param name="instance"&gt;The instance to return.&lt;/param&gt;
+        private void ReturnToPool(ParticleSystem prefab, ParticleSystem instance)
+        {
+            string key = prefab.name;
+
+            instance.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            instance.gameObject.SetActive(false);
+
+            if (_pools.ContainsKey(key))
+            {
+                _pools[key].Enqueue(instance);
+            }
+        }
+
+        // ─── Play Methods (call these from gameplay scripts) ────
+
+        /// &lt;summary&gt;
+        /// Plays the coin collect effect at the specified world position.
+        /// Call this from your coin/collectible script when collected.
+        /// &lt;/summary&gt;
+        /// &lt;param name="position"&gt;World position where the coin was collected.&lt;/param&gt;
+        public void PlayCoinCollect(Vector3 position)
+        {
+            if (coinCollectPrefab == null)
+            {
+                Debug.LogWarning("[ParticleManager] Coin collect prefab not assigned!");
+                return;
+            }
+
+            PlayEffectAtPosition(coinCollectPrefab, position);
+        }
+
+        /// &lt;summary&gt;
+        /// Plays the crash/death effect at the specified world position.
+        /// Call this when the player hits an obstacle.
+        /// &lt;/summary&gt;
+        /// &lt;param name="position"&gt;World position where the crash occurred.&lt;/param&gt;
+        public void PlayCrash(Vector3 position)
+        {
+            if (crashPrefab == null)
+            {
+                Debug.LogWarning("[ParticleManager] Crash prefab not assigned!");
+                return;
+            }
+
+            PlayEffectAtPosition(crashPrefab, position);
+        }
+
+        /// &lt;summary&gt;
+        /// Starts or updates the speed lines effect.
+        /// Call this with the current player speed to modulate intensity.
+        /// Pass 0 or call StopSpeedLines() to turn them off.
+        /// &lt;/summary&gt;
+        /// &lt;param name="normalizedSpeed"&gt;
+        /// Speed value from 0 (stopped) to 1 (max speed).
+        /// Controls emission rate and particle speed.
+        /// &lt;/param&gt;
+        public void UpdateSpeedLines(float normalizedSpeed)
+        {
+            if (_activeSpeedLines == null) return;
+
+            if (normalizedSpeed &lt;= 0.1f)
+            {
+                // Speed too low — turn off speed lines
+                if (_activeSpeedLines.gameObject.activeSelf)
+                {
+                    _activeSpeedLines.Stop();
+                    _activeSpeedLines.gameObject.SetActive(false);
+                }
+                return;
+            }
+
+            // Activate if not already active
+            if (!_activeSpeedLines.gameObject.activeSelf)
+            {
+                _activeSpeedLines.gameObject.SetActive(true);
+                _activeSpeedLines.Play();
+            }
+
+            // Modulate emission rate based on speed
+            // At normalizedSpeed = 0.5 we get ~15 particles/sec
+            // At normalizedSpeed = 1.0 we get ~50 particles/sec
+            var emission = _activeSpeedLines.emission;
+            emission.rateOverTime = Mathf.Lerp(10f, 50f, normalizedSpeed);
+
+            // Modulate particle speed
+            var main = _activeSpeedLines.main;
+            main.startSpeed = Mathf.Lerp(15f, 50f, normalizedSpeed);
+        }
+
+        /// &lt;summary&gt;
+        /// Immediately stops the speed lines effect.
+        /// &lt;/summary&gt;
+        public void StopSpeedLines()
+        {
+            UpdateSpeedLines(0f);
+        }
+
+        // ─── Internal Helpers ───────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Gets an instance from the pool, positions it, plays it,
+        /// and schedules it to be returned to the pool when done.
+        /// &lt;/summary&gt;
+        private void PlayEffectAtPosition(ParticleSystem prefab, Vector3 position)
+        {
+            ParticleSystem instance = GetFromPool(prefab);
+
+            // Position the particle system at the target location
+            instance.transform.position = position;
+            instance.gameObject.SetActive(true);
+
+            // Clear any leftover particles from a previous play
+            instance.Clear();
+
+            // Play the effect
+            instance.Play();
+
+            // Schedule return to pool after the effect finishes.
+            // We use the main module's duration + startLifetime as our delay.
+            float returnDelay = instance.main.duration + instance.main.startLifetime.constantMax;
+            StartCoroutine(ReturnToPoolAfterDelay(prefab, instance, returnDelay));
+        }
+
+        /// &lt;summary&gt;
+        /// Waits for the particle effect to finish, then returns it to the pool.
+        /// &lt;/summary&gt;
+        private System.Collections.IEnumerator ReturnToPoolAfterDelay(
+            ParticleSystem prefab,
+            ParticleSystem instance,
+            float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            ReturnToPool(prefab, instance);
+        }
+
+        // ─── Cleanup ────────────────────────────────────────────
+
+        /// &lt;summary&gt;
+        /// Stops all active particle effects. Call this on game over or scene reset.
+        /// &lt;/summary&gt;
+        public void StopAllEffects()
+        {
+            StopAllCoroutines();
+            StopSpeedLines();
+
+            // Stop and return all active particles to their pools
+            foreach (var kvp in _pools)
+            {
+                foreach (var ps in kvp.Value)
+                {
+                    if (ps != null &amp;&amp; ps.gameObject.activeSelf)
+                    {
+                        ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                        ps.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Script Breakdown</h3>
+        <ul>
+          <li><strong>Object Pooling</strong> &mdash; The manager pre-creates a configurable number of each particle effect in <code>Awake()</code>. When a script calls <code>PlayCoinCollect()</code>, it grabs an inactive instance from the pool instead of calling <code>Instantiate()</code>. After the effect finishes, a coroutine returns it to the pool. This avoids garbage collection stutters.</li>
+          <li><strong>Pool Growth</strong> &mdash; If all instances are in use (e.g., the player rapidly collects many coins), the pool creates a new instance on the fly and logs a warning. You can then increase the pool size to avoid runtime allocations.</li>
+          <li><strong>Speed Lines</strong> &mdash; Unlike burst effects, speed lines are a single persistent instance. We modulate their emission rate and particle speed based on how fast the player is moving. The <code>UpdateSpeedLines()</code> method takes a normalized speed (0 to 1) for simplicity.</li>
+          <li><strong>StopAllEffects()</strong> &mdash; A cleanup method called on game over to ensure no stray particles linger.</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: Integrating With Events -->
+      <section>
+        <h2>Integrating Particles with Events</h2>
+        <p>In Chapter 7 we built an event system. Now we connect our particle effects to game events so they play automatically when things happen. Here is a "glue" script that listens for events and triggers the appropriate particle effects:</p>
+
+        <div class="code-block">
+          <div class="code-block-header"><span class="file-name">ParticleEventListener.cs</span><span class="lang-badge">C#</span></div>
+          <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.VFX;
+
+namespace InfiniteRunner.VFX
+{
+    /// &lt;summary&gt;
+    /// Listens for game events and triggers appropriate particle effects.
+    /// Attach this to the [ParticleManager] GameObject.
+    /// &lt;/summary&gt;
+    public class ParticleEventListener : MonoBehaviour
+    {
+        private void OnEnable()
+        {
+            // Subscribe to game events
+            // (Assumes your event system uses static events or
+            //  ScriptableObject channels from Chapter 7)
+            GameEvents.OnCoinCollected += HandleCoinCollected;
+            GameEvents.OnPlayerDied += HandlePlayerDied;
+            GameEvents.OnSpeedChanged += HandleSpeedChanged;
+            GameManager.Instance.OnGameStateChanged += HandleStateChanged;
+        }
+
+        private void OnDisable()
+        {
+            // Always unsubscribe to prevent memory leaks
+            GameEvents.OnCoinCollected -= HandleCoinCollected;
+            GameEvents.OnPlayerDied -= HandlePlayerDied;
+            GameEvents.OnSpeedChanged -= HandleSpeedChanged;
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameStateChanged -= HandleStateChanged;
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// When a coin is collected, play the gold burst at its position.
+        /// &lt;/summary&gt;
+        private void HandleCoinCollected(Vector3 coinPosition)
+        {
+            ParticleManager.Instance.PlayCoinCollect(coinPosition);
+        }
+
+        /// &lt;summary&gt;
+        /// When the player dies, play the crash explosion at their position.
+        /// &lt;/summary&gt;
+        private void HandlePlayerDied(Vector3 playerPosition)
+        {
+            ParticleManager.Instance.PlayCrash(playerPosition);
+            ParticleManager.Instance.StopSpeedLines();
+        }
+
+        /// &lt;summary&gt;
+        /// When the player's speed changes, update speed lines intensity.
+        /// &lt;/summary&gt;
+        private void HandleSpeedChanged(float normalizedSpeed)
+        {
+            ParticleManager.Instance.UpdateSpeedLines(normalizedSpeed);
+        }
+
+        /// &lt;summary&gt;
+        /// When the game state changes, stop all effects if not playing.
+        /// &lt;/summary&gt;
+        private void HandleStateChanged(GameState newState)
+        {
+            if (newState != GameState.Playing)
+            {
+                ParticleManager.Instance.StopAllEffects();
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="callout info">
+          <div class="callout-title">Decoupled Design</div>
+          <p>Notice that the <code>Collectible</code> script does not need to know about particles. It simply raises an <code>OnCoinCollected</code> event. The <code>ParticleEventListener</code> hears that event and tells the <code>ParticleManager</code> to play the effect. If you later decide to remove particles, you delete this listener &mdash; no changes to the collectible code. This is the power of event-driven architecture.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Performance Tips -->
+      <section>
+        <h2>Performance Tips for Particles</h2>
+        <p>Particles are cheap individually, but they can add up quickly. Here are the most important optimization rules:</p>
+
+        <table>
+          <thead>
+            <tr><th>Tip</th><th>Why It Matters</th><th>Recommended Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Limit Max Particles</strong></td><td>Each particle consumes memory and GPU draw time. Setting a cap prevents runaway effects.</td><td>20&ndash;60 per effect</td></tr>
+            <tr><td><strong>Use Simulation Space: World</strong></td><td>For burst effects only. Prevents particles from following the emitter after play.</td><td>World for bursts, Local for speed lines</td></tr>
+            <tr><td><strong>Enable Culling</strong></td><td>In the Renderer module, set <strong>Render Alignment</strong> to View and enable culling so off-screen particles are not rendered.</td><td>Always enable</td></tr>
+            <tr><td><strong>Short Lifetimes</strong></td><td>Particles that live too long pile up. Keep lifetimes under 1 second for gameplay effects.</td><td>0.2&ndash;1.0 seconds</td></tr>
+            <tr><td><strong>Pool, Do Not Instantiate</strong></td><td>Creating and destroying GameObjects causes GC spikes. Our ParticleManager pools everything.</td><td>Pool size 3&ndash;10 per type</td></tr>
+            <tr><td><strong>Disable Sub-Emitters</strong></td><td>Sub-emitters (particles that spawn more particles) look amazing but are expensive. Use sparingly.</td><td>Only for key moments</td></tr>
+            <tr><td><strong>Simple Materials</strong></td><td>Use Unlit or Additive particle shaders. Avoid complex lit shaders on particles.</td><td>Particles/Standard Unlit</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warning">
+          <div class="callout-title">Mobile Performance</div>
+          <p>On mobile devices, particles can be a significant performance bottleneck. If you notice frame drops, reduce Max Particles first, then shorten lifetimes, and finally reduce emission rates. You can also create "low quality" variants of each effect and swap them in on low-end devices using Unity's Quality Settings.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Setting Up In Scene -->
+      <section>
+        <h2>Setting Up in the Scene</h2>
+        <ol class="steps">
+          <li>Create an empty GameObject named <code>[ParticleManager]</code>.</li>
+          <li>Attach the <code>ParticleManager</code> script and the <code>ParticleEventListener</code> script.</li>
+          <li>Drag your <code>CoinCollectVFX</code> prefab into the <strong>Coin Collect Prefab</strong> field.</li>
+          <li>Drag your <code>CrashVFX</code> prefab into the <strong>Crash Prefab</strong> field.</li>
+          <li>Drag your <code>SpeedLinesVFX</code> prefab into the <strong>Speed Lines Prefab</strong> field.</li>
+          <li>Set <strong>Pool Size Per Effect</strong> to 5 (increase if you see the pool growth warning in the Console).</li>
+          <li>Press Play and collect a coin &mdash; you should see gold sparkles burst at the coin's position.</li>
+        </ol>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>What We Built</h2>
+        <p>In this chapter, we added four distinct particle effects to our game:</p>
+        <ul>
+          <li><strong>Coin Collect</strong> &mdash; A burst of gold sparkles triggered by the <code>OnCoinCollected</code> event.</li>
+          <li><strong>Crash Explosion</strong> &mdash; A dramatic debris burst triggered by <code>OnPlayerDied</code>.</li>
+          <li><strong>Speed Lines</strong> &mdash; Looping stretched particles whose intensity scales with player speed.</li>
+          <li><strong>Player Trail</strong> &mdash; A Trail Renderer that follows the player to reinforce motion.</li>
+        </ul>
+        <p>We also built a <strong>ParticleManager</strong> that pools particle instances for performance and provides simple <code>Play</code> methods that any script can call. Finally, we connected everything to our event system so particles play automatically without tight coupling.</p>
+        <p>In the next chapter, we will bring our player character to life with <strong>animations</strong> &mdash; run cycles, jumps, slides, and death sequences using Unity's Animator system.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Particle effects add so much juice. Save it.</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add particle effects for coins, death, and speed lines"
+git push</code></pre>
+        </div>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="20-audio.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Audio</span></a>
+        <a href="22-animation.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Animation</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

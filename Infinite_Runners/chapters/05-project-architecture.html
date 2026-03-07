@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Architecture & Folder Structure - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link active"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 5</span>
+        <h1>Project Architecture &amp; Folder Structure</h1>
+        <p class="chapter-desc">Design the organizational backbone of our infinite runner. Folder conventions, namespaces, assembly definitions, ScriptableObjects, the Singleton pattern, and SOLID principles adapted for game development.</p>
+      </div>
+
+      <p>This chapter is about setting up the <strong>structure</strong> that will keep our project maintainable as it grows from a few scripts to dozens. We're making decisions now that will prevent pain later. None of this code does anything visible in the game yet, but it's the foundation everything else is built on.</p>
+
+      <!-- Section: Why Architecture Matters -->
+      <h2>Why Architecture Matters</h2>
+      <p>Let's look at two versions of the same project to understand why spending time on architecture pays off.</p>
+
+      <h3>The "Tutorial Code" Project (What We're Avoiding)</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Spaghetti Project Structure</span><span class="lang-badge">BAD</span></div>
+        <pre><code>Assets/
+  GameManager.cs          (800 lines - handles state, scoring, UI, audio)
+  PlayerMove.cs           (400 lines - movement, input, collision, animation)
+  Spawner.cs              (300 lines - obstacles, coins, power-ups, all mixed)
+  UIScript.cs             (200 lines - every UI screen in one file)
+  Coin.prefab
+  Obstacle1.prefab
+  player model.fbx
+  background_music.mp3
+  SampleScene.unity
+  coin_sound (1).wav
+  final_final_v2.unity</code></pre>
+      </div>
+
+      <p>This is what happens when you don't plan. Everything is in one folder. Scripts are massive monoliths that handle multiple unrelated concerns. File names are inconsistent. There's no way to find anything quickly. Changing the scoring system means editing the GameManager, which also controls audio and UI, so any change might break something unrelated.</p>
+
+      <h3>The Production Project (What We're Building)</h3>
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Our Project Structure</span><span class="lang-badge">GOOD</span></div>
+        <pre><code>Assets/
+  _Project/
+    Scenes/
+      GameScene.unity
+      MenuScene.unity
+    Scripts/
+      Core/
+        GameManager.cs        (manages game state only)
+        EventBus.cs           (central event system)
+        GameEvents.cs         (event definitions)
+        Core.asmdef
+      Player/
+        PlayerController.cs   (lane switching, jump, slide)
+        PlayerAnimator.cs     (animation control)
+        PlayerCollision.cs    (collision handling)
+        Player.asmdef
+      World/
+        ChunkManager.cs       (chunk lifecycle)
+        WorldGenerator.cs     (procedural generation)
+        ObjectPool.cs         (object recycling)
+        OriginShifter.cs      (floating point fix)
+        World.asmdef
+      Obstacles/
+        ObstacleBase.cs       (base class for all obstacles)
+        BarrierObstacle.cs    (specific obstacle type)
+        Obstacles.asmdef
+      Collectibles/
+        Coin.cs
+        PowerUp.cs
+        Collectibles.asmdef
+      UI/
+        HUDController.cs
+        MenuController.cs
+        GameOverController.cs
+        UI.asmdef
+      Audio/
+        AudioManager.cs
+        Audio.asmdef
+      Camera/
+        CameraController.cs
+        CameraShake.cs
+        Camera.asmdef
+      Data/
+        GameConfig.cs         (ScriptableObject)
+        DifficultyConfig.cs   (ScriptableObject)
+        Data.asmdef
+    Prefabs/
+      Player/
+      Obstacles/
+      Collectibles/
+      UI/
+    Materials/
+    Audio/
+      Music/
+      SFX/
+    Art/
+      Models/
+      Textures/
+      Animations/
+    Settings/
+      GameConfig.asset
+      DifficultyConfig.asset</code></pre>
+      </div>
+
+      <p>Every script has a clear home. Every file type has its own folder. Each system is isolated in its own folder with its own assembly definition. Finding a file takes seconds. Changing the scoring system means editing <code>Scripts/Core/</code> files only &mdash; nothing else is touched.</p>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; The _Project Folder Convention</div>
+        <p>We put all our custom files inside a folder called <code>_Project</code>. The underscore makes it sort to the top of the Assets folder, keeping it visually separated from Unity's auto-generated folders (like <code>Settings</code>, <code>Packages</code>, <code>TextMesh Pro</code>). This is a common convention in professional Unity projects. You can name it <code>_Game</code> or <code>_App</code> instead &mdash; the important thing is consistency.</p>
+      </div>
+
+      <!-- Section: Create the Folder Structure -->
+      <h2>Creating the Folder Structure</h2>
+      <p>Let's create this folder structure now. Open your InfiniteRunner project in Unity and follow these steps:</p>
+
+      <ol class="steps">
+        <li>In the Project window, right-click on <strong>Assets</strong> and choose <strong>Create &rarr; Folder</strong>. Name it <code>_Project</code>.</li>
+        <li>Inside <code>_Project</code>, create these folders:
+          <ul>
+            <li><code>Scenes</code></li>
+            <li><code>Scripts</code></li>
+            <li><code>Prefabs</code></li>
+            <li><code>Materials</code></li>
+            <li><code>Audio</code></li>
+            <li><code>Art</code></li>
+            <li><code>Settings</code></li>
+          </ul>
+        </li>
+        <li>Inside <code>Scripts</code>, create these subfolders:
+          <ul>
+            <li><code>Core</code></li>
+            <li><code>Player</code></li>
+            <li><code>World</code></li>
+            <li><code>Obstacles</code></li>
+            <li><code>Collectibles</code></li>
+            <li><code>UI</code></li>
+            <li><code>Audio</code></li>
+            <li><code>Camera</code></li>
+            <li><code>Data</code></li>
+          </ul>
+        </li>
+        <li>Inside <code>Prefabs</code>, create subfolders: <code>Player</code>, <code>Obstacles</code>, <code>Collectibles</code>, <code>UI</code>.</li>
+        <li>Inside <code>Audio</code>, create subfolders: <code>Music</code>, <code>SFX</code>.</li>
+        <li>Inside <code>Art</code>, create subfolders: <code>Models</code>, <code>Textures</code>, <code>Animations</code>.</li>
+        <li>Move your existing <code>GameScene.unity</code> from wherever it is into <code>_Project/Scenes/</code>. (Drag it in the Project window.)</li>
+      </ol>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Move Files Inside Unity Only</div>
+        <p>Always move files by dragging them within the Project window. Never use Windows Explorer or macOS Finder to move Unity files. Unity tracks files using <code>.meta</code> files, and moving files externally breaks those references, causing missing asset errors.</p>
+      </div>
+
+      <!-- Section: Version Control with Git -->
+      <h2>Version Control with Git</h2>
+
+      <p>Before we write a single line of game code, we need to set up <strong>version control</strong>. This is non-negotiable in production development. Version control tracks every change you make to your project, lets you undo mistakes, and keeps a history of your entire project's evolution.</p>
+
+      <div class="callout danger">
+        <div class="callout-title">Why this matters RIGHT NOW</div>
+        <p>Imagine you spend 3 hours building the player controller. It works great. Then you make a "small change" that breaks everything, and you can't remember what you changed. Without version control, you're stuck. With version control, you type one command and you're back to the working version. <strong>Every professional game studio uses version control. No exceptions.</strong></p>
+      </div>
+
+      <h3>What is Git?</h3>
+      <p><strong>Git</strong> is the most widely used version control system in the world. It tracks changes to your files over time. Think of it like an unlimited "undo" system, but much more powerful &mdash; you can see exactly what changed, when, and why. You can jump back to any previous state of your project at any time.</p>
+
+      <p>Key concepts you need to know:</p>
+      <ul>
+        <li><strong>Repository (repo)</strong> &mdash; Your project folder, tracked by Git. All history is stored here.</li>
+        <li><strong>Commit</strong> &mdash; A snapshot of your project at a point in time. Like pressing "save" in a video game. Each commit has a message describing what changed.</li>
+        <li><strong>Staging</strong> &mdash; Choosing which files to include in your next commit. You might have changed 10 files, but only want to commit 3 of them.</li>
+        <li><strong>Branch</strong> &mdash; A parallel version of your project. You can experiment on a branch without affecting your main code. We'll learn this later.</li>
+      </ul>
+
+      <h3>Step 1: Install Git</h3>
+
+      <ol class="steps">
+        <li><strong>Windows:</strong> Download Git from <code>git-scm.com</code>. Run the installer. Accept all default options. When asked about the default editor, choose <strong>Visual Studio Code</strong> if you installed it.
+        </li>
+        <li><strong>Mac:</strong> Open Terminal and type <code>git --version</code>. If Git isn't installed, macOS will prompt you to install it via Xcode Command Line Tools. Click Install.</li>
+        <li><strong>Linux:</strong> Open a terminal and run <code>sudo apt install git</code> (Ubuntu/Debian) or <code>sudo dnf install git</code> (Fedora).</li>
+        <li><strong>Verify installation:</strong> Open a terminal (Command Prompt on Windows, Terminal on Mac/Linux) and type:
+          <div class="code-block">
+            <div class="code-block-header"><span class="file-name">Terminal</span><span class="lang-badge">Shell</span></div>
+            <pre><code>git --version</code></pre>
+          </div>
+          <p>You should see something like <code>git version 2.43.0</code>. The exact version doesn't matter.</p>
+        </li>
+        <li><strong>Set your identity</strong> (one-time setup). Git attaches your name and email to every commit:
+          <div class="code-block">
+            <div class="code-block-header"><span class="file-name">Terminal</span><span class="lang-badge">Shell</span></div>
+            <pre><code>git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</code></pre>
+          </div>
+        </li>
+      </ol>
+
+      <h3>Step 2: Create the .gitignore File</h3>
+
+      <p>Unity generates a LOT of temporary files &mdash; compiled code, cached textures, editor layouts, build outputs. We do <strong>not</strong> want to track these in Git. They can be regenerated automatically, and they change constantly, cluttering your history.</p>
+
+      <p>A <code>.gitignore</code> file tells Git which files and folders to ignore. Create this file in the <strong>root</strong> of your Unity project (the folder that contains <code>Assets/</code>, <code>Packages/</code>, and <code>ProjectSettings/</code>):</p>
+
+      <ol class="steps">
+        <li>Open your code editor (VS Code or Visual Studio).</li>
+        <li>Create a new file in the root of your Unity project.</li>
+        <li>Name it exactly <code>.gitignore</code> (with the dot at the start, no file extension).</li>
+        <li>Paste the following content into it:</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">.gitignore</span><span class="lang-badge">Git</span></div>
+        <pre><code># Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# MemoryCaptures
+[Mm]emoryCaptures/
+
+# Recordings
+[Rr]ecordings/
+
+# Asset meta data should only be ignored when the corresponding asset is also ignored
+!/[Aa]ssets/**/*.meta
+
+# Autogenerated Crash Report
+sysinfo.txt
+
+# Builds
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Compiled code
+*.dll
+*.exe
+*.pdb
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.idea/
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Gradle (Android builds)
+ExportedObj/
+.gradle/
+build/
+*.unitypackage
+
+# Plastic SCM
+ignore.conf
+*.private.0
+*.private</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-title">The .gitignore MUST be created before your first commit</div>
+        <p>If you commit the Library folder and then add the .gitignore later, Git will <em>continue tracking</em> those files. The .gitignore only affects <em>untracked</em> files. Always create it first. If you make this mistake, you'll need to run <code>git rm -r --cached Library/</code> to untrack it &mdash; but let's avoid that by doing it in the right order.</p>
+      </div>
+
+      <h3>Step 3: Initialize the Repository</h3>
+
+      <p>Now let's turn your Unity project into a Git repository. Open a terminal and navigate to your project's root folder (the one containing <code>Assets/</code>):</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Terminal</span><span class="lang-badge">Shell</span></div>
+        <pre><code># Navigate to your project folder
+cd "C:/Users/YourName/Unity Projects/InfiniteRunner"
+
+# Initialize Git repository
+git init</code></pre>
+      </div>
+
+      <p>You should see: <code>Initialized empty Git repository in .../InfiniteRunner/.git/</code></p>
+
+      <h3>Step 4: Your First Commit</h3>
+
+      <p>Let's save the current state of your project. This is the workflow you'll follow every time:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Terminal</span><span class="lang-badge">Shell</span></div>
+        <pre><code># 1. See what files Git sees (check that Library/ etc. are NOT listed)
+git status
+
+# 2. Stage ALL current files for commit
+git add .
+
+# 3. Create your first commit with a descriptive message
+git commit -m "Initial project setup with folder structure"</code></pre>
+      </div>
+
+      <p>Let's break down those three commands &mdash; you'll use them hundreds of times:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>What It Does</th>
+            <th>Analogy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>git status</code></td>
+            <td>Shows which files have changed since the last commit</td>
+            <td>Checking what's in your shopping cart before checkout</td>
+          </tr>
+          <tr>
+            <td><code>git add .</code></td>
+            <td>Stages all changed files for the next commit. The <code>.</code> means "everything"</td>
+            <td>Putting items in the shopping cart</td>
+          </tr>
+          <tr>
+            <td><code>git commit -m "..."</code></td>
+            <td>Creates a snapshot with a message describing what changed</td>
+            <td>Pressing "confirm purchase" &mdash; the save is permanent</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <div class="callout-title">Writing good commit messages</div>
+        <p>Your commit message should describe <strong>what you did</strong>, not what files changed. Git already tracks which files changed. Good messages:</p>
+        <ul>
+          <li><code>"Add player controller with lane switching"</code></li>
+          <li><code>"Fix jump height being too low"</code></li>
+          <li><code>"Implement object pooling for obstacles"</code></li>
+        </ul>
+        <p>Bad messages:</p>
+        <ul>
+          <li><code>"updated stuff"</code></li>
+          <li><code>"fixed bug"</code></li>
+          <li><code>"asdfasdf"</code></li>
+        </ul>
+        <p>Your future self will thank you when you're searching through history trying to find when something changed.</p>
+      </div>
+
+      <h3>Step 5: Verify It Worked</h3>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Terminal</span><span class="lang-badge">Shell</span></div>
+        <pre><code># See your commit history
+git log --oneline</code></pre>
+      </div>
+
+      <p>You should see something like:</p>
+      <div class="code-block">
+        <pre><code>a1b2c3d Initial project setup with folder structure</code></pre>
+      </div>
+
+      <p>That's your first commit. Your project is now safely tracked. If anything ever goes wrong, you can always come back to this state.</p>
+
+      <h3>The Daily Git Workflow</h3>
+
+      <p>From now on, at the end of every chapter, we'll tell you to save your progress. The workflow is always the same three commands:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">The Three Commands You'll Memorize</span><span class="lang-badge">Shell</span></div>
+        <pre><code># 1. Check what changed
+git status
+
+# 2. Stage the changes
+git add .
+
+# 3. Commit with a message
+git commit -m "Your description of what you did"</code></pre>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-title">How often should I commit?</div>
+        <p>Commit whenever you finish a logical piece of work that <strong>compiles and doesn't break anything</strong>. At minimum, commit after completing each chapter. In professional development, you'd commit multiple times per day &mdash; after adding a feature, fixing a bug, or reaching any stable milestone. Think of it like quicksaving in a game: do it before anything risky.</p>
+      </div>
+
+      <h3>Useful Git Commands Reference</h3>
+
+      <p>You only need the three commands above for now. We'll introduce more throughout the course, but here's a quick reference for when you're ready:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>What It Does</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>git status</code></td>
+            <td>See what's changed</td>
+          </tr>
+          <tr>
+            <td><code>git add .</code></td>
+            <td>Stage all changes</td>
+          </tr>
+          <tr>
+            <td><code>git add filename</code></td>
+            <td>Stage a specific file only</td>
+          </tr>
+          <tr>
+            <td><code>git commit -m "msg"</code></td>
+            <td>Save a snapshot</td>
+          </tr>
+          <tr>
+            <td><code>git log --oneline</code></td>
+            <td>See commit history (compact)</td>
+          </tr>
+          <tr>
+            <td><code>git diff</code></td>
+            <td>See exactly what lines changed</td>
+          </tr>
+          <tr>
+            <td><code>git checkout -- filename</code></td>
+            <td>Undo changes to a file (revert to last commit)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>We'll introduce <strong>branches</strong> (for safely experimenting), <strong>GitHub</strong> (for backup and sharing), and <strong>git diff</strong> (for reviewing changes) in later chapters as they become relevant. For now, master the three-command workflow: <code>status</code>, <code>add</code>, <code>commit</code>.</p>
+
+      <!-- Section: Namespaces -->
+      <h2>Namespaces</h2>
+      <p>A <strong>namespace</strong> is a way to organize your code into logical groups and prevent naming conflicts. Without namespaces, if you create a class called <code>GameManager</code> and a Unity asset store package also has a class called <code>GameManager</code>, they'll conflict and cause errors. With namespaces, your <code>InfiniteRunner.Core.GameManager</code> is completely separate from any other <code>GameManager</code>.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Core/GameManager.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    public class GameManager : MonoBehaviour
+    {
+        // All code for this class goes inside the namespace block
+        void Start()
+        {
+            Debug.Log("GameManager initialized");
+        }
+    }
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Player/PlayerController.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core; // Import the Core namespace to use GameManager
+
+namespace InfiniteRunner.Player
+{
+    public class PlayerController : MonoBehaviour
+    {
+        void Start()
+        {
+            Debug.Log("PlayerController initialized");
+        }
+    }
+}</code></pre>
+      </div>
+
+      <p>Our namespace convention mirrors our folder structure:</p>
+
+      <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border);">
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Folder</th>
+            <th style="text-align:left; padding: 0.75rem; color: var(--accent);">Namespace</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Core/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Core</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Player/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Player</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/World/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.World</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Obstacles/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Obstacles</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Collectibles/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Collectibles</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/UI/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.UI</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Audio/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Audio</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Camera/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.GameCamera</td>
+          </tr>
+          <tr>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">Scripts/Data/</td>
+            <td style="padding: 0.75rem; font-family: var(--font-mono);">InfiniteRunner.Data</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; Why InfiniteRunner.GameCamera Instead of InfiniteRunner.Camera?</div>
+        <p>Unity already has a class called <code>Camera</code> in the <code>UnityEngine</code> namespace. If we named our namespace <code>InfiniteRunner.Camera</code>, the C# compiler could get confused between our namespace and Unity's Camera class. By using <code>GameCamera</code>, we avoid any ambiguity. This kind of naming conflict is exactly what namespaces are designed to prevent, but sometimes the namespace name itself can cause issues.</p>
+      </div>
+
+      <!-- Section: Assembly Definitions -->
+      <h2>Assembly Definitions</h2>
+      <p><strong>Assembly Definitions</strong> (asmdef files) tell Unity how to organize your code into separate compilation units. Without them, Unity compiles <em>all</em> of your scripts into a single assembly every time you change <em>any</em> script. With them, Unity only recompiles the assembly that changed.</p>
+
+      <h3>Why This Matters</h3>
+      <p>Imagine you have 50 scripts. You change one line in <code>Coin.cs</code>. Without assembly definitions, Unity recompiles all 50 scripts. With assembly definitions, Unity only recompiles the <code>Collectibles</code> assembly (maybe 3 scripts) and anything that depends on it. On large projects, this can cut compile times from 10 seconds down to 1&ndash;2 seconds. For a small project like ours, the difference is minor, but learning this now sets you up for good habits.</p>
+
+      <h3>Creating an Assembly Definition</h3>
+      <ol class="steps">
+        <li>In the Project window, navigate to <code>_Project/Scripts/Core/</code>.</li>
+        <li>Right-click and choose <strong>Create &rarr; Assembly Definition</strong>.</li>
+        <li>Name it <code>InfiniteRunner.Core</code>.</li>
+        <li>Click on the new <code>.asmdef</code> file. In the Inspector, you'll see its settings.</li>
+        <li>Under <strong>"Root Namespace"</strong>, type <code>InfiniteRunner.Core</code>. This tells your code editor to use this namespace by default for scripts in this folder.</li>
+      </ol>
+
+      <p>Repeat this process for each script folder. Here's the dependency chain &mdash; some assemblies need to reference others:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Assembly Dependencies</span><span class="lang-badge">Reference</span></div>
+        <pre><code>InfiniteRunner.Core       &rarr; (no dependencies - it's the foundation)
+InfiniteRunner.Data       &rarr; references Core
+InfiniteRunner.Player     &rarr; references Core, Data
+InfiniteRunner.World      &rarr; references Core, Data
+InfiniteRunner.Obstacles  &rarr; references Core, Data, World
+InfiniteRunner.Collectibles &rarr; references Core, Data
+InfiniteRunner.UI         &rarr; references Core, Data
+InfiniteRunner.Audio      &rarr; references Core
+InfiniteRunner.GameCamera &rarr; references Core, Player</code></pre>
+      </div>
+
+      <p>To add a reference: click on an assembly definition file, find the <strong>"Assembly Definition References"</strong> section in the Inspector, click <strong>"+"</strong>, and drag the referenced assembly definition into the slot.</p>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Assembly Definition Gotcha</div>
+        <p>Once you create an assembly definition in a folder, scripts in that folder can <strong>only</strong> see scripts in assemblies they explicitly reference. If your <code>PlayerController</code> needs to use <code>GameManager</code> from the Core assembly, the Player assembly definition <strong>must</strong> list Core as a reference. If you forget this, you'll get "type not found" compile errors. The error message will tell you exactly which type is missing, so you'll know which reference to add.</p>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Don't Worry If This Seems Complex</div>
+        <p>Assembly definitions are an advanced organizational tool. If they feel overwhelming right now, you can skip them and come back later. Your project will work perfectly without them &mdash; compile times will just be slightly slower. We include them here because they're part of production-grade architecture, and it's easier to set them up at the start than to retrofit them later.</p>
+      </div>
+
+      <!-- Section: ScriptableObjects -->
+      <h2>ScriptableObjects: Data That Lives as Assets</h2>
+      <p>A <strong>ScriptableObject</strong> is a special type of class in Unity that stores data as an asset file in your Project window. Instead of hardcoding values like <code>float moveSpeed = 10f;</code> directly in your scripts, you create a ScriptableObject that holds those values. Then you can edit them in the Inspector without touching any code.</p>
+
+      <h3>Why ScriptableObjects Are Powerful</h3>
+      <ul>
+        <li><strong>Designers can tweak values without opening code.</strong> Your game designer (even if that's just you) can adjust speed, jump height, spawn rates, and difficulty curves in the Inspector.</li>
+        <li><strong>Multiple configurations from one class.</strong> You can create a "Easy Difficulty" asset and a "Hard Difficulty" asset from the same ScriptableObject class, then swap between them.</li>
+        <li><strong>Data is shared, not copied.</strong> If 100 obstacles reference the same ScriptableObject, they all read the same data. Change it once and all 100 update instantly.</li>
+        <li><strong>No scene dependency.</strong> ScriptableObjects live in the Project as assets, not in any scene. They persist between scene loads and aren't destroyed when you load a new scene.</li>
+      </ul>
+
+      <h3>Creating a ScriptableObject</h3>
+      <p>Let's create a configuration file for our game's core settings:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Data/GameConfig.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Data
+{
+    // The CreateAssetMenu attribute adds an entry to Unity's
+    // right-click Create menu, letting you create instances
+    // of this ScriptableObject as asset files.
+    [CreateAssetMenu(
+        fileName = "GameConfig",
+        menuName = "Infinite Runner/Game Config",
+        order = 0
+    )]
+    public class GameConfig : ScriptableObject
+    {
+        [Header("Player Settings")]
+        [Tooltip("Base forward speed of the player")]
+        [SerializeField] private float baseSpeed = 10f;
+
+        [Tooltip("Horizontal distance between lane centers")]
+        [SerializeField] private float laneWidth = 2.5f;
+
+        [Tooltip("How fast the player switches lanes")]
+        [SerializeField] private float laneSwitchSpeed = 8f;
+
+        [Tooltip("Force applied when jumping")]
+        [SerializeField] private float jumpForce = 10f;
+
+        [Header("World Settings")]
+        [Tooltip("Length of each world chunk in units")]
+        [SerializeField] private float chunkLength = 40f;
+
+        [Tooltip("Number of chunks to keep ahead of the player")]
+        [SerializeField] private int chunksAhead = 3;
+
+        [Tooltip("Number of chunks to keep behind the player")]
+        [SerializeField] private int chunksBehind = 1;
+
+        [Header("Difficulty")]
+        [Tooltip("How much speed increases per second")]
+        [SerializeField] private float speedIncreaseRate = 0.1f;
+
+        [Tooltip("Maximum speed the game can reach")]
+        [SerializeField] private float maxSpeed = 30f;
+
+        // Public read-only properties: other scripts can READ
+        // these values but cannot CHANGE them.
+        public float BaseSpeed => baseSpeed;
+        public float LaneWidth => laneWidth;
+        public float LaneSwitchSpeed => laneSwitchSpeed;
+        public float JumpForce => jumpForce;
+        public float ChunkLength => chunkLength;
+        public int ChunksAhead => chunksAhead;
+        public int ChunksBehind => chunksBehind;
+        public float SpeedIncreaseRate => speedIncreaseRate;
+        public float MaxSpeed => maxSpeed;
+    }
+}</code></pre>
+      </div>
+
+      <p>Now create an instance of this ScriptableObject in Unity:</p>
+      <ol class="steps">
+        <li>Save the script and switch back to Unity. Wait for it to compile.</li>
+        <li>In the Project window, navigate to <code>_Project/Settings/</code>.</li>
+        <li>Right-click and choose <strong>Create &rarr; Infinite Runner &rarr; Game Config</strong>. (This menu entry was created by our <code>[CreateAssetMenu]</code> attribute.)</li>
+        <li>Name the asset <code>GameConfig</code>.</li>
+        <li>Click on it. In the Inspector, you'll see all the settings with their default values, neatly organized under headers. You can edit any value here.</li>
+      </ol>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; The Power of [Header] and [Tooltip]</div>
+        <p>Notice the <code>[Header("Player Settings")]</code> and <code>[Tooltip("...")]</code> attributes on our fields. <code>[Header]</code> adds a bold section label in the Inspector, keeping related values grouped together visually. <code>[Tooltip]</code> shows explanatory text when you hover over a field in the Inspector. These small touches make your ScriptableObjects much more user-friendly, especially when you come back to the project after a break and can't remember what each value does.</p>
+      </div>
+
+      <h3>Using a ScriptableObject in a Script</h3>
+      <p>Any MonoBehaviour script can reference a ScriptableObject. You drag the asset into a serialized field in the Inspector:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Player/PlayerController.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Data;
+
+namespace InfiniteRunner.Player
+{
+    public class PlayerController : MonoBehaviour
+    {
+        // Drag the GameConfig asset into this field in the Inspector
+        [SerializeField] private GameConfig config;
+
+        private float currentSpeed;
+
+        void Start()
+        {
+            // Read values from the config asset
+            currentSpeed = config.BaseSpeed;
+            Debug.Log("Starting speed: " + currentSpeed);
+            Debug.Log("Lane width: " + config.LaneWidth);
+        }
+
+        void Update()
+        {
+            // Use config values for movement
+            transform.Translate(
+                Vector3.forward * currentSpeed * Time.deltaTime
+            );
+        }
+    }
+}</code></pre>
+      </div>
+
+      <!-- Section: System Overview Diagram -->
+      <h2>How Our Systems Connect</h2>
+      <p>Here's a conceptual overview of how our systems communicate. The key principle is that systems talk through <strong>events</strong>, not direct references. This keeps them decoupled &mdash; you can change or remove any system without breaking others.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">System Communication Diagram</span><span class="lang-badge">Architecture</span></div>
+        <pre><code>                    ┌─────────────────┐
+                    │   Game Config    │  (ScriptableObject)
+                    │  (shared data)   │
+                    └────────┬────────┘
+                             │ read by all systems
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼───────┐ ┌─────▼─────┐ ┌────────▼────────┐
+    │ Game Manager  │ │  Player   │ │ World Generator  │
+    │  (state)      │ │Controller │ │  (chunks, pool)  │
+    └───────┬───────┘ └─────┬─────┘ └────────┬────────┘
+            │               │                │
+            │         ┌─────▼─────┐          │
+            │         │  Input    │          │
+            │         │  System   │          │
+            │         └───────────┘          │
+            │                                │
+    ┌───────▼────────────────────────────────▼───┐
+    │              EVENT BUS                      │
+    │  (GameStarted, PlayerDied, ScoreChanged,    │
+    │   CoinCollected, StateChanged, etc.)        │
+    └───┬──────────┬──────────┬──────────┬───────┘
+        │          │          │          │
+   ┌────▼───┐ ┌───▼────┐ ┌──▼───┐ ┌───▼──────┐
+   │   UI   │ │ Audio  │ │Camera│ │ Scoring  │
+   │ System │ │Manager │ │System│ │  System  │
+   └────────┘ └────────┘ └──────┘ └──────────┘</code></pre>
+      </div>
+
+      <p>Notice that the UI System doesn't know the Player Controller exists. It doesn't need to. It listens for a <code>PlayerDied</code> event and shows the game over screen. If we replaced the player with a spaceship, the UI would work exactly the same &mdash; it only cares about events, not where they came from.</p>
+
+      <!-- Section: The Singleton Pattern -->
+      <h2>The Singleton Pattern</h2>
+      <p>A <strong>Singleton</strong> is a design pattern that ensures only one instance of a class exists, and provides a global access point to it. In Unity, this is commonly used for manager objects like <code>GameManager</code> and <code>AudioManager</code> &mdash; systems where having two copies would cause problems.</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Core/Singleton.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Generic Singleton base class for MonoBehaviours.
+    /// Inherit from this to make any manager a Singleton.
+    /// Usage: public class GameManager : Singleton&lt;GameManager&gt;
+    /// &lt;/summary&gt;
+    public abstract class Singleton&lt;T&gt; : MonoBehaviour where T : MonoBehaviour
+    {
+        private static T instance;
+
+        public static T Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    // Try to find an existing instance in the scene
+                    instance = FindFirstObjectByType&lt;T&gt;();
+
+                    if (instance == null)
+                    {
+                        Debug.LogError(
+                            typeof(T).Name + " Singleton not found in scene! "
+                            + "Make sure a GameObject with this component exists."
+                        );
+                    }
+                }
+                return instance;
+            }
+        }
+
+        protected virtual void Awake()
+        {
+            // If an instance already exists and it's not this one, destroy this one
+            if (instance != null && instance != this)
+            {
+                Debug.LogWarning(
+                    "Duplicate " + typeof(T).Name + " found. Destroying duplicate."
+                );
+                Destroy(gameObject);
+                return;
+            }
+
+            instance = this as T;
+
+            // Optional: survive scene loads
+            // DontDestroyOnLoad(gameObject);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (instance == this)
+            {
+                instance = null;
+            }
+        }
+    }
+}</code></pre>
+      </div>
+
+      <p>Using the Singleton base class is simple. Any manager that should be a Singleton just inherits from it:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Core/GameManager.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Core
+{
+    public class GameManager : Singleton&lt;GameManager&gt;
+    {
+        // Awake is called in the base Singleton class,
+        // so if we override it, we must call base.Awake()
+        protected override void Awake()
+        {
+            base.Awake(); // IMPORTANT: let Singleton do its setup
+            Debug.Log("GameManager is ready");
+        }
+
+        public void StartGame()
+        {
+            Debug.Log("Game started!");
+        }
+    }
+
+    // Any script can now access it globally:
+    // GameManager.Instance.StartGame();
+}</code></pre>
+      </div>
+
+      <h3>When to Use Singletons</h3>
+      <ul>
+        <li><strong>DO use Singletons for:</strong> GameManager, AudioManager, and other systems where exactly one instance must exist and many systems need to access it.</li>
+        <li><strong>Do NOT use Singletons for:</strong> Player controllers, enemies, UI elements, or anything that could have multiple instances. If you find yourself wanting more than one of something, it shouldn't be a Singleton.</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-title">&#9888;&#65039; Singletons Are Controversial</div>
+        <p>Many experienced developers dislike Singletons because they create hidden global state, make testing harder, and can lead to tight coupling. These criticisms are valid. However, for a game of this scope, Singletons for core managers are a pragmatic choice. Our event-driven architecture mitigates most of the downsides &mdash; other systems communicate through events, not by directly calling <code>GameManager.Instance.DoSomething()</code>. We'll keep Singletons to a minimum: only <code>GameManager</code>, <code>AudioManager</code>, and <code>EventBus</code>.</p>
+      </div>
+
+      <!-- Section: SOLID Principles -->
+      <h2>SOLID Principles for Game Development</h2>
+      <p>SOLID is a set of five design principles from software engineering. They sound academic, but they solve very real problems. Here's each one explained in practical game dev terms:</p>
+
+      <h3>S &mdash; Single Responsibility Principle</h3>
+      <p><strong>"Every class should have one reason to change."</strong></p>
+      <p>Don't put player movement, scoring, and UI logic in the same script. If you need to change how scoring works, you shouldn't have to open the player movement file. Each script does one thing and does it well.</p>
+      <ul>
+        <li><code>PlayerController.cs</code> handles movement only.</li>
+        <li><code>PlayerCollision.cs</code> handles collisions only.</li>
+        <li><code>PlayerAnimator.cs</code> handles animations only.</li>
+        <li>They all sit on the same GameObject, but each has a single responsibility.</li>
+      </ul>
+
+      <h3>O &mdash; Open/Closed Principle</h3>
+      <p><strong>"Open for extension, closed for modification."</strong></p>
+      <p>When you add a new obstacle type, you shouldn't have to modify existing obstacle code. Instead, you create a new class that extends the base obstacle. In our project:</p>
+      <ul>
+        <li><code>ObstacleBase.cs</code> defines the common behavior.</li>
+        <li><code>BarrierObstacle.cs</code> extends it with barrier-specific behavior.</li>
+        <li>Adding <code>SpikeObstacle.cs</code> doesn't require changing <code>ObstacleBase</code> or <code>BarrierObstacle</code> at all.</li>
+      </ul>
+
+      <h3>L &mdash; Liskov Substitution Principle</h3>
+      <p><strong>"Child classes should work anywhere the parent class is expected."</strong></p>
+      <p>If your world generator works with <code>ObstacleBase</code>, it should be able to use any subclass (<code>BarrierObstacle</code>, <code>SpikeObstacle</code>) without knowing or caring which specific type it is.</p>
+
+      <h3>I &mdash; Interface Segregation Principle</h3>
+      <p><strong>"Don't force classes to implement methods they don't use."</strong></p>
+      <p>If you have an <code>ICollectable</code> interface, it should only require methods related to collecting (<code>Collect()</code>, <code>GetValue()</code>). Don't add <code>Move()</code> or <code>Animate()</code> to the same interface &mdash; not all collectibles need those.</p>
+
+      <h3>D &mdash; Dependency Inversion Principle</h3>
+      <p><strong>"Depend on abstractions, not concrete implementations."</strong></p>
+      <p>Our UI system listens for events (an abstraction), not for specific methods on the <code>GameManager</code> (a concrete implementation). If we replaced <code>GameManager</code> with a completely different state system, the UI would still work because it depends on events, not on <code>GameManager</code> directly.</p>
+
+      <div class="callout info">
+        <div class="callout-title">&#128161; Don't Over-Apply These Principles</div>
+        <p>SOLID principles are guidelines, not laws. In game development, pragmatism wins over purity. If following a principle makes your code harder to understand for no practical benefit, skip it. For our project, we'll apply these principles where they clearly help (like using a base class for obstacles) and keep things simple where they don't (like not creating an interface for something only one class implements). The goal is readable, maintainable code &mdash; not textbook-perfect architecture.</p>
+      </div>
+
+      <!-- Section: Putting It All Together -->
+      <h2>Putting It All Together</h2>
+      <p>Let's verify our setup by creating the core files we'll build on in the next chapters. Create these three scripts in the specified locations:</p>
+
+      <div class="code-block">
+        <div class="code-block-header"><span class="file-name">Scripts/Core/GameEvents.cs</span><span class="lang-badge">C#</span></div>
+        <pre><code class="language-csharp">namespace InfiniteRunner.Core
+{
+    /// &lt;summary&gt;
+    /// Defines all game events as structs.
+    /// Structs are lightweight, no-allocation event payloads.
+    /// We'll populate this as we build each system.
+    /// &lt;/summary&gt;
+    public struct GameStartedEvent { }
+
+    public struct GameOverEvent
+    {
+        public int FinalScore;
+        public float DistanceTraveled;
+    }
+
+    public struct GamePausedEvent
+    {
+        public bool IsPaused;
+    }
+
+    public struct ScoreChangedEvent
+    {
+        public int NewScore;
+    }
+}</code></pre>
+      </div>
+
+      <p>This file defines our event types as lightweight structs. We'll add more events as we build each system. The key insight is that events are just data &mdash; they describe what happened, not how to respond to it. The response is up to whoever is listening.</p>
+
+      <!-- Section: Chapter Summary -->
+      <h2>Chapter Summary</h2>
+      <p>We've laid the architectural foundation for our entire project. Here's what we accomplished:</p>
+      <ul>
+        <li><strong>Folder structure</strong> &mdash; Organized assets into <code>_Project/</code> with subfolders for Scripts, Prefabs, Materials, Audio, Art, Scenes, and Settings.</li>
+        <li><strong>Version control</strong> &mdash; Installed Git, created a Unity <code>.gitignore</code>, initialized a repository, and made our first commit.</li>
+        <li><strong>Script folders</strong> &mdash; Separated code by system: Core, Player, World, Obstacles, Collectibles, UI, Audio, Camera, Data.</li>
+        <li><strong>Namespaces</strong> &mdash; Each folder has its own namespace (e.g., <code>InfiniteRunner.Core</code>) to prevent naming conflicts and improve organization.</li>
+        <li><strong>Assembly Definitions</strong> &mdash; Each script folder gets an <code>.asmdef</code> file for faster compile times and explicit dependency management.</li>
+        <li><strong>ScriptableObjects</strong> &mdash; Created <code>GameConfig</code> for data-driven configuration that designers can edit without touching code.</li>
+        <li><strong>Singleton pattern</strong> &mdash; Built a reusable <code>Singleton&lt;T&gt;</code> base class for our manager objects.</li>
+        <li><strong>SOLID principles</strong> &mdash; Understood the five principles and how they apply pragmatically to game development.</li>
+        <li><strong>Event architecture</strong> &mdash; Defined initial event structs for decoupled system communication.</li>
+      </ul>
+
+      <p>This might feel like we haven't built "the game" yet. That's true &mdash; and that's intentional. This architecture is the skeleton. Starting in the next chapter, we'll flesh it out rapidly. The Game Manager comes first, followed by the Event System, and from there, each chapter adds a complete, working system. Because we invested in architecture now, adding each system will be clean and straightforward.</p>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>You've finished the architecture chapter. Let's commit everything we've set up. Open your terminal, navigate to your project folder, and run:</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git status
+git add .
+git commit -m "Set up project architecture, folder structure, and core scripts"</code></pre>
+        </div>
+        <p>Run <code>git log --oneline</code> to see your commits so far. You should see two entries now: your initial setup commit and this one. Get used to this workflow &mdash; you'll do it at the end of every chapter from here on out.</p>
+      </div>
+
+      <p>Let's build the Game Manager.</p>
+
+      <div class="chapter-nav">
+        <a href="04-csharp-basics.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">C# Basics</span></a>
+        <a href="06-game-manager.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">Game Manager</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

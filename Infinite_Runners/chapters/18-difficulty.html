@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Difficulty Progression - Infinite Runner Tutorial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/app.js"></script>
+</head>
+<body>
+  <div class="progress-bar"></div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="sidebar-toggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <a href="../index.html" class="topbar-logo">
+        <div class="logo-icon">IR</div>
+        <span>Infinite Runner Guide</span>
+      </a>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon"></span>
+        <span class="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 1 &mdash; Foundations</div>
+      <a href="01-welcome.html" class="sidebar-link"><span class="chapter-num">01</span> Welcome</a>
+      <a href="02-unity-setup.html" class="sidebar-link"><span class="chapter-num">02</span> Unity Setup</a>
+      <a href="03-editor-tour.html" class="sidebar-link"><span class="chapter-num">03</span> Editor Tour</a>
+      <a href="04-csharp-basics.html" class="sidebar-link"><span class="chapter-num">04</span> C# Basics</a>
+      <a href="05-project-architecture.html" class="sidebar-link"><span class="chapter-num">05</span> Architecture</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 2 &mdash; Core Systems</div>
+      <a href="06-game-manager.html" class="sidebar-link"><span class="chapter-num">06</span> Game Manager</a>
+      <a href="07-event-system.html" class="sidebar-link"><span class="chapter-num">07</span> Event System</a>
+      <a href="08-input-system.html" class="sidebar-link"><span class="chapter-num">08</span> Input System</a>
+      <a href="09-player-controller.html" class="sidebar-link"><span class="chapter-num">09</span> Player Controller</a>
+      <a href="10-camera-system.html" class="sidebar-link"><span class="chapter-num">10</span> Camera System</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 3 &mdash; World Generation</div>
+      <a href="11-chunk-system.html" class="sidebar-link"><span class="chapter-num">11</span> Chunk System</a>
+      <a href="12-object-pooling.html" class="sidebar-link"><span class="chapter-num">12</span> Object Pooling</a>
+      <a href="13-world-generation.html" class="sidebar-link"><span class="chapter-num">13</span> World Generation</a>
+      <a href="14-origin-shifting.html" class="sidebar-link"><span class="chapter-num">14</span> Origin Shifting</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 4 &mdash; Gameplay</div>
+      <a href="15-obstacles.html" class="sidebar-link"><span class="chapter-num">15</span> Obstacles</a>
+      <a href="16-collectibles.html" class="sidebar-link"><span class="chapter-num">16</span> Collectibles</a>
+      <a href="17-scoring.html" class="sidebar-link"><span class="chapter-num">17</span> Scoring</a>
+      <a href="18-difficulty.html" class="sidebar-link active"><span class="chapter-num">18</span> Difficulty</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 5 &mdash; Polish</div>
+      <a href="19-ui-system.html" class="sidebar-link"><span class="chapter-num">19</span> UI System</a>
+      <a href="20-audio.html" class="sidebar-link"><span class="chapter-num">20</span> Audio</a>
+      <a href="21-particles.html" class="sidebar-link"><span class="chapter-num">21</span> Particles</a>
+      <a href="22-animation.html" class="sidebar-link"><span class="chapter-num">22</span> Animation</a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Part 6 &mdash; Ship It</div>
+      <a href="23-save-system.html" class="sidebar-link"><span class="chapter-num">23</span> Save System</a>
+      <a href="24-optimization.html" class="sidebar-link"><span class="chapter-num">24</span> Optimization</a>
+      <a href="25-build-publish.html" class="sidebar-link"><span class="chapter-num">25</span> Build &amp; Publish</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="content-wrapper">
+      <div class="chapter-header">
+        <span class="chapter-label">Chapter 18</span>
+        <h1>Difficulty Progression</h1>
+        <p class="chapter-desc">Build a data-driven difficulty system that gradually ramps up speed, obstacle density, and complexity using ScriptableObjects and AnimationCurves for designer-friendly tuning.</p>
+      </div>
+
+      <!-- SECTION: Why Difficulty Matters -->
+      <section>
+        <h2>Why Difficulty Progression Matters</h2>
+        <p>Imagine playing an infinite runner where the speed, obstacle density, and challenge never change. The first 30 seconds might be fun, but after a minute it becomes monotonous. Conversely, if the game starts at maximum difficulty, new players will die immediately and never come back.</p>
+        <p>Difficulty progression solves both problems. It starts easy so newcomers can learn the controls, then gradually ramps up to challenge experienced players. This creates what game designers call <strong>flow</strong> &mdash; a state where the challenge perfectly matches the player's skill level, keeping them engaged and wanting "just one more run."</p>
+        <p>In this chapter, we will build a difficulty system that:</p>
+        <ul>
+          <li>Increases the player's forward speed over time</li>
+          <li>Spawns more obstacles per chunk as the game progresses</li>
+          <li>Introduces more complex obstacle types at higher difficulties</li>
+          <li>Slightly increases coin value to reward skilled players</li>
+          <li>Uses a smooth curve (not sudden jumps) for all transitions</li>
+          <li>Is fully configurable in the Unity Inspector without touching code</li>
+        </ul>
+      </section>
+
+      <!-- SECTION: What Scales -->
+      <section>
+        <h2>What Scales with Difficulty</h2>
+        <p>Let us define exactly what changes as difficulty increases. Each parameter has a minimum (start of game) and maximum (endgame) value:</p>
+
+        <h3>1. Player Speed</h3>
+        <p>The most impactful change. Speed starts comfortable (around 8 m/s) and increases to a challenging pace (around 20 m/s). The increase must be gradual &mdash; players should barely notice it happening until they realize they are going much faster than before.</p>
+
+        <h3>2. Obstacle Density</h3>
+        <p>Early game: maybe 1-2 obstacles per chunk. Late game: 3-5 obstacles per chunk. More obstacles means less safe space, forcing the player to react faster and plan further ahead.</p>
+
+        <h3>3. Obstacle Complexity</h3>
+        <p>Early game: only simple obstacles (single barriers, low hurdles). Mid game: introduce double barriers, sliding obstacles. Late game: complex combinations that require precise timing. We control this with weighted probabilities per difficulty tier.</p>
+
+        <h3>4. Coin Value</h3>
+        <p>A subtle but rewarding touch: coins are worth slightly more at higher difficulties. This rewards skilled players who survive longer and offsets the increased challenge. The increase is small (perhaps 1.0x to 1.5x) to avoid inflation.</p>
+
+        <div class="callout info">
+          <div class="callout-title">The Golden Rule of Difficulty</div>
+          <p>Never increase difficulty in sudden jumps. Players perceive gradual increases as "I am getting better at this game." They perceive sudden jumps as "the game is cheating." Always use smooth curves for difficulty ramping.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: DifficultyConfig ScriptableObject -->
+      <section>
+        <h2>DifficultyConfig ScriptableObject</h2>
+        <p>We store all difficulty parameters in a ScriptableObject so designers can tweak values in the Inspector without modifying code. This also lets you create multiple difficulty presets (Easy Mode, Hard Mode) by creating different config assets.</p>
+
+        <h3>Step 1: Create the ScriptableObject</h3>
+        <ol class="steps">
+          <li>Navigate to <code>Assets/Scripts/Gameplay</code> in the Project window.</li>
+          <li>Right-click &gt; <strong>Create &gt; C# Script</strong> and name it <code>DifficultyConfig</code>.</li>
+          <li>Replace the contents with the code below.</li>
+        </ol>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">DifficultyConfig.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// ScriptableObject that defines all difficulty progression parameters.
+    /// Create instances via Assets > Create > Infinite Runner > Difficulty Config.
+    ///
+    /// All values interpolate between min and max based on the difficulty
+    /// curve, which maps distance traveled (or time) to a 0-1 difficulty value.
+    /// &lt;/summary&gt;
+    [CreateAssetMenu(
+        fileName = "NewDifficultyConfig",
+        menuName = "Infinite Runner/Difficulty Config"
+    )]
+    public class DifficultyConfig : ScriptableObject
+    {
+        // ---------------------------------------------------------------
+        // Difficulty Curve
+        // ---------------------------------------------------------------
+
+        [Header("Difficulty Curve")]
+        [Tooltip("Maps distance traveled (X axis, in meters) to difficulty " +
+                 "level (Y axis, 0 to 1). The shape of this curve controls " +
+                 "how quickly the game gets harder.\n\n" +
+                 "A gentle S-curve is recommended: slow start, faster " +
+                 "ramp in the middle, and a plateau near the end.")]
+        public AnimationCurve difficultyCurve = new AnimationCurve(
+            new Keyframe(0f, 0f),        // Start at 0 difficulty
+            new Keyframe(500f, 0.25f),   // 25% at 500m
+            new Keyframe(1500f, 0.6f),   // 60% at 1500m
+            new Keyframe(3000f, 0.85f),  // 85% at 3000m
+            new Keyframe(5000f, 1.0f)    // Max at 5000m
+        );
+
+        [Tooltip("The maximum distance value on the curve's X axis. " +
+                 "Beyond this distance, difficulty stays at 1.0.")]
+        public float maxDistance = 5000f;
+
+        // ---------------------------------------------------------------
+        // Speed Settings
+        // ---------------------------------------------------------------
+
+        [Header("Player Speed")]
+        [Tooltip("Starting speed at difficulty 0 (beginning of game).")]
+        public float minSpeed = 8f;
+
+        [Tooltip("Maximum speed at difficulty 1 (endgame).")]
+        public float maxSpeed = 22f;
+
+        [Tooltip("Optional curve for speed progression. If set, overrides " +
+                 "linear interpolation. Leave as default linear for simple behavior.")]
+        public AnimationCurve speedCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
+        // ---------------------------------------------------------------
+        // Obstacle Settings
+        // ---------------------------------------------------------------
+
+        [Header("Obstacle Density")]
+        [Tooltip("Minimum obstacles per chunk at difficulty 0.")]
+        public int minObstaclesPerChunk = 1;
+
+        [Tooltip("Maximum obstacles per chunk at difficulty 1.")]
+        public int maxObstaclesPerChunk = 5;
+
+        [Header("Obstacle Type Weights")]
+        [Tooltip("Weight configuration for each difficulty tier. " +
+                 "Defines which obstacle types appear and how often.")]
+        public ObstacleTierConfig[] obstacleTiers;
+
+        // ---------------------------------------------------------------
+        // Coin Settings
+        // ---------------------------------------------------------------
+
+        [Header("Coin Value")]
+        [Tooltip("Coin value multiplier at difficulty 0 (1.0 = normal).")]
+        public float minCoinValueMultiplier = 1.0f;
+
+        [Tooltip("Coin value multiplier at difficulty 1 (e.g., 1.5 = 50% bonus).")]
+        public float maxCoinValueMultiplier = 1.5f;
+
+        // ---------------------------------------------------------------
+        // Difficulty Tiers
+        // ---------------------------------------------------------------
+
+        [Header("Named Difficulty Tiers (for display/logging)")]
+        [Tooltip("Human-readable tier definitions. Used for logging " +
+                 "and potentially for UI display (e.g., 'HARD' warning).")]
+        public DifficultyTier[] tiers;
+
+        // ---------------------------------------------------------------
+        // Evaluation Methods
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Evaluates the difficulty level (0-1) for a given distance.
+        /// This is the core method that drives all difficulty calculations.
+        /// &lt;/summary&gt;
+        /// &lt;param name="distance"&gt;How far the player has traveled in meters.&lt;/param&gt;
+        /// &lt;returns&gt;Difficulty level from 0 (easiest) to 1 (hardest).&lt;/returns&gt;
+        public float EvaluateDifficulty(float distance)
+        {
+            // Clamp distance to our curve's range.
+            float clampedDistance = Mathf.Clamp(distance, 0f, maxDistance);
+
+            // Evaluate the curve to get difficulty 0-1.
+            return Mathf.Clamp01(difficultyCurve.Evaluate(clampedDistance));
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the target speed for a given difficulty level.
+        /// Interpolates between minSpeed and maxSpeed using the speed curve.
+        /// &lt;/summary&gt;
+        public float GetSpeed(float difficulty)
+        {
+            float t = speedCurve.Evaluate(difficulty);
+            return Mathf.Lerp(minSpeed, maxSpeed, t);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the target obstacle count for a given difficulty level.
+        /// Uses simple linear interpolation and rounds to the nearest integer.
+        /// &lt;/summary&gt;
+        public int GetObstacleCount(float difficulty)
+        {
+            float count = Mathf.Lerp(
+                minObstaclesPerChunk,
+                maxObstaclesPerChunk,
+                difficulty
+            );
+            return Mathf.RoundToInt(count);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the coin value multiplier for a given difficulty level.
+        /// &lt;/summary&gt;
+        public float GetCoinValueMultiplier(float difficulty)
+        {
+            return Mathf.Lerp(
+                minCoinValueMultiplier,
+                maxCoinValueMultiplier,
+                difficulty
+            );
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the name of the current difficulty tier based on distance.
+        /// Example: "Easy" for 0-500m, "Medium" for 500-2000m, etc.
+        /// &lt;/summary&gt;
+        public string GetTierName(float distance)
+        {
+            if (tiers == null || tiers.Length == 0) return "Normal";
+
+            // Find the highest tier whose threshold has been passed.
+            for (int i = tiers.Length - 1; i >= 0; i--)
+            {
+                if (distance >= tiers[i].distanceThreshold)
+                {
+                    return tiers[i].tierName;
+                }
+            }
+
+            return tiers[0].tierName;
+        }
+    }
+
+    // -------------------------------------------------------------------
+    // Supporting Data Structures
+    // -------------------------------------------------------------------
+
+    /// &lt;summary&gt;
+    /// Defines a named difficulty tier with a distance threshold.
+    /// Used for logging and potential UI display.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public struct DifficultyTier
+    {
+        [Tooltip("Human-readable name for this tier (e.g., 'Easy', 'Hard').")]
+        public string tierName;
+
+        [Tooltip("The distance (in meters) at which this tier begins.")]
+        public float distanceThreshold;
+    }
+
+    /// &lt;summary&gt;
+    /// Defines obstacle type weights for a specific difficulty range.
+    /// Controls which obstacle types appear and how likely they are.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public struct ObstacleTierConfig
+    {
+        [Tooltip("The minimum difficulty (0-1) for this tier to be active.")]
+        [Range(0f, 1f)]
+        public float minDifficulty;
+
+        [Tooltip("The maximum difficulty (0-1) for this tier.")]
+        [Range(0f, 1f)]
+        public float maxDifficulty;
+
+        [Tooltip("Obstacle type names and their spawn weights within this tier.")]
+        public ObstacleWeight[] obstacleWeights;
+    }
+
+    /// &lt;summary&gt;
+    /// Maps an obstacle type name to a spawn weight.
+    /// Higher weights mean the obstacle appears more frequently.
+    /// &lt;/summary&gt;
+    [System.Serializable]
+    public struct ObstacleWeight
+    {
+        [Tooltip("Name/identifier for the obstacle type.")]
+        public string obstacleId;
+
+        [Tooltip("Relative spawn weight. Higher = more common.")]
+        public float weight;
+    }
+}</code></pre></div>
+
+        <h3>Step 2: Create a Difficulty Config Asset</h3>
+        <ol class="steps">
+          <li>In the Project window, navigate to <code>Assets/Data</code> (create this folder if needed).</li>
+          <li>Right-click &gt; <strong>Create &gt; Infinite Runner &gt; Difficulty Config</strong>.</li>
+          <li>Name it <code>DefaultDifficulty</code>.</li>
+          <li>Select it and configure the values in the Inspector.</li>
+        </ol>
+
+        <div class="callout tip">
+          <div class="callout-title">Setting Up the Difficulty Curve</div>
+          <p>Click the curve field in the Inspector to open the Curve Editor. Click to add keyframes and drag them to shape the curve. A good starting curve: put a keyframe at (0, 0), one at (500, 0.25), one at (1500, 0.6), one at (3000, 0.85), and one at (5000, 1.0). Right-click each keyframe and set the tangent mode to "Auto" for smooth transitions.</p>
+        </div>
+
+        <h3>Setting Up Difficulty Tiers</h3>
+        <p>In the Inspector, expand the <strong>Tiers</strong> array and add three entries:</p>
+        <ul>
+          <li><strong>Easy:</strong> Distance Threshold = <code>0</code></li>
+          <li><strong>Medium:</strong> Distance Threshold = <code>500</code></li>
+          <li><strong>Hard:</strong> Distance Threshold = <code>2000</code></li>
+        </ul>
+      </section>
+
+      <!-- SECTION: AnimationCurve Explanation -->
+      <section>
+        <h2>Understanding AnimationCurve</h2>
+        <p><code>AnimationCurve</code> is one of Unity's most powerful tools for game designers. It is a curve that maps an input value (X axis) to an output value (Y axis). You define keyframes (points on the curve) and Unity smoothly interpolates between them.</p>
+
+        <h3>Why AnimationCurve Instead of Linear Math?</h3>
+        <p>With linear interpolation (<code>Mathf.Lerp</code>), difficulty increases at a constant rate. This feels unnatural &mdash; the jump from 0 to 10% feels the same as 90% to 100%, even though the latter is much harder. AnimationCurve lets you shape the progression precisely:</p>
+
+        <ul>
+          <li><strong>Slow start:</strong> A flat beginning lets new players settle in.</li>
+          <li><strong>Gradual ramp:</strong> The middle section increases steadily.</li>
+          <li><strong>Plateau:</strong> The curve flattens near the top so the game does not become impossibly hard.</li>
+        </ul>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">AnimationCurve usage</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Define a curve with keyframes
+AnimationCurve curve = new AnimationCurve(
+    new Keyframe(0f, 0f),       // At input 0, output 0
+    new Keyframe(500f, 0.25f),  // At input 500, output 0.25
+    new Keyframe(5000f, 1.0f)   // At input 5000, output 1.0
+);
+
+// Evaluate the curve at any input value
+float difficulty = curve.Evaluate(1200f);
+// Returns approximately 0.45 (smoothly interpolated)
+
+// The curve automatically smooths between keyframes
+// No additional math needed - just Evaluate()!</code></pre></div>
+
+        <div class="callout info">
+          <div class="callout-title">The Curve Editor</div>
+          <p>When you click an AnimationCurve field in the Unity Inspector, a visual curve editor opens. You can click to add points, drag points to reshape the curve, and right-click points to change their tangent mode (smooth, linear, stepped). This visual editor is why AnimationCurve is so powerful &mdash; designers can tune the feel of the game without writing a single line of code.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: DifficultyManager.cs -->
+      <section>
+        <h2>The DifficultyManager</h2>
+        <p>The <code>DifficultyManager</code> reads the <code>DifficultyConfig</code> each frame, evaluates the current difficulty based on distance traveled, and broadcasts the resulting values to other systems (speed to the PlayerController, obstacle density to the WorldGenerator, etc.).</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">DifficultyManager.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+
+namespace InfiniteRunner.Gameplay
+{
+    /// &lt;summary&gt;
+    /// Reads the DifficultyConfig ScriptableObject and applies
+    /// difficulty-scaled values to game systems based on the
+    /// player's distance traveled.
+    ///
+    /// This is the central hub that connects the difficulty curve
+    /// to actual gameplay parameters. Other systems listen for
+    /// events from this manager rather than calculating difficulty
+    /// themselves.
+    ///
+    /// Attach to a persistent manager GameObject.
+    /// &lt;/summary&gt;
+    public class DifficultyManager : MonoBehaviour
+    {
+        // ---------------------------------------------------------------
+        // Singleton
+        // ---------------------------------------------------------------
+
+        public static DifficultyManager Instance { get; private set; }
+
+        // ---------------------------------------------------------------
+        // Inspector Fields
+        // ---------------------------------------------------------------
+
+        [Header("Configuration")]
+        [Tooltip("The difficulty configuration asset. Drag your " +
+                 "DifficultyConfig ScriptableObject here.")]
+        [SerializeField] private DifficultyConfig config;
+
+        [Header("Update Settings")]
+        [Tooltip("How often (in seconds) to recalculate difficulty. " +
+                 "Lower = more responsive, higher = less CPU usage.")]
+        [SerializeField] private float updateInterval = 0.25f;
+
+        [Header("Debug")]
+        [Tooltip("Enable to log difficulty changes to the console.")]
+        [SerializeField] private bool debugLogging = false;
+
+        // ---------------------------------------------------------------
+        // Private State
+        // ---------------------------------------------------------------
+
+        // The current difficulty level (0 to 1).
+        private float currentDifficulty;
+
+        // The current difficulty tier name (for logging/display).
+        private string currentTierName = "";
+
+        // Distance traveled by the player (received via events).
+        private float currentDistance;
+
+        // Whether the difficulty system is active (only during gameplay).
+        private bool isActive;
+
+        // Timer for throttling difficulty updates.
+        private float updateTimer;
+
+        // Cached previous values to detect changes (avoids firing
+        // events when nothing has changed).
+        private float previousSpeed;
+        private int previousObstacleCount;
+        private float previousCoinMultiplier;
+
+        // ---------------------------------------------------------------
+        // Unity Lifecycle
+        // ---------------------------------------------------------------
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+
+            // Validate config.
+            if (config == null)
+            {
+                Debug.LogError("[DifficultyManager] No DifficultyConfig " +
+                               "assigned! Difficulty will not progress.");
+            }
+        }
+
+        private void OnEnable()
+        {
+            GameEvents.OnGameStarted += HandleGameStarted;
+            GameEvents.OnGameOver += HandleGameOver;
+            GameEvents.OnScoreUpdated += HandleScoreUpdated;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnGameStarted -= HandleGameStarted;
+            GameEvents.OnGameOver -= HandleGameOver;
+            GameEvents.OnScoreUpdated -= HandleScoreUpdated;
+        }
+
+        private void Update()
+        {
+            if (!isActive || config == null) return;
+
+            // Throttle updates to save performance.
+            updateTimer += Time.deltaTime;
+            if (updateTimer < updateInterval) return;
+            updateTimer = 0f;
+
+            // Recalculate and apply difficulty.
+            UpdateDifficulty();
+        }
+
+        // ---------------------------------------------------------------
+        // Core Difficulty Calculation
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Evaluates the difficulty curve based on current distance,
+        /// calculates all derived values, and broadcasts changes.
+        /// &lt;/summary&gt;
+        private void UpdateDifficulty()
+        {
+            // Evaluate the main difficulty curve.
+            float newDifficulty = config.EvaluateDifficulty(currentDistance);
+
+            // Check if difficulty changed enough to warrant updates.
+            // Using a small epsilon avoids firing events for tiny fluctuations.
+            if (Mathf.Abs(newDifficulty - currentDifficulty) < 0.001f) return;
+
+            currentDifficulty = newDifficulty;
+
+            // Broadcast the raw difficulty value.
+            GameEvents.OnDifficultyChanged?.Invoke(currentDifficulty);
+
+            // Calculate and broadcast derived values.
+            ApplySpeed();
+            ApplyObstacleDensity();
+            ApplyCoinValue();
+            CheckTierChange();
+
+            if (debugLogging)
+            {
+                Debug.Log($"[DifficultyManager] Distance: {currentDistance:F0}m " +
+                          $"| Difficulty: {currentDifficulty:F2} " +
+                          $"| Tier: {currentTierName} " +
+                          $"| Speed: {config.GetSpeed(currentDifficulty):F1}");
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Individual Parameter Application
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Calculates the target speed and fires an event if it changed.
+        /// &lt;/summary&gt;
+        private void ApplySpeed()
+        {
+            float targetSpeed = config.GetSpeed(currentDifficulty);
+
+            // Only fire event if speed actually changed.
+            if (Mathf.Abs(targetSpeed - previousSpeed) > 0.01f)
+            {
+                previousSpeed = targetSpeed;
+                GameEvents.OnSpeedChanged?.Invoke(targetSpeed);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Calculates the target obstacle density and fires an event
+        /// if it changed.
+        /// &lt;/summary&gt;
+        private void ApplyObstacleDensity()
+        {
+            int targetCount = config.GetObstacleCount(currentDifficulty);
+
+            if (targetCount != previousObstacleCount)
+            {
+                previousObstacleCount = targetCount;
+                GameEvents.OnObstacleDensityChanged?.Invoke(targetCount);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Calculates the coin value multiplier and fires an event
+        /// if it changed.
+        /// &lt;/summary&gt;
+        private void ApplyCoinValue()
+        {
+            float multiplier = config.GetCoinValueMultiplier(currentDifficulty);
+
+            if (Mathf.Abs(multiplier - previousCoinMultiplier) > 0.01f)
+            {
+                previousCoinMultiplier = multiplier;
+                GameEvents.OnCoinValueMultiplierChanged?.Invoke(multiplier);
+            }
+        }
+
+        /// &lt;summary&gt;
+        /// Checks if we have entered a new difficulty tier and
+        /// fires an event if so (for UI notifications like "HARD MODE").
+        /// &lt;/summary&gt;
+        private void CheckTierChange()
+        {
+            string newTier = config.GetTierName(currentDistance);
+
+            if (newTier != currentTierName)
+            {
+                string previousTier = currentTierName;
+                currentTierName = newTier;
+
+                GameEvents.OnDifficultyTierChanged?.Invoke(currentTierName);
+
+                if (debugLogging)
+                {
+                    Debug.Log($"[DifficultyManager] Tier changed: " +
+                              $"{previousTier} -> {currentTierName}");
+                }
+            }
+        }
+
+        // ---------------------------------------------------------------
+        // Event Handlers
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Resets difficulty when a new game starts.
+        /// &lt;/summary&gt;
+        private void HandleGameStarted()
+        {
+            currentDifficulty = 0f;
+            currentDistance = 0f;
+            currentTierName = "";
+            updateTimer = 0f;
+            previousSpeed = 0f;
+            previousObstacleCount = 0;
+            previousCoinMultiplier = 0f;
+            isActive = true;
+
+            // Apply initial difficulty values.
+            UpdateDifficulty();
+
+            Debug.Log("[DifficultyManager] Difficulty system started.");
+        }
+
+        /// &lt;summary&gt;
+        /// Stops difficulty progression when the game ends.
+        /// &lt;/summary&gt;
+        private void HandleGameOver()
+        {
+            isActive = false;
+            Debug.Log($"[DifficultyManager] Game over at difficulty " +
+                      $"{currentDifficulty:F2}, tier: {currentTierName}");
+        }
+
+        /// &lt;summary&gt;
+        /// Receives distance updates from the ScoreManager.
+        /// This is how the DifficultyManager knows how far the
+        /// player has traveled.
+        /// &lt;/summary&gt;
+        private void HandleScoreUpdated(ScoreData data)
+        {
+            currentDistance = data.DistanceTraveled;
+        }
+
+        // ---------------------------------------------------------------
+        // Public API
+        // ---------------------------------------------------------------
+
+        /// &lt;summary&gt;
+        /// Returns the current difficulty level (0 to 1).
+        /// &lt;/summary&gt;
+        public float GetCurrentDifficulty()
+        {
+            return currentDifficulty;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the name of the current difficulty tier.
+        /// &lt;/summary&gt;
+        public string GetCurrentTierName()
+        {
+            return currentTierName;
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the current target speed based on difficulty.
+        /// &lt;/summary&gt;
+        public float GetCurrentSpeed()
+        {
+            if (config == null) return 8f;
+            return config.GetSpeed(currentDifficulty);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the current obstacle count based on difficulty.
+        /// &lt;/summary&gt;
+        public int GetCurrentObstacleCount()
+        {
+            if (config == null) return 1;
+            return config.GetObstacleCount(currentDifficulty);
+        }
+
+        /// &lt;summary&gt;
+        /// Returns the DifficultyConfig for external inspection.
+        /// Useful for testing and debugging.
+        /// &lt;/summary&gt;
+        public DifficultyConfig GetConfig()
+        {
+            return config;
+        }
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: New Events -->
+      <section>
+        <h2>New Events for Difficulty</h2>
+        <p>Add these event declarations to your <code>GameEvents</code> class:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">GameEvents.cs (difficulty additions)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using System;
+
+namespace InfiniteRunner.Core
+{
+    public static partial class GameEvents
+    {
+        // --- Difficulty Events ---
+
+        /// &lt;summary&gt;
+        /// Fired when the difficulty level changes (value is 0-1).
+        /// &lt;/summary&gt;
+        public static Action&lt;float&gt; OnDifficultyChanged;
+
+        /// &lt;summary&gt;
+        /// Fired when the difficulty enters a new named tier
+        /// (e.g., "Easy" -> "Medium").
+        /// &lt;/summary&gt;
+        public static Action&lt;string&gt; OnDifficultyTierChanged;
+
+        /// &lt;summary&gt;
+        /// Fired when the target obstacle count per chunk changes.
+        /// &lt;/summary&gt;
+        public static Action&lt;int&gt; OnObstacleDensityChanged;
+
+        /// &lt;summary&gt;
+        /// Fired when the coin value multiplier changes due to difficulty.
+        /// &lt;/summary&gt;
+        public static Action&lt;float&gt; OnCoinValueMultiplierChanged;
+    }
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Connecting to Other Systems -->
+      <section>
+        <h2>Connecting to WorldGenerator and ObstacleSpawner</h2>
+        <p>The DifficultyManager does not modify other systems directly. Instead, it broadcasts events that those systems listen for. Here is how each system reacts:</p>
+
+        <h3>PlayerController or MovementSystem</h3>
+        <p>Listens for <code>OnSpeedChanged</code> and updates the player's forward movement speed:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">PlayerController.cs (excerpt)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">private void OnEnable()
+{
+    GameEvents.OnSpeedChanged += HandleSpeedChanged;
+}
+
+private void OnDisable()
+{
+    GameEvents.OnSpeedChanged -= HandleSpeedChanged;
+}
+
+private void HandleSpeedChanged(float newSpeed)
+{
+    // Smoothly transition to the new speed to avoid jarring jumps.
+    targetSpeed = newSpeed;
+}
+
+private void Update()
+{
+    // Lerp current speed toward the target for a smooth transition.
+    currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, Time.deltaTime * 2f);
+
+    // Apply movement.
+    transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
+}</code></pre></div>
+
+        <h3>ObstacleSpawner</h3>
+        <p>Listens for <code>OnObstacleDensityChanged</code> and adjusts how many obstacles are placed per chunk:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">ObstacleSpawner.cs (excerpt)</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">private int targetObstacleCount = 1;
+
+private void OnEnable()
+{
+    GameEvents.OnObstacleDensityChanged += HandleDensityChanged;
+}
+
+private void HandleDensityChanged(int newCount)
+{
+    targetObstacleCount = newCount;
+    Debug.Log($"[ObstacleSpawner] Now placing {newCount} obstacles per chunk.");
+}
+
+// When spawning obstacles on a new chunk:
+private void SpawnObstaclesOnChunk(Transform chunk, Transform[] spawnPoints)
+{
+    // Only use up to targetObstacleCount spawn points.
+    int count = Mathf.Min(targetObstacleCount, spawnPoints.Length);
+
+    for (int i = 0; i &lt; count; i++)
+    {
+        // ... spawn obstacle at spawnPoints[i] ...
+    }
+}</code></pre></div>
+
+        <h3>CoinSpawner</h3>
+        <p>Listens for <code>OnCoinValueMultiplierChanged</code> if you want coins placed at higher difficulty tiers to be worth more inherently:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Coin value adjustment</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// In the Coin class, adjust value based on difficulty multiplier:
+private float valueMultiplier = 1f;
+
+private void OnEnable()
+{
+    GameEvents.OnCoinValueMultiplierChanged += m => valueMultiplier = m;
+}
+
+// When collected, multiply the base value:
+private void Collect()
+{
+    int adjustedValue = Mathf.RoundToInt(coinValue * valueMultiplier);
+    GameEvents.OnCoinCollected?.Invoke(adjustedValue);
+    // ...
+}</code></pre></div>
+      </section>
+
+      <!-- SECTION: Testing Difficulty -->
+      <section>
+        <h2>Testing and Visualizing the Difficulty Curve</h2>
+        <p>Getting difficulty right requires iteration. Here are strategies for testing and tuning:</p>
+
+        <h3>Debug Overlay</h3>
+        <p>Create a debug display that shows current difficulty values in real-time:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">DifficultyDebugDisplay.cs</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">using UnityEngine;
+using InfiniteRunner.Core;
+using InfiniteRunner.Gameplay;
+
+namespace InfiniteRunner.Debug
+{
+    /// &lt;summary&gt;
+    /// Temporary debug script that shows difficulty values on screen.
+    /// Remove once the game is ready for release.
+    /// &lt;/summary&gt;
+    public class DifficultyDebugDisplay : MonoBehaviour
+    {
+        private float difficulty;
+        private float speed;
+        private int obstacles;
+        private string tier = "";
+
+        private void OnEnable()
+        {
+            GameEvents.OnDifficultyChanged += d => difficulty = d;
+            GameEvents.OnSpeedChanged += s => speed = s;
+            GameEvents.OnObstacleDensityChanged += o => obstacles = o;
+            GameEvents.OnDifficultyTierChanged += t => tier = t;
+        }
+
+        private void OnGUI()
+        {
+            // Show in the top-right corner.
+            GUILayout.BeginArea(new Rect(Screen.width - 310, 10, 300, 150));
+            GUI.color = Color.yellow;
+            GUILayout.Label($"DIFFICULTY DEBUG");
+            GUILayout.Label($"Level: {difficulty:F3} ({difficulty * 100:F1}%)");
+            GUILayout.Label($"Tier: {tier}");
+            GUILayout.Label($"Speed: {speed:F1} m/s");
+            GUILayout.Label($"Obstacles/Chunk: {obstacles}");
+            GUI.color = Color.white;
+            GUILayout.EndArea();
+        }
+    }
+}</code></pre></div>
+
+        <h3>Inspector Curve Adjustments</h3>
+        <p>One of the best things about using AnimationCurve is that you can adjust it <strong>while the game is running</strong> in the Editor:</p>
+        <ol class="steps">
+          <li>Enter Play Mode.</li>
+          <li>Select the DifficultyConfig asset in the Project window.</li>
+          <li>Click the difficulty curve to open the Curve Editor.</li>
+          <li>Drag keyframes around and watch the game respond in real-time.</li>
+          <li>When you find values you like, note them down (changes in Play Mode are lost when you exit).</li>
+        </ol>
+
+        <div class="callout warning">
+          <div class="callout-title">Play Mode Changes Are Temporary</div>
+          <p>Any changes you make in the Unity Inspector while in Play Mode are <strong>reverted</strong> when you exit Play Mode. This is a common beginner trap. If you find difficulty values you like while testing, write them down or take a screenshot before exiting Play Mode, then re-enter the values in Edit Mode.</p>
+        </div>
+
+        <h3>Fast-Forward Testing</h3>
+        <p>Waiting 5 minutes to reach maximum difficulty is slow for testing. Add a debug key to artificially advance distance:</p>
+
+        <div class="code-block"><div class="code-block-header"><span class="file-name">Debug fast-forward</span><span class="lang-badge">C#</span></div><pre><code class="language-csharp">// Add to DifficultyManager.Update() for testing:
+#if UNITY_EDITOR
+if (Input.GetKey(KeyCode.F5))
+{
+    // Hold F5 to simulate traveling 100m per second
+    currentDistance += 100f * Time.deltaTime;
+    Debug.Log($"[DEBUG] Fast-forward distance: {currentDistance:F0}m");
+}
+if (Input.GetKeyDown(KeyCode.F6))
+{
+    // Press F6 to jump to max difficulty instantly
+    currentDistance = config.maxDistance;
+    Debug.Log("[DEBUG] Jumped to max difficulty!");
+}
+#endif</code></pre></div>
+
+        <div class="callout tip">
+          <div class="callout-title">The #if UNITY_EDITOR Directive</div>
+          <p><code>#if UNITY_EDITOR</code> is a preprocessor directive that tells the C# compiler to only include the enclosed code when building for the Unity Editor. This code is automatically stripped from your final game build, so you do not need to worry about removing debug keys before publishing.</p>
+        </div>
+      </section>
+
+      <!-- SECTION: Summary -->
+      <section>
+        <h2>Chapter Summary</h2>
+        <p>In this chapter, you built a complete, designer-friendly difficulty progression system:</p>
+        <ul>
+          <li><strong>DifficultyConfig ScriptableObject</strong> &mdash; Stores all difficulty parameters (speed, obstacle density, coin value, tiers) in a data asset editable in the Inspector.</li>
+          <li><strong>AnimationCurve</strong> &mdash; Maps distance traveled to a 0-1 difficulty value using a smooth, customizable curve.</li>
+          <li><strong>DifficultyManager.cs</strong> &mdash; Evaluates difficulty each frame, calculates derived values, and broadcasts changes via events.</li>
+          <li><strong>Difficulty Tiers</strong> &mdash; Named stages (Easy, Medium, Hard) with distance thresholds for logging and UI display.</li>
+          <li><strong>Event-driven connections</strong> &mdash; PlayerController, ObstacleSpawner, and CoinSpawner all react to difficulty events without tight coupling.</li>
+          <li><strong>Testing tools</strong> &mdash; Debug overlays, live curve editing, and fast-forward keys for efficient iteration.</li>
+        </ul>
+        <p>The difficulty system is the final gameplay system in Part 4. In the next chapter, we move to Part 5: Polish, starting with the UI system that displays all the scores, power-ups, and game states we have been building.</p>
+      </section>
+
+      <!-- Save Your Progress -->
+      <div class="callout tip" style="margin-top: 3rem; border-left-width: 5px;">
+        <div class="callout-title">Save Your Progress</div>
+        <p>Difficulty progression complete — and that wraps up Part 4. Merge time!</p>
+        <div class="code-block" style="margin: 0.75rem 0;">
+          <pre><code>git add .
+git commit -m "Add difficulty progression with ScriptableObject config"
+
+# Merge gameplay branch into main
+git checkout main
+git merge feature/gameplay</code></pre>
+        </div>
+        <p>Same merge workflow as before. <code>main</code> now has everything through Chapter 18. Run <code>git log --oneline</code> to see the full project history — it should be a satisfying list of clear, descriptive commits.</p>
+      </div>
+
+      <div class="chapter-nav">
+        <a href="17-scoring.html" class="nav-prev"><span class="nav-label">Previous</span><span class="nav-title">Scoring System</span></a>
+        <a href="19-ui-system.html" class="nav-next"><span class="nav-label">Next</span><span class="nav-title">UI System</span></a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
