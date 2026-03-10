@@ -265,13 +265,23 @@
 
       <div class="code-block">
         <div class="code-block-header"><span class="file-name">ConsoleExample.cs</span><span class="lang-badge">C#</span></div>
-        <pre><code class="language-csharp">void Start()
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class ConsoleExample : MonoBehaviour
 {
-    // These three lines demonstrate the different console message types
-    Debug.Log("This is a regular message.");        // White
-    Debug.LogWarning("This is a warning.");          // Yellow
-    Debug.LogError("This is an error!");             // Red
+    void Start()
+    {
+        // These three lines demonstrate the different console message types
+        Debug.Log("This is a regular message.");        // White
+        Debug.LogWarning("This is a warning.");          // Yellow
+        Debug.LogError("This is an error!");             // Red
+    }
 }</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-title">&#9989; Try It Yourself</div>
+        <p>In the Project window, right-click inside your Scripts folder &rarr; <strong>Create &rarr; C# Script</strong>. Name it <code>ConsoleExample</code>. Double-click to open it, delete everything inside, and paste the code above. Save the file, go back to Unity, select any GameObject in the Hierarchy (or create an empty one: <strong>GameObject &rarr; Create Empty</strong>), and click <strong>Add Component &rarr; ConsoleExample</strong>. Press <strong>Play</strong> and check the Console window &mdash; you should see one white, one yellow, and one red message.</p>
       </div>
 
       <h3>Console Toolbar</h3>
@@ -373,20 +383,25 @@
 
       <div class="code-block">
         <div class="code-block-header"><span class="file-name">TransformExample.cs</span><span class="lang-badge">C#</span></div>
-        <pre><code class="language-csharp">void Start()
+        <pre><code class="language-csharp">using UnityEngine;
+
+public class TransformExample : MonoBehaviour
 {
-    // Read the current position
-    Vector3 pos = transform.position;
-    Debug.Log("I am at: " + pos);
+    void Start()
+    {
+        // Read the current position
+        Vector3 pos = transform.position;
+        Debug.Log("I am at: " + pos);
 
-    // Move the object to a new position
-    transform.position = new Vector3(0f, 5f, 10f);
+        // Move the object to a new position
+        transform.position = new Vector3(0f, 5f, 10f);
 
-    // Move the object relative to its current position
-    transform.Translate(Vector3.forward * 2f);
+        // Move the object relative to its current position
+        transform.Translate(Vector3.forward * 2f);
 
-    // Rotate 90 degrees around the Y axis
-    transform.Rotate(0f, 90f, 0f);
+        // Rotate 90 degrees around the Y axis
+        transform.Rotate(0f, 90f, 0f);
+    }
 }</code></pre>
       </div>
 

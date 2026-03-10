@@ -443,25 +443,40 @@ public class Conditionals : MonoBehaviour
 
       <div class="code-block">
         <div class="code-block-header"><span class="file-name">SwitchExample.cs</span><span class="lang-badge">C#</span></div>
-        <pre><code class="language-csharp">void HandleGameState(GameState state)
+        <pre><code class="language-csharp">using UnityEngine;
+
+// Define the enum so this script works on its own
+public enum GameState { Menu, Playing, Paused, GameOver }
+
+public class SwitchExample : MonoBehaviour
 {
-    switch (state)
+    [SerializeField] private GameState currentState = GameState.Menu;
+
+    void Start()
     {
-        case GameState.Menu:
-            Debug.Log("Show main menu");
-            break;
-        case GameState.Playing:
-            Debug.Log("Game is running");
-            break;
-        case GameState.Paused:
-            Debug.Log("Game is paused");
-            break;
-        case GameState.GameOver:
-            Debug.Log("Show game over screen");
-            break;
-        default:
-            Debug.LogError("Unknown state: " + state);
-            break;
+        HandleGameState(currentState);
+    }
+
+    void HandleGameState(GameState state)
+    {
+        switch (state)
+        {
+            case GameState.Menu:
+                Debug.Log("Show main menu");
+                break;
+            case GameState.Playing:
+                Debug.Log("Game is running");
+                break;
+            case GameState.Paused:
+                Debug.Log("Game is paused");
+                break;
+            case GameState.GameOver:
+                Debug.Log("Show game over screen");
+                break;
+            default:
+                Debug.LogError("Unknown state: " + state);
+                break;
+        }
     }
 }</code></pre>
       </div>
@@ -1013,22 +1028,33 @@ PlayerController.Update () (at Assets/_Project/Scripts/Player/PlayerController.c
 
       <div class="code-block">
         <div class="code-block-header"><span class="file-name">NullCheckExample.cs</span><span class="lang-badge">C#</span></div>
-        <pre><code class="language-csharp">// Preventing NullReferenceException with null checks
-[SerializeField] private AudioSource audioSource;
+        <pre><code class="language-csharp">using UnityEngine;
 
-void PlaySound()
+public class NullCheckExample : MonoBehaviour
 {
-    // BAD: Will crash if audioSource is null
-    // audioSource.Play();
+    // Drag an AudioSource component into this slot in the Inspector
+    [SerializeField] private AudioSource audioSource;
 
-    // GOOD: Check first, then use
-    if (audioSource != null)
+    void Start()
     {
-        audioSource.Play();
+        // Try playing the sound when the game starts
+        PlaySound();
     }
-    else
+
+    void PlaySound()
     {
-        Debug.LogWarning("AudioSource is not assigned on " + gameObject.name);
+        // BAD: Will crash if audioSource is null
+        // audioSource.Play();
+
+        // GOOD: Check first, then use
+        if (audioSource != null)
+        {
+            audioSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning("AudioSource is not assigned on " + gameObject.name);
+        }
     }
 }</code></pre>
       </div>
@@ -1148,25 +1174,45 @@ public class CoroutineBasics : MonoBehaviour
 
       <div class="code-block">
         <div class="code-block-header"><span class="file-name">YieldExamples.cs</span><span class="lang-badge">C#</span></div>
-        <pre><code class="language-csharp">private IEnumerator YieldExamples()
+        <pre><code class="language-csharp">using System.Collections;
+using UnityEngine;
+
+public class YieldExamples : MonoBehaviour
 {
-    // Wait for a specific number of seconds (real time)
-    yield return new WaitForSeconds(2f);
+    private int score = 0;
+    private bool isPaused = false;
 
-    // Wait one frame (continues on the next Update cycle)
-    yield return null;
+    void Start()
+    {
+        StartCoroutine(ShowYieldTypes());
+    }
 
-    // Wait until the end of the current frame
-    yield return new WaitForEndOfFrame();
+    private IEnumerator ShowYieldTypes()
+    {
+        Debug.Log("Starting yield examples...");
 
-    // Wait for the next FixedUpdate (physics step)
-    yield return new WaitForFixedUpdate();
+        // Wait for a specific number of seconds (real time)
+        yield return new WaitForSeconds(2f);
+        Debug.Log("2 seconds passed!");
 
-    // Wait until a condition becomes true
-    yield return new WaitUntil(() => score >= 100);
+        // Wait one frame (continues on the next Update cycle)
+        yield return null;
+        Debug.Log("One frame later.");
 
-    // Wait while a condition is true (opposite of WaitUntil)
-    yield return new WaitWhile(() => isPaused);
+        // Wait until the end of the current frame
+        yield return new WaitForEndOfFrame();
+
+        // Wait for the next FixedUpdate (physics step)
+        yield return new WaitForFixedUpdate();
+
+        // Wait until a condition becomes true
+        // yield return new WaitUntil(() => score >= 100);
+
+        // Wait while a condition is true (opposite of WaitUntil)
+        // yield return new WaitWhile(() => isPaused);
+
+        Debug.Log("All yield examples done!");
+    }
 }</code></pre>
       </div>
 
