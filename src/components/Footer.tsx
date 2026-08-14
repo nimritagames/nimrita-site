@@ -1,34 +1,14 @@
+import { siteContent } from '../data/content'
 
-export const Footer = () => {
-  const socialLinks = [
-    { name: 'Twitter', href: '#', label: 'Follow us on Twitter' },
-    { name: 'Discord', href: '#', label: 'Join our Discord' },
-    { name: 'YouTube', href: '#', label: 'Subscribe on YouTube' },
-    { name: 'LinkedIn', href: '#', label: 'Connect on LinkedIn' }
-  ]
-
-  return (
-    <footer>
-      <div className="foot">
-        <div>
-          <div className="brand brand--lg">NIMRITA GAMES</div>
-          <div className="copy">
-            © 2025 Nimrita Games. Crafted with obsession. Photos via Unsplash.
-          </div>
-        </div>
-        <div className="social" aria-label="Social links">
-          {socialLinks.map((link) => (
-            <a 
-              key={link.name}
-              href={link.href} 
-              rel="noopener"
-              aria-label={link.label}
-            >
-              {link.name}
-            </a>
-          ))}
-        </div>
+export const Footer = () => (
+  <footer className="footer">
+    <div className="shell footer-inner">
+      <small>© {new Date().getFullYear()} {siteContent.studio.name}</small>
+      <div className="footer-links">
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a href={`mailto:${siteContent.studio.email}`}>Email</a>
       </div>
-    </footer>
-  )
-}
+    </div>
+  </footer>
+)

@@ -1,71 +1,33 @@
-export interface SiteContent {
-  hero: HeroContent
-  origin: OriginContent
-  principles: PrincipleContent[]
-  projects: ProjectContent[]
-  worlds: WorldContent[]
-  footer: FooterContent
-}
-
-export interface HeroContent {
-  tag: string
+export interface Game {
+  /** Card title. */
   title: string
-  subtitle: string
-  pillPoints: string[]
-  ctaPrimary: string
-  ctaSecondary: string
+  /** One plain line. Describe the game, don't sell it. */
+  blurb: string
+  /** Play Store listing. Omit until the game is actually published. */
+  playStoreUrl?: string
+  /** Key art or screenshot under public/. Omit to show a flat panel. */
+  art?: string
+  status: 'Released' | 'In development'
 }
 
-export interface OriginContent {
+export interface Tool {
   title: string
-  subtitle: string
-  lead: string
-  promises: OriginPromise[]
-  metrics: Metric[]
-  photo: {
-    src: string
-    alt: string
-    caption: string
-  }
-}
-
-export interface OriginPromise {
-  text: string
-}
-
-export interface Metric {
-  value: number
-  suffix?: string
-  label: string
-  sublabel: string
-}
-
-export interface PrincipleContent {
-  num: string
-  title: string
-  description: string
-}
-
-export interface ProjectContent {
-  title: string
-  status: string
-  description: string
-  features: string[]
-}
-
-export interface WorldContent {
-  src: string
-  alt: string
-  caption: string
-}
-
-export interface FooterContent {
-  socialLinks: SocialLink[]
-  copyright: string
-}
-
-export interface SocialLink {
-  name: string
+  blurb: string
+  /** Where the thing actually lives. */
   href: string
-  label: string
+  /** Optional install line, rendered in a mono panel. */
+  install?: string
+  /** Short factual label, e.g. "25 chapters". */
+  meta: string
+}
+
+export interface SiteContent {
+  studio: {
+    name: string
+    /** One factual sentence. Not a slogan. */
+    statement: string
+    email: string
+  }
+  games: Game[]
+  tools: Tool[]
 }

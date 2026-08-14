@@ -1,0 +1,248 @@
+/* ============================================================
+   NIMRITA GAMES — DESIGN SYSTEM  (LOCKED)
+
+   This file is the ONLY place the palette, spacing scale, type
+   scale and shared primitives are defined. Every page on the site
+   links it: the React app via index.html, and the static pages
+   under public/ via their own <link>.
+
+   RULES
+   - The palette is fixed. Do not add colour values anywhere else,
+     and do not introduce a colour that is not a token below.
+   - Spacing and type come from the scales below. No off-scale
+     values — that is what made the previous site read as
+     assembled rather than designed.
+   - Shadows have zero blur, always. Cel shading steps; it does
+     not bloom. There are no glow shadows on this site.
+   - Contrast is verified. Every text/ground pair below meets
+     WCAG AA (measured, not estimated):
+       body text on parchment .......... 12.56:1
+       secondary text on parchment ...... 6.04:1
+       coral link on parchment .......... 4.91:1
+       muted text on parchment .......... 4.52:1
+       white on coral button ............ 5.28:1
+     If you change a colour you have broken these. Re-measure.
+
+   ONE SANCTIONED DUPLICATE: <meta name="theme-color"> in each
+   HTML file repeats --bg (#FDF6E8) as a literal, because a meta
+   tag cannot read a CSS variable. If --bg ever changes, those
+   three tags change with it. Nothing else may repeat a colour.
+
+   NOTE: files in public/ are served unhashed, so browsers may
+   cache this. That is fine while it does not change — which is
+   the intent.
+   ============================================================ */
+
+:root {
+  /* ---- palette: parchment ground, slate ink, ONE warm accent ---- */
+  --bg:          #FDF6E8;  /* page ground — warm parchment        */
+  --bg-2:        #F6EAD3;  /* recessed ground — footer, code      */
+  --panel:       #FFFDF7;  /* raised surface — cards              */
+  --line:        #22303B;  /* outlines. cel art is outlined.      */
+  --shadow:      #22303B;  /* stepped shadow, same as the outline */
+  --text:        #22303B;  /* body copy and headings              */
+  --text-2:      #4E6070;  /* secondary copy                      */
+  --text-3:      #66737E;  /* eyebrows, captions, meta            */
+  --accent:      #C43A21;  /* the one accent. coral-vermilion.    */
+  --accent-tint: #FBE3DC;  /* accent at wash strength, for tags   */
+  --gold:        #E9A93B;  /* secondary, sparingly                */
+  --gold-tint:   #FBEDD0;
+  --sky:         #5AA9D6;  /* secondary, sparingly                */
+  --sky-tint:    #DDEEF8;
+
+  /* ---- spacing: seven values ---- */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 1rem;
+  --s4: 1.5rem;
+  --s5: 2.5rem;
+  --s6: 4rem;
+  --s7: 6rem;
+
+  /* ---- type: six steps ---- */
+  --t-1: 0.8125rem;
+  --t0:  1rem;
+  --t1:  1.25rem;
+  --t2:  1.75rem;
+  --t3:  2.5rem;
+  --t4:  3.5rem;
+
+  --r:      12px;
+  --r-sm:   8px;
+  --r-pill: 999px;
+
+  --rounded: "M PLUS Rounded 1c", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+
+  /* ---- the signature: light that steps instead of blurring ---- */
+  --cel:    4px 4px 0 var(--shadow);
+  --cel-in: 2px 2px 0 var(--shadow);
+}
+
+/* One visual world, deliberately. A parchment ground with hard outlines has
+   no honest dark counterpart — inverting it yields a different, weaker
+   design — so the palette is declared once and color-scheme keeps the
+   browser's own chrome in step. */
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; color-scheme: light; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--rounded);
+  font-size: var(--t0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  line-height: 1.15;
+  text-wrap: balance;
+  font-weight: 800;
+}
+h1 { font-size: var(--t4); letter-spacing: -0.02em; }
+h2 { font-size: var(--t3); letter-spacing: -0.015em; }
+h3 { font-size: var(--t1); font-weight: 700; }
+p  { margin: 0; }
+
+a { color: var(--accent); font-weight: 700; text-underline-offset: 3px; }
+a:hover { color: var(--text); }
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+code { font-family: var(--mono); font-size: 0.9em; }
+
+.skip-link { position: absolute; left: -9999px; }
+.skip-link:focus {
+  left: var(--s3);
+  top: var(--s3);
+  z-index: 100;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: var(--s2) var(--s3);
+  box-shadow: var(--cel);
+}
+
+/* ---- shared primitives ------------------------------------------------ */
+
+/* Never put a max-width on .shell's own element as well — the two compete
+   and the block centres instead of aligning to the page gutter. Nest. */
+.shell {
+  width: 100%;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding-inline: var(--s4);
+}
+
+.panel {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--cel);
+}
+
+.eyebrow {
+  font-size: var(--t-1);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.btn {
+  display: inline-block;
+  font-family: inherit;
+  font-size: var(--t0);
+  font-weight: 800;
+  padding: var(--s2) var(--s4);
+  border: 2px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--cel);
+  transition: transform 0.12s steps(2), box-shadow 0.12s steps(2);
+}
+.btn:hover { transform: translate(2px, 2px); box-shadow: var(--cel-in); color: var(--text); }
+.btn:active { transform: translate(4px, 4px); box-shadow: none; }
+.btn-primary { background: var(--accent); color: #FFFFFF; }
+.btn-primary:hover { color: #FFFFFF; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .btn { transition: none; }
+}
+
+/* ---- nav -------------------------------------------------------------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  border-bottom: 2px solid var(--line);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-block: var(--s3);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  font-weight: 800;
+  font-size: var(--t1);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand-mark {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 2px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  box-shadow: var(--cel-in);
+  flex: none;
+}
+.nav-links { display: flex; gap: var(--s4); align-items: center; }
+.nav-links a { color: var(--text-2); font-weight: 700; text-decoration: none; }
+.nav-links a:hover { color: var(--text); }
+
+/* ---- footer ----------------------------------------------------------- */
+
+.footer {
+  border-top: 2px solid var(--line);
+  padding-block: var(--s5);
+  background: var(--bg-2);
+  margin-top: var(--s6);
+}
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  justify-content: space-between;
+  align-items: center;
+}
+.footer-links { display: flex; flex-wrap: wrap; gap: var(--s4); }
+.footer small { color: var(--text-3); font-size: var(--t-1); }
+.footer a { font-size: var(--t-1); }
+
+@media (max-width: 40rem) {
+  :root { --t4: 2.5rem; --t3: 1.875rem; }
+  .nav-links { gap: var(--s3); }
+  .nav-links a { font-size: var(--t-1); }
+}
