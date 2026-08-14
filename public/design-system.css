@@ -84,13 +84,24 @@
   --s6: 4rem;
   --s7: 6rem;
 
-  /* ---- type: six steps ---- */
-  --t-1: 0.8125rem;
-  --t0:  1rem;
-  --t1:  1.25rem;
-  --t2:  1.75rem;
-  --t3:  2.5rem;
-  --t4:  3.5rem;
+  /* ---- type: one ratio, 1.2, from a 16px base ----
+     Every step is a power of 1.2, so the whole ramp is one system rather
+     than two. Headings climb in 1.2^2 increments (23 -> 33 -> 48), which
+     is why the ramp reads evenly. Each step below has exactly one job:
+       --t-1  uppercase labels, eyebrows, meta, footer  (never prose)
+       --t0   ALL running prose, buttons, nav
+       --t1   the hero's lead line
+       --t2   h3 / card titles
+       --t3   h2 / section titles
+       --t4   h1 only
+     If a step stops being used, delete it rather than leaving a gap —
+     an unused rung is what previously made h3 jump straight to h2. */
+  --t-1: 0.833rem;   /* 13.3px */
+  --t0:  1rem;       /* 16px   */
+  --t1:  1.2rem;     /* 19.2px */
+  --t2:  1.44rem;    /* 23px   */
+  --t3:  2.074rem;   /* 33.2px */
+  --t4:  2.986rem;   /* 47.8px */
 
   --r:      12px;
   --r-sm:   8px;
@@ -147,15 +158,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 {
-  margin: 0;
-  line-height: 1.15;
-  text-wrap: balance;
-  font-weight: 800;
-}
-h1 { font-size: var(--t4); letter-spacing: -0.02em; }
-h2 { font-size: var(--t3); letter-spacing: -0.015em; }
-h3 { font-size: var(--t1); font-weight: 700; }
+/* Leading tightens as size grows — a display line needs less than a
+   heading that wraps at card width. One value for all three was wrong. */
+h1, h2, h3 { margin: 0; text-wrap: balance; font-weight: 800; }
+h1 { font-size: var(--t4); line-height: 1.08; letter-spacing: -0.022em; }
+h2 { font-size: var(--t3); line-height: 1.18; letter-spacing: -0.015em; }
+h3 { font-size: var(--t2); line-height: 1.3; letter-spacing: -0.008em; font-weight: 700; }
 p  { margin: 0; }
 
 a { color: var(--accent); font-weight: 700; text-underline-offset: 3px; }
@@ -303,7 +311,9 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .footer a { font-size: var(--t-1); }
 
 @media (max-width: 40rem) {
-  :root { --t4: 2.5rem; --t3: 1.875rem; }
+  /* Mobile shifts the heading ramp down one rung of the same scale,
+     rather than inventing new sizes. */
+  :root { --t4: 2.074rem; --t3: 1.728rem; }
   .nav-links { gap: var(--s3); }
   .nav-links a { font-size: var(--t-1); }
 }

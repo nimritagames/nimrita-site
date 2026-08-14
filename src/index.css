@@ -26,7 +26,7 @@
 .hero { padding-block: var(--s7) var(--s6); }
 .hero-inner { display: flex; flex-direction: column; gap: var(--s4); max-width: 36rem; }
 .hero h1 { max-width: 22ch; }
-.hero p { font-size: var(--t1); color: var(--text-2); }
+.hero p { font-size: var(--t1); line-height: 1.5; color: var(--text-2); }
 .hero-actions { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s2); }
 
 /* ---- sections --------------------------------------------------------- */
@@ -58,7 +58,7 @@
   display: block;
 }
 .game-body { padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); align-items: flex-start; }
-.game-body p { color: var(--text-2); font-size: var(--t-1); }
+.game-body p { color: var(--text-2); font-size: var(--t0); }
 
 .empty {
   padding: var(--s5);
@@ -76,7 +76,7 @@
 
 .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--s4); }
 .tool { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
-.tool p { color: var(--text-2); font-size: var(--t-1); }
+.tool p { color: var(--text-2); font-size: var(--t0); }
 .tool-meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
 .tool-cmd {
   font-family: var(--mono);
