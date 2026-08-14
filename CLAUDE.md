@@ -1,65 +1,41 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working in this repository.
 
-## Commands
+## What this is
 
-### Development
-- `npm run dev` - Start development server on port 3000
-- `npm run build` - Build for production (runs TypeScript check then Vite build)
-- `npm run preview` - Preview production build locally
+`nimritagames.com` — a static site for a one-person studio that makes small 2D
+Android games. Plain HTML plus one stylesheet. **No build step, no package
+manager, no framework, no JavaScript.** It was a React + Vite app; that was
+removed because nothing on the site used state, effects or event handlers, and
+it shipped 198 KB of JavaScript to render static markup.
 
-### Build Process
-The build process includes TypeScript compilation followed by Vite bundling. Always run `npm run build` before deployment to ensure type safety.
+Do not reintroduce a framework or a build step to add a page or a game.
 
-## Architecture
+## Rules
 
-### Core Technologies
-- **React 19** with TypeScript in strict mode
-- **Vite** for build tooling and development server
-- **React Router DOM** for client-side routing
-- **React Context + useReducer** for state management
+- **`design-system.css` is the single source for anything visual.** Palette,
+  spacing scale, type scale and every shared component live there. Never
+  declare a colour, spacing value or font size anywhere else. Its header
+  documents the constraints, including measured contrast ratios — read it
+  before changing a colour, and re-measure if you do.
+- **The palette is fixed** and derived from `brand/logo.jpg`. `--brand` is the
+  logo's exact coral and is for graphics only; it fails contrast as text.
+  `--accent` is the darkened variant that carries text.
+- **Shadows never blur.** The design is cel-shaded: light steps, it does not
+  bloom.
+- **The site claims nothing it cannot show.** No invented metrics, no stock
+  photography, no games that do not exist. This is deliberate — the previous
+  version failed on exactly that.
 
-### Application Structure
+## Verifying a change
 
-#### State Management
-The app uses a centralized state system via `AppContext`:
-- **Global state**: Navigation, email subscription, theme, reduced motion preferences
-- **Persistence**: Key state (theme, founders list status) persists to localStorage via `useLocalStorage` hook
-- **Reducer pattern**: All state updates go through `appReducer` with typed actions
+There are no tests and nothing to compile. Serve the repository root over HTTP
+and open it — relative to root, because links are root-absolute (`/privacy/`).
+Check the homepage, `/privacy/`, `/support/`, and that `/Infinite_Runners/`
+still redirects.
 
-#### Component Architecture
-- **Pages**: Top-level route components in `src/pages/`
-- **Sections**: The page's content sections in `src/sections/`, rendered in order by `HomePage`
-- **Components**: Site chrome (Navigation, Footer) in `src/components/`
-- **Hooks**: Custom hooks for reusable logic (`useLocalStorage`, `useScrollAnimation`)
-- **Context**: Global state management in `src/context/`
+## Deploying
 
-#### Content Management
-- **Partially centralized content**: `src/data/content.ts` is typed by `src/types/`, but only its
-  `projects` key is consumed (by `sections/Projects.tsx`). Every other section hardcodes its own
-  copy, so the remaining keys are dead and their values contradict what the page renders. Treat the
-  component as the source of truth until this is reconciled.
-- **Type safety**: Content structure enforced by TypeScript interfaces in `src/types/`
-- **Dynamic rendering**: Components consume typed content objects rather than hardcoded text
-
-#### Key Patterns
-- **Animation system**: Global scroll animation hook manages intersection observers and reduced motion preferences
-- **Responsive design**: Mobile-first CSS with custom properties
-- **Accessibility**: Proper semantic HTML, ARIA labels, and reduced motion support
-- **Performance**: Component-based architecture with React 19 optimizations
-
-### File Organization
-```
-src/
-├── sections/       # Page sections (Hero, Origin, Principles, Projects, Gallery, Contact)
-├── components/     # Site chrome (Navigation, Footer)
-├── pages/         # Route-level components
-├── hooks/         # Custom React hooks
-├── context/       # React Context providers
-├── types/         # TypeScript type definitions
-├── data/          # Static content and configuration
-└── index.css      # Global styles with CSS custom properties
-```
-
-The codebase prioritizes type safety, performance, and maintainability with a clear separation between content, components, and application logic.
+Push to `main`. GitHub Pages serves the repository root. `CNAME` at the root
+holds the custom domain — do not move or delete it.

@@ -3,8 +3,7 @@
 
    This file is the ONLY place the palette, spacing scale, type
    scale and shared primitives are defined. Every page on the site
-   links it: the React app via index.html, and the static pages
-   under public/ via their own <link>.
+   links it: index.html, privacy/ and support/.
 
    RULES
    - The palette is fixed. Do not add colour values anywhere else,
@@ -32,14 +31,13 @@
    tag cannot read a CSS variable. If --bg ever changes, those
    three tags change with it. Nothing else may repeat a colour.
 
-   NOTE: files in public/ are served unhashed, so browsers may
-   cache this. That is fine while it does not change — which is
-   the intent.
+   NOTE: this file is served unhashed, so browsers may cache it.
+   That is fine while it does not change — which is the intent.
    ============================================================ */
 
 :root {
   /* ---- palette: sampled from the logo, then made accessible ----
-     Every value below is either taken from public/brand/logo.jpg or
+     Every value below is either taken from brand/logo.jpg or
      derived from it. Sampled points: cream #FEEFDC, peach #F5D6C1,
      dusty rose #D7B3A5, mauve #AD9497, coral #F05A40, ink #372E33. */
 
@@ -316,4 +314,99 @@ code { font-family: var(--mono); font-size: 0.9em; }
   :root { --t4: 2.074rem; --t3: 1.728rem; }
   .nav-links { gap: var(--s3); }
   .nav-links a { font-size: var(--t-1); }
+}
+
+/* ---- homepage sections ------------------------------------------------ */
+
+/* ---- tags ------------------------------------------------------------- */
+
+.tag {
+  display: inline-block;
+  font-size: var(--t-1);
+  font-weight: 800;
+  padding: var(--s1) var(--s3);
+  border: 2px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--accent-tint);
+  color: var(--text);
+  box-shadow: var(--cel-in);
+}
+.tag-gold { background: var(--gold-tint); }
+.tag-sky { background: var(--sky-tint); }
+
+/* ---- hero ------------------------------------------------------------- */
+
+.hero { padding-block: var(--s7) var(--s6); }
+.hero-inner { display: flex; flex-direction: column; gap: var(--s4); max-width: 36rem; }
+.hero h1 { max-width: 22ch; }
+.hero p { font-size: var(--t1); line-height: 1.5; color: var(--text-2); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s2); }
+
+/* ---- sections --------------------------------------------------------- */
+
+.section { padding-block: var(--s6); border-top: 2px solid var(--line); }
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  margin-bottom: var(--s5);
+  max-width: 40rem;
+}
+.section-head p { color: var(--text-2); }
+
+/* ---- games ------------------------------------------------------------ */
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--s4);
+}
+.game { display: flex; flex-direction: column; overflow: hidden; }
+.game-art {
+  aspect-ratio: 4 / 3;
+  border-bottom: 2px solid var(--line);
+  background: var(--bg-2);
+  object-fit: cover;
+  width: 100%;
+  display: block;
+}
+.game-body { padding: var(--s3); display: flex; flex-direction: column; gap: var(--s2); align-items: flex-start; }
+.game-body p { color: var(--text-2); font-size: var(--t0); }
+
+.empty {
+  padding: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  align-items: center;
+  text-align: center;
+  border-style: dashed;
+  box-shadow: none;
+}
+.empty p { color: var(--text-2); max-width: 40ch; }
+
+/* ---- tools ------------------------------------------------------------ */
+
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--s4); }
+.tool { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); }
+.tool p { color: var(--text-2); font-size: var(--t0); }
+.tool-meta { margin-top: auto; display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+.tool-cmd {
+  font-family: var(--mono);
+  font-size: var(--t-1);
+  background: var(--bg-2);
+  border: 2px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: var(--s2);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* ---- contact ---------------------------------------------------------- */
+
+.contact-card { padding: var(--s5); display: flex; flex-direction: column; gap: var(--s3); align-items: flex-start; }
+.contact-card p { color: var(--text-2); max-width: 46ch; }
+
+@media (max-width: 40rem) {
+  .hero { padding-block: var(--s6) var(--s5); }
 }

@@ -17,10 +17,141 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/design-system.css">
-    <script type="module" src="/src/main.tsx"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div id="root"></div>
+
+  <nav class="nav" aria-label="Main">
+    <div class="shell nav-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true"></span>Nimrita Games
+      </a>
+      <div class="nav-links">
+        <a href="#games">Games</a>
+        <a href="#tools">Tools</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="shell">
+      <div class="hero-inner">
+        <span class="eyebrow">Nimrita Games</span>
+        <h1>Small games, shipped one after another.</h1>
+        <p>A one-person studio making small 2D games for Android.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#games">What I&rsquo;m building</a>
+          <a class="btn" href="#tools">Tools &amp; writing</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="section" id="games" aria-labelledby="games-title">
+      <div class="shell">
+        <div class="section-head">
+          <span class="eyebrow">Games</span>
+          <h2 id="games-title">On the Play Store</h2>
+          <p>Every game I release goes here, newest first.</p>
+        </div>
+
+        <!-- Nothing released yet, so this shows the empty state.
+
+             TO ADD A GAME: delete the .empty panel below, then add a
+             .game-grid with one .game article per game, newest first.
+             Nothing else on the site needs touching.
+
+             <div class="game-grid">
+               <article class="panel game">
+                 <img class="game-art" src="/brand/GAME-art.png" alt="GAME key art">
+                 <div class="game-body">
+                   <h3>Game name</h3>
+                   <p>One plain line. Describe it, don't sell it.</p>
+                   <a class="btn" href="PLAY_STORE_URL">Get it on Play</a>
+                 </div>
+               </article>
+             </div>
+        -->
+        <div class="panel empty">
+          <span class="tag tag-gold">First game in development</span>
+          <p>
+            Nothing released yet. When the first game is on the Play Store it
+            appears here, and so does everything after it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools" aria-labelledby="tools-title">
+      <div class="shell">
+        <div class="section-head">
+          <span class="eyebrow">Tools &amp; writing</span>
+          <h2 id="tools-title">Things you can actually use</h2>
+          <p>Built while making games. Free, and yours to take.</p>
+        </div>
+
+        <div class="tool-grid">
+          <article class="panel tool">
+            <h3>FlowUI</h3>
+            <p>
+              A Unity package for referencing UI elements by path instead of
+              wiring them by hand. Scans the hierarchy, groups elements into
+              categories, and keeps the references type-safe.
+            </p>
+            <div class="tool-cmd">Unity &rarr; Package Manager &rarr; Add from Git URL</div>
+            <div class="tool-meta">
+              <a class="btn" href="/flowui/">Open</a>
+              <span class="eyebrow">Unity package &middot; documented</span>
+            </div>
+          </article>
+
+          <article class="panel tool">
+            <h3>Build an Infinite Runner in Unity</h3>
+            <p>
+              A full written guide to building a 3-lane runner from scratch &mdash;
+              chunk streaming, object pooling, origin shifting, save system, and
+              the architecture that holds it together.
+            </p>
+            <div class="tool-meta">
+              <a class="btn" href="/infinite-runner/">Open</a>
+              <span class="eyebrow">25 chapters &middot; free to read</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact" aria-labelledby="contact-title">
+      <div class="shell">
+        <div class="section-head">
+          <span class="eyebrow">Contact</span>
+          <h2 id="contact-title">Get in touch</h2>
+        </div>
+        <div class="panel contact-card">
+          <p>
+            Bug in one of the games, or something you want to ask? Email is the
+            fastest way to reach me &mdash; it comes straight to me, not a
+            support queue.
+          </p>
+          <a class="btn btn-primary" href="mailto:kamshu@nimritagames.com">kamshu@nimritagames.com</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <small>&copy; 2026 Nimrita Games</small>
+      <div class="footer-links">
+        <a href="/privacy/">Privacy</a>
+        <a href="/support/">Support</a>
+        <a href="mailto:kamshu@nimritagames.com">Email</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

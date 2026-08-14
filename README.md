@@ -1,94 +1,39 @@
-# Nimrita Games Website
+# nimritagames.com
 
-A modern, dynamic website built with React, TypeScript, and Vite.
+A one-person studio site. Static HTML and one stylesheet — no build step, no
+dependencies, no JavaScript. Open `index.html` in a browser and that is the
+site.
 
-## Features
-
-- **Fully Dynamic**: React-based components with state management
-- **Interactive Animations**: Scroll-triggered animations and interactive elements
-- **Responsive Design**: Mobile-first responsive layout
-- **TypeScript**: Full type safety throughout the application
-- **Form Handling**: Email subscription with persistent state
-- **Performance Optimized**: Vite build system for fast development and optimized production builds
-
-## Project Structure
+## Layout
 
 ```
-src/
-├── sections/           # The page's content sections, in render order
-├── components/         # Site chrome (Navigation, Footer)
-├── pages/              # Route-level components
-├── hooks/              # Custom React hooks
-├── context/            # React context for state management
-├── types/              # TypeScript type definitions
-├── data/               # Static content and configuration
-└── index.css           # Global styles
+index.html           the homepage
+design-system.css    the ONLY stylesheet — palette, scales, every component
+privacy/             privacy policy   (required by Google Play)
+support/             support page     (required by Google Play)
+brand/logo.jpg       logo — also the favicon and social image
+CNAME                custom domain
 
-public/                 # Copied verbatim into dist/ at build time
-├── CNAME               # Custom domain (nimritagames.com)
-├── flowui/             # Standalone site -> /flowui/
-├── infinite-runner/    # Standalone site -> /infinite-runner/
-└── Infinite_Runners/   # Redirect stub -> /infinite-runner/
+flowui/              standalone site -> /flowui/
+infinite-runner/     standalone site -> /infinite-runner/
+Infinite_Runners/    redirect stub to /infinite-runner/ — keeps old links alive
 ```
 
-### Standalone sites under `public/`
+`flowui/` and `infinite-runner/` are self-contained sites unrelated to the
+homepage. They are reached by direct URL and are not linked from it.
 
-`flowui/` and `infinite-runner/` are self-contained static sites unrelated to
-the React app. They live in `public/` so Vite copies them into `dist/`
-untouched. They are not linked from the main site — they are reached by direct
-URL only.
+## Editing
 
-`Infinite_Runners/` holds only a redirect stub. The guide originally shipped at
-that path, so the stub keeps existing links working; do not delete it.
+**Adding a game** — the only routine change. Open `index.html`, find the
+`#games` section, and follow the comment there: delete the empty-state panel
+and add one `.game` article per game, newest first. Nothing else changes.
 
-### Section naming
+**Anything visual** — change it in `design-system.css` and nowhere else. Its
+header sets the rules: one fixed palette, spacing and type on their scales,
+shadows with no blur, and contrast ratios that have been measured. Read it
+before changing a colour.
 
-A section's directory name, component name, `id`, and CSS class must all match
-(`sections/Projects.tsx` → `id="projects"` → `.projects`), and the navigation
-entry in `components/Navigation.tsx` must reference that same `id`.
+## Deploying
 
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## Deployment
-
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs
-`npm run build` and publishes `dist/` to GitHub Pages. Build output is never
-committed — do not commit `dist/` or a prebuilt `assets/` directory, and do not
-point `index.html` at a hashed bundle. Its only entry is `/src/main.tsx`.
-
-This requires the repository's **Settings → Pages → Source** to be set to
-**GitHub Actions** (not "Deploy from a branch").
-
-## Key Features Implemented
-
-1. **Modern Development Environment**: Vite + React + TypeScript
-2. **Component Architecture**: Modular, reusable components
-3. **Dynamic Content Management**: Centralized content system with TypeScript types
-4. **Interactive Features**: Animated counters, scroll animations, form handling
-5. **Single Page Application**: React Router for navigation
-6. **State Management**: React Context with persistent localStorage
-7. **Build Process**: Optimized production builds with code splitting
-
-## Technologies Used
-
-- **Frontend**: React 19, TypeScript, Vite
-- **Routing**: React Router DOM
-- **Styling**: CSS with custom properties and responsive design
-- **Build Tool**: Vite
-- **Type Checking**: TypeScript with strict mode
-
-The website is now fully dynamic and ready for deployment!
+Push to `main`. GitHub Pages serves the repository root directly, so whatever
+is committed is what is live. There is nothing to build.
