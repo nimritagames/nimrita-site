@@ -264,23 +264,15 @@ code { font-family: var(--mono); font-size: 0.9em; }
   color: var(--text);
   text-decoration: none;
 }
-/* The Om from the logo, framed like an app icon — apt for a studio whose
-   work ships on a store. Cropped with background-size/position rather than
-   by cutting a second asset, so there is one logo file to maintain. */
+/* The Om, transparent and trimmed to its own bounding box. No frame: the
+   mark carries its own black outline, and boxing it would double that. */
 .brand-mark {
-  width: 1.75rem;
-  height: 1.75rem;
-  border: 2px solid var(--line);
-  border-radius: var(--r-sm);
-  background-color: var(--bg);
-  background-image: url("/brand/logo.jpg");
-  /* The Om occupies x 0.050–0.349, y 0.360–0.663 of logo.jpg (measured).
-     A 0.35-wide window at 286% frames it with a little air; the position
-     percentages centre that window on the mark. */
-  background-size: 286% 286%;
-  background-position: 3.8% 51.8%;
+  width: 1.9rem;
+  height: 1.9rem;
+  background-image: url("/brand/mark-180.png");
+  background-size: contain;
+  background-position: center;
   background-repeat: no-repeat;
-  box-shadow: var(--cel-in);
   flex: none;
 }
 .nav-links { display: flex; gap: var(--s4); align-items: center; }
