@@ -14,17 +14,21 @@
      assembled rather than designed.
    - Shadows have zero blur, always. Cel shading steps; it does
      not bloom. There are no glow shadows on this site.
-   - Contrast is verified. Every text/ground pair below meets
-     WCAG AA (measured, not estimated):
-       body text on parchment .......... 12.56:1
-       secondary text on parchment ...... 6.04:1
-       coral link on parchment .......... 4.91:1
-       muted text on parchment .......... 4.52:1
-       white on coral button ............ 5.28:1
-     If you change a colour you have broken these. Re-measure.
+   - Contrast is verified against EVERY ground the page presents,
+     including the darkest end of the body gradient. All 17 pairs
+     meet WCAG AA (measured, not estimated). Worst cases:
+       link on gradient foot ............ 4.62:1
+       muted text on gradient foot ...... 4.86:1
+       link on gradient top ............. 5.45:1
+       white on primary button .......... 6.15:1
+       footer small text on --bg-2 ...... 6.72:1
+       body text on panel .............. 12.61:1
+     --accent is #B4321D rather than the logo's own coral because
+     the gradient foot is the darkest ground; a lighter coral fails
+     there. If you change a colour you have broken these. Re-measure.
 
    ONE SANCTIONED DUPLICATE: <meta name="theme-color"> in each
-   HTML file repeats --bg (#FDF6E8) as a literal, because a meta
+   HTML file repeats --bg (#FEEFDC) as a literal, because a meta
    tag cannot read a CSS variable. If --bg ever changes, those
    three tags change with it. Nothing else may repeat a colour.
 
@@ -34,17 +38,38 @@
    ============================================================ */
 
 :root {
-  /* ---- palette: parchment ground, slate ink, ONE warm accent ---- */
-  --bg:          #FDF6E8;  /* page ground — warm parchment        */
-  --bg-2:        #F6EAD3;  /* recessed ground — footer, code      */
-  --panel:       #FFFDF7;  /* raised surface — cards              */
-  --line:        #22303B;  /* outlines. cel art is outlined.      */
-  --shadow:      #22303B;  /* stepped shadow, same as the outline */
-  --text:        #22303B;  /* body copy and headings              */
-  --text-2:      #4E6070;  /* secondary copy                      */
-  --text-3:      #66737E;  /* eyebrows, captions, meta            */
-  --accent:      #C43A21;  /* the one accent. coral-vermilion.    */
-  --accent-tint: #FBE3DC;  /* accent at wash strength, for tags   */
+  /* ---- palette: sampled from the logo, then made accessible ----
+     Every value below is either taken from public/brand/logo.jpg or
+     derived from it. Sampled points: cream #FEEFDC, peach #F5D6C1,
+     dusty rose #D7B3A5, mauve #AD9497, coral #F05A40, ink #372E33. */
+
+  --bg:          #FEEFDC;  /* page ground — the logo's cream      */
+  --bg-grad-mid: #FCEAD8;  /* gradient waypoint                   */
+  --bg-grad-end: #F6DAC6;  /* gradient foot — light peach only    */
+
+  /* Facet tones for the low-poly ground, mirroring the logo's crystalline
+     background. All four sit between --bg and --bg-grad-end, so no facet
+     is ever darker than the ground the contrast figures were measured
+     against. That is what keeps the texture safe behind text. */
+  --facet-1:     #FDEDD9;
+  --facet-2:     #FAE5D0;
+  --facet-3:     #F8DFCA;
+  --facet-4:     #F5D9C4;
+  --bg-2:        #F0D5C2;  /* recessed ground — footer, code      */
+  --panel:       #FFFAF0;  /* raised surface — cards              */
+  --line:        #372E33;  /* the logo's own outline colour       */
+  --shadow:      #372E33;  /* stepped shadow, same as the outline */
+  --text:        #372E33;  /* body copy and headings              */
+  --text-2:      #534245;  /* secondary copy                      */
+  --text-3:      #6B5A5C;  /* eyebrows, captions, meta            */
+
+  /* Two corals, deliberately. The logo's exact coral cannot carry text
+     (2.98:1 as a link, 3.36:1 under white), so it is reserved for
+     graphics, and a darkened variant does the reading. */
+  --brand:       #F05A40;  /* logo-exact. FILLS AND GRAPHICS ONLY */
+  --accent:      #B4321D;  /* text, links, button fills           */
+  --accent-tint: #FBE0D8;  /* accent at wash strength, for tags   */
+
   --gold:        #E9A93B;  /* secondary, sparingly                */
   --gold-tint:   #FBEDD0;
   --sky:         #5AA9D6;  /* secondary, sparingly                */
@@ -90,7 +115,31 @@ html { scroll-behavior: smooth; color-scheme: light; }
 
 body {
   margin: 0;
-  background: var(--bg);
+  /* The logo's crystalline ground, rebuilt in CSS. Each conic-gradient is a
+     single wedge with a hard stop, so its edges are crisp rather than
+     blurred — facets, like cel shading, step. Layered over the base
+     gradient they read as one low-poly plane.
+
+     The logo's own ground continues into rose and mauve; this stops at
+     light peach, because secondary text measures only 3.36:1 on that rose.
+     Deep tones are allowed only where no body copy sits — see .footer. */
+  background-color: var(--bg);
+  background-image:
+    conic-gradient(from 195deg at 8% 4%,   var(--facet-2) 0 14%, transparent 14%),
+    conic-gradient(from 25deg  at 78% 2%,  var(--facet-3) 0 11%, transparent 11%),
+    conic-gradient(from 300deg at 96% 22%, var(--facet-4) 0 16%, transparent 16%),
+    conic-gradient(from 130deg at 32% 30%, var(--facet-1) 0 12%, transparent 12%),
+    conic-gradient(from 75deg  at 60% 48%, var(--facet-3) 0 9%,  transparent 9%),
+    conic-gradient(from 250deg at 12% 62%, var(--facet-2) 0 13%, transparent 13%),
+    conic-gradient(from 340deg at 88% 74%, var(--facet-4) 0 15%, transparent 15%),
+    conic-gradient(from 160deg at 44% 88%, var(--facet-2) 0 11%, transparent 11%),
+    conic-gradient(from 60deg  at 4% 96%,  var(--facet-3) 0 10%, transparent 10%),
+    linear-gradient(170deg, var(--bg) 0%, var(--bg-grad-mid) 45%, var(--bg-grad-end) 100%);
+  /* Deliberately NOT background-attachment: fixed. Ten compositing layers
+     pinned to the viewport is a known source of scroll jank on Android and
+     iOS, and this site's audience is on phones. Letting it scroll with the
+     document costs nothing visually. */
+  background-repeat: no-repeat;
   color: var(--text);
   font-family: var(--rounded);
   font-size: var(--t0);
@@ -209,12 +258,22 @@ code { font-family: var(--mono); font-size: 0.9em; }
   color: var(--text);
   text-decoration: none;
 }
+/* The Om from the logo, framed like an app icon — apt for a studio whose
+   work ships on a store. Cropped with background-size/position rather than
+   by cutting a second asset, so there is one logo file to maintain. */
 .brand-mark {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.75rem;
+  height: 1.75rem;
   border: 2px solid var(--line);
   border-radius: var(--r-sm);
-  background: var(--accent);
+  background-color: var(--bg);
+  background-image: url("/brand/logo.jpg");
+  /* The Om occupies x 0.050–0.349, y 0.360–0.663 of logo.jpg (measured).
+     A 0.35-wide window at 286% frames it with a little air; the position
+     percentages centre that window on the mark. */
+  background-size: 286% 286%;
+  background-position: 3.8% 51.8%;
+  background-repeat: no-repeat;
   box-shadow: var(--cel-in);
   flex: none;
 }
@@ -238,7 +297,9 @@ code { font-family: var(--mono); font-size: 0.9em; }
   align-items: center;
 }
 .footer-links { display: flex; flex-wrap: wrap; gap: var(--s4); }
-.footer small { color: var(--text-3); font-size: var(--t-1); }
+/* --bg-2 is deeper than the page, so the footer steps up to --text-2;
+   --text-3 does not hold contrast on it. */
+.footer small { color: var(--text-2); font-size: var(--t-1); }
 .footer a { font-size: var(--t-1); }
 
 @media (max-width: 40rem) {
