@@ -30,12 +30,16 @@ The app uses a centralized state system via `AppContext`:
 
 #### Component Architecture
 - **Pages**: Top-level route components in `src/pages/`
-- **Components**: Reusable UI components in `src/components/`
+- **Sections**: The page's content sections in `src/sections/`, rendered in order by `HomePage`
+- **Components**: Site chrome (Navigation, Footer) in `src/components/`
 - **Hooks**: Custom hooks for reusable logic (`useLocalStorage`, `useScrollAnimation`)
 - **Context**: Global state management in `src/context/`
 
 #### Content Management
-- **Centralized content**: All site content defined in `src/data/content.ts`
+- **Partially centralized content**: `src/data/content.ts` is typed by `src/types/`, but only its
+  `projects` key is consumed (by `sections/Projects.tsx`). Every other section hardcodes its own
+  copy, so the remaining keys are dead and their values contradict what the page renders. Treat the
+  component as the source of truth until this is reconciled.
 - **Type safety**: Content structure enforced by TypeScript interfaces in `src/types/`
 - **Dynamic rendering**: Components consume typed content objects rather than hardcoded text
 
@@ -48,7 +52,8 @@ The app uses a centralized state system via `AppContext`:
 ### File Organization
 ```
 src/
-├── components/     # Reusable UI components (Navigation, Hero, etc.)
+├── sections/       # Page sections (Hero, Origin, Principles, Projects, Gallery, Contact)
+├── components/     # Site chrome (Navigation, Footer)
 ├── pages/         # Route-level components
 ├── hooks/         # Custom React hooks
 ├── context/       # React Context providers

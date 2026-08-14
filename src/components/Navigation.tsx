@@ -18,7 +18,7 @@ export const Navigation = () => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
 
-      const sections = ['origin', 'principles', 'services', 'worlds', 'contact']
+      const sections = ['origin', 'principles', 'projects', 'gallery', 'contact']
       const current = sections.find(section => {
         const element = document.getElementById(section)
         if (element) {
@@ -38,8 +38,8 @@ export const Navigation = () => {
   const navItems = [
     { id: 'origin', label: 'ORIGIN', sublabel: 'Our Story' },
     { id: 'principles', label: 'CORE', sublabel: 'Principles' },
-    { id: 'services', label: 'GAMES', sublabel: 'Projects' },
-    { id: 'worlds', label: 'GALLERY', sublabel: 'Visuals' },
+    { id: 'projects', label: 'GAMES', sublabel: 'Projects' },
+    { id: 'gallery', label: 'GALLERY', sublabel: 'Visuals' },
     { id: 'contact', label: 'CONNECT', sublabel: 'Contact' }
   ]
 

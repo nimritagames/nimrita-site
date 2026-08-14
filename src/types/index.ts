@@ -20,7 +20,7 @@ export interface OriginContent {
   title: string
   subtitle: string
   lead: string
-  promises: Promise[]
+  promises: OriginPromise[]
   metrics: Metric[]
   photo: {
     src: string
@@ -29,7 +29,7 @@ export interface OriginContent {
   }
 }
 
-export interface Promise {
+export interface OriginPromise {
   text: string
 }
 

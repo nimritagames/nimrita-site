@@ -41,9 +41,9 @@ const scrollToContact = () => {
   }
 }
 
-export const Services = () => {
+export const Projects = () => {
   return (
-    <section id="services" aria-labelledby="projects-title" className="services">
+    <section id="projects" aria-labelledby="projects-title" className="projects">
       <div className="container">
         <span className="kicker">Chapter 03 — Projects</span>
         <h2 className="section-title" id="projects-title">What we're building</h2>

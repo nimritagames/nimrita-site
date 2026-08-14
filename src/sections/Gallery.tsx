@@ -19,7 +19,7 @@ const MoodImage = ({ src, alt, caption }: MoodProps) => (
   </figure>
 )
 
-export const Worlds = () => {
+export const Gallery = () => {
   const moods = [
     {
       src: 'https://images.unsplash.com/photo-1496284427489-f59461d8a8e6?w=1200&q=80',
@@ -54,10 +54,10 @@ export const Worlds = () => {
   ]
 
   return (
-    <section id="worlds" className="worlds" aria-labelledby="worlds-title">
+    <section id="gallery" className="gallery" aria-labelledby="gallery-title">
       <div className="container">
         <span className="kicker">Chapter 04 — Worlds</span>
-        <h2 className="section-title" id="worlds-title">Atmosphere previews</h2>
+        <h2 className="section-title" id="gallery-title">Atmosphere previews</h2>
         <p className="lead">
           Not announcements—just signals. The kinds of places we love to build.
         </p>

@@ -15,14 +15,37 @@ A modern, dynamic website built with React, TypeScript, and Vite.
 
 ```
 src/
-├── components/          # Reusable React components
-├── pages/              # Page components
+├── sections/           # The page's content sections, in render order
+├── components/         # Site chrome (Navigation, Footer)
+├── pages/              # Route-level components
 ├── hooks/              # Custom React hooks
 ├── context/            # React context for state management
 ├── types/              # TypeScript type definitions
 ├── data/               # Static content and configuration
 └── index.css           # Global styles
+
+public/                 # Copied verbatim into dist/ at build time
+├── CNAME               # Custom domain (nimritagames.com)
+├── flowui/             # Standalone site -> /flowui/
+├── infinite-runner/    # Standalone site -> /infinite-runner/
+└── Infinite_Runners/   # Redirect stub -> /infinite-runner/
 ```
+
+### Standalone sites under `public/`
+
+`flowui/` and `infinite-runner/` are self-contained static sites unrelated to
+the React app. They live in `public/` so Vite copies them into `dist/`
+untouched. They are not linked from the main site — they are reached by direct
+URL only.
+
+`Infinite_Runners/` holds only a redirect stub. The guide originally shipped at
+that path, so the stub keeps existing links working; do not delete it.
+
+### Section naming
+
+A section's directory name, component name, `id`, and CSS class must all match
+(`sections/Projects.tsx` → `id="projects"` → `.projects`), and the navigation
+entry in `components/Navigation.tsx` must reference that same `id`.
 
 ## Development
 
@@ -39,6 +62,16 @@ npm run build
 # Preview production build
 npm run preview
 ```
+
+## Deployment
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs
+`npm run build` and publishes `dist/` to GitHub Pages. Build output is never
+committed — do not commit `dist/` or a prebuilt `assets/` directory, and do not
+point `index.html` at a hashed bundle. Its only entry is `/src/main.tsx`.
+
+This requires the repository's **Settings → Pages → Source** to be set to
+**GitHub Actions** (not "Deploy from a branch").
 
 ## Key Features Implemented
 
