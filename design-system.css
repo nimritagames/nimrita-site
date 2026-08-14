@@ -269,7 +269,7 @@ code { font-family: var(--mono); font-size: 0.9em; }
 .brand-mark {
   width: 1.9rem;
   height: 1.9rem;
-  background-image: url("/brand/mark-180.png");
+  background-image: url("/brand/mark.svg");
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
